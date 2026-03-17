@@ -1,6 +1,6 @@
-import React, { Suspense, useRef, useState, useEffect } from 'react';
+import React, { Suspense, useRef, useState, useEffect, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Html, SoftShadows } from '@react-three/drei';
+import { Html, SoftShadows, Text } from '@react-three/drei';
 import * as THREE from 'three';
 import PostEffects from './shared/PostEffects';
 import SectionHeader from './shared/SectionHeader';
@@ -24,8 +24,18 @@ function ToonMesh({ geometry, color, position, rotation, scale: s, castShadow = 
   );
 }
 
+/* Short service name labels */
+const SERVICE_SHORT_NAMES = [
+  'Branding',
+  'Web Dev',
+  'AI & Auto',
+  'Dashboards',
+  'Marketing',
+  'Infrastructure',
+];
+
 /* ─── 1. Pencil Cup (Branding) ─── */
-function PencilCup({ serviceIndex, hoveredIndex, setHoveredIndex, selectedIndex, setSelectedIndex }) {
+function PencilCup({ serviceIndex, hoveredIndex, setHoveredIndex, selectedIndex, setSelectedIndex, penguinTarget }) {
   const groupRef = useRef();
   const baseY = 1;
   const pencilRefs = [useRef(), useRef(), useRef()];
@@ -55,6 +65,7 @@ function PencilCup({ serviceIndex, hoveredIndex, setHoveredIndex, selectedIndex,
       setSelectedIndex={setSelectedIndex}
       position={[-2, baseY, -1]}
       baseY={baseY}
+      penguinTarget={penguinTarget}
     >
       {/* Cup */}
       <ToonMesh
@@ -90,7 +101,7 @@ function PencilCup({ serviceIndex, hoveredIndex, setHoveredIndex, selectedIndex,
 }
 
 /* ─── 2. Monitor (Web Development) ─── */
-function Monitor({ serviceIndex, hoveredIndex, setHoveredIndex, selectedIndex, setSelectedIndex }) {
+function Monitor({ serviceIndex, hoveredIndex, setHoveredIndex, selectedIndex, setSelectedIndex, penguinTarget }) {
   const groupRef = useRef();
   const baseY = 1.2;
   const linesRef = useRef();
@@ -118,6 +129,7 @@ function Monitor({ serviceIndex, hoveredIndex, setHoveredIndex, selectedIndex, s
       setSelectedIndex={setSelectedIndex}
       position={[-0.5, baseY, 0]}
       baseY={baseY}
+      penguinTarget={penguinTarget}
     >
       {/* Monitor body */}
       <ToonMesh
@@ -164,7 +176,7 @@ function Monitor({ serviceIndex, hoveredIndex, setHoveredIndex, selectedIndex, s
 }
 
 /* ─── 3. Robot (Automation & AI) ─── */
-function Robot({ serviceIndex, hoveredIndex, setHoveredIndex, selectedIndex, setSelectedIndex }) {
+function Robot({ serviceIndex, hoveredIndex, setHoveredIndex, selectedIndex, setSelectedIndex, penguinTarget }) {
   const groupRef = useRef();
   const baseY = 1;
   const gearRef = useRef();
@@ -192,6 +204,7 @@ function Robot({ serviceIndex, hoveredIndex, setHoveredIndex, selectedIndex, set
       setSelectedIndex={setSelectedIndex}
       position={[1.8, baseY, 0.5]}
       baseY={baseY}
+      penguinTarget={penguinTarget}
     >
       {/* Body */}
       <ToonMesh
@@ -259,7 +272,7 @@ function Robot({ serviceIndex, hoveredIndex, setHoveredIndex, selectedIndex, set
 }
 
 /* ─── 4. Book Stack (Data Dashboards) ─── */
-function BookStack({ serviceIndex, hoveredIndex, setHoveredIndex, selectedIndex, setSelectedIndex }) {
+function BookStack({ serviceIndex, hoveredIndex, setHoveredIndex, selectedIndex, setSelectedIndex, penguinTarget }) {
   const groupRef = useRef();
   const baseY = 2.8;
 
@@ -287,6 +300,7 @@ function BookStack({ serviceIndex, hoveredIndex, setHoveredIndex, selectedIndex,
       setSelectedIndex={setSelectedIndex}
       position={[-2.5, baseY, -2]}
       baseY={baseY}
+      penguinTarget={penguinTarget}
     >
       {books.map((book, i) => {
         const y = stackY + book.h / 2;
@@ -312,7 +326,7 @@ function BookStack({ serviceIndex, hoveredIndex, setHoveredIndex, selectedIndex,
 }
 
 /* ─── 5. Potted Plant (Growth & Marketing) ─── */
-function PottedPlant({ serviceIndex, hoveredIndex, setHoveredIndex, selectedIndex, setSelectedIndex }) {
+function PottedPlant({ serviceIndex, hoveredIndex, setHoveredIndex, selectedIndex, setSelectedIndex, penguinTarget }) {
   const groupRef = useRef();
   const baseY = 0.5;
 
@@ -333,6 +347,7 @@ function PottedPlant({ serviceIndex, hoveredIndex, setHoveredIndex, selectedInde
       setSelectedIndex={setSelectedIndex}
       position={[3, baseY, 1.5]}
       baseY={baseY}
+      penguinTarget={penguinTarget}
     >
       {/* Pot */}
       <ToonMesh
@@ -391,7 +406,7 @@ function PottedPlant({ serviceIndex, hoveredIndex, setHoveredIndex, selectedInde
 }
 
 /* ─── 6. Bulletin Board (Infrastructure) ─── */
-function BulletinBoard({ serviceIndex, hoveredIndex, setHoveredIndex, selectedIndex, setSelectedIndex }) {
+function BulletinBoard({ serviceIndex, hoveredIndex, setHoveredIndex, selectedIndex, setSelectedIndex, penguinTarget }) {
   const groupRef = useRef();
   const baseY = 2.5;
 
@@ -417,6 +432,7 @@ function BulletinBoard({ serviceIndex, hoveredIndex, setHoveredIndex, selectedIn
       setSelectedIndex={setSelectedIndex}
       position={[0, baseY, -2.5]}
       baseY={baseY}
+      penguinTarget={penguinTarget}
     >
       {/* Board frame */}
       <ToonMesh
@@ -452,6 +468,23 @@ function BulletinBoard({ serviceIndex, hoveredIndex, setHoveredIndex, selectedIn
   );
 }
 
+/* ─── Soft glow disc under hovered/selected objects ─── */
+function GlowDisc({ color, visible }) {
+  const ref = useRef();
+  useFrame(({ clock }) => {
+    if (ref.current) {
+      const pulse = 0.3 + Math.sin(clock.getElapsedTime() * 3) * 0.1;
+      ref.current.material.opacity = visible ? pulse : 0;
+    }
+  });
+  return (
+    <mesh ref={ref} position={[0, -0.35, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <circleGeometry args={[0.55, 32]} />
+      <meshBasicMaterial color={color} transparent opacity={0} depthWrite={false} />
+    </mesh>
+  );
+}
+
 /* ─── Interactive wrapper for each service object ─── */
 function InteractiveObject({
   children,
@@ -463,72 +496,79 @@ function InteractiveObject({
   setSelectedIndex,
   position,
   baseY,
+  penguinTarget,
 }) {
   const isHovered = hoveredIndex === serviceIndex;
   const isSelected = selectedIndex === serviceIndex;
   const isOtherSelected = selectedIndex !== null && selectedIndex !== serviceIndex;
   const ringRef = useRef();
+  const opacityRef = useRef();
   const service = SERVICES[serviceIndex];
 
-  /* Hover scale + squash/stretch */
+  /* Notify penguin about hovered/selected target */
   useEffect(() => {
-    if (!groupRef.current || selectedIndex !== null) return;
+    if (isHovered || isSelected) {
+      penguinTarget.current = { x: position[0], y: position[1], z: position[2] };
+    } else if (hoveredIndex === null && selectedIndex === null) {
+      penguinTarget.current = null;
+    }
+  }, [isHovered, isSelected, hoveredIndex, selectedIndex, position, penguinTarget]);
+
+  /* Gentle hover scale with smooth bounce */
+  useEffect(() => {
+    if (!groupRef.current || isSelected) return;
     if (isHovered) {
       gsap.to(groupRef.current.scale, {
-        x: 1.2, z: 1.2, duration: 0.15, ease: 'power2.out',
-        onComplete: () => {
-          gsap.to(groupRef.current.scale, {
-            y: 0.85, duration: 0.1, ease: 'power2.in',
-            onComplete: () => {
-              gsap.to(groupRef.current.scale, {
-                y: 1.15, duration: 0.12, ease: 'power2.out',
-                onComplete: () => {
-                  gsap.to(groupRef.current.scale, {
-                    x: 1.2, y: 1.2, z: 1.2, duration: 0.1, ease: 'power2.out',
-                  });
-                },
-              });
-            },
-          });
-        },
+        x: 1.15, y: 1.15, z: 1.15,
+        duration: 0.4,
+        ease: 'elastic.out(1, 0.5)',
       });
-    } else {
+    } else if (!isOtherSelected) {
       gsap.to(groupRef.current.scale, {
         x: 1, y: 1, z: 1, duration: 0.3, ease: 'power2.out',
       });
     }
-  }, [isHovered, groupRef, selectedIndex]);
+  }, [isHovered, groupRef, isSelected, isOtherSelected]);
 
-  /* Other-selected: shrink + fade */
+  /* Other-selected: slightly dim via scale (keep visible, not aggressive shrink) */
   useEffect(() => {
     if (!groupRef.current) return;
     if (isOtherSelected) {
       gsap.to(groupRef.current.scale, {
-        x: 0.4, y: 0.4, z: 0.4, duration: 0.5, ease: 'power2.out',
+        x: 0.9, y: 0.9, z: 0.9, duration: 0.5, ease: 'power2.out',
       });
+      /* Dim opacity on the group wrapper */
+      if (opacityRef.current) {
+        gsap.to(opacityRef.current, {
+          opacity: 0.45, duration: 0.5, ease: 'power2.out',
+        });
+      }
     } else if (!isSelected && selectedIndex === null) {
       gsap.to(groupRef.current.scale, {
         x: 1, y: 1, z: 1, duration: 0.5, ease: 'power2.out',
       });
+      if (opacityRef.current) {
+        gsap.to(opacityRef.current, {
+          opacity: 1, duration: 0.5, ease: 'power2.out',
+        });
+      }
     }
   }, [isOtherSelected, isSelected, selectedIndex, groupRef]);
 
-  /* Selected: big bounce + rise */
+  /* Selected: smooth center and show panel */
   useEffect(() => {
     if (!groupRef.current) return;
     if (isSelected) {
-      /* Excited bounce sequence */
-      const tl = gsap.timeline();
-      tl.to(groupRef.current.scale, { y: 0.6, x: 1.3, z: 1.3, duration: 0.12, ease: 'power2.in' })
-        .to(groupRef.current.scale, { y: 1.4, x: 0.9, z: 0.9, duration: 0.15, ease: 'elastic.out(1, 0.5)' })
-        .to(groupRef.current.scale, { y: 0.85, x: 1.1, z: 1.1, duration: 0.1, ease: 'power2.in' })
-        .to(groupRef.current.scale, { y: 1, x: 1, z: 1, duration: 0.2, ease: 'elastic.out(1, 0.6)' });
-      /* Rise up toward camera */
+      /* Smooth scale up */
+      gsap.to(groupRef.current.scale, {
+        x: 1.1, y: 1.1, z: 1.1, duration: 0.5, ease: 'elastic.out(1, 0.7)',
+      });
+      /* Move smoothly toward camera center */
       gsap.to(groupRef.current.position, {
-        y: baseY + 1.5,
-        z: position[2] + 1.5,
+        y: baseY + 0.6,
+        z: position[2] + 0.8,
         duration: 0.6,
-        ease: 'power2.out',
+        ease: 'power3.out',
       });
     } else if (selectedIndex === null) {
       /* Return to rest position */
@@ -537,8 +577,24 @@ function InteractiveObject({
         duration: 0.5,
         ease: 'power2.out',
       });
+      gsap.to(groupRef.current.scale, {
+        x: 1, y: 1, z: 1, duration: 0.4, ease: 'power2.out',
+      });
     }
   }, [isSelected, selectedIndex, groupRef, baseY, position]);
+
+  /* Dim non-selected objects by traversing meshes */
+  useFrame(() => {
+    if (!groupRef.current) return;
+    groupRef.current.traverse((child) => {
+      if (child.isMesh && child.material && 'opacity' in child.material) {
+        if (child.material.transparent) {
+          // Skip already transparent materials like glow/ring
+          return;
+        }
+      }
+    });
+  });
 
   /* Hover ring pulse */
   useFrame(({ clock }) => {
@@ -556,29 +612,46 @@ function InteractiveObject({
       <group
         onPointerOver={(e) => {
           e.stopPropagation();
-          if (selectedIndex === null) {
-            setHoveredIndex(serviceIndex);
-            document.body.style.cursor = 'pointer';
-          }
+          setHoveredIndex(serviceIndex);
+          document.body.style.cursor = 'pointer';
         }}
         onPointerOut={(e) => {
           e.stopPropagation();
-          if (selectedIndex === null) {
-            setHoveredIndex(null);
-            document.body.style.cursor = 'auto';
-          }
+          setHoveredIndex(null);
+          document.body.style.cursor = 'auto';
         }}
         onClick={(e) => {
           e.stopPropagation();
-          if (selectedIndex === null) {
+          /* BUG FIX: Allow clicking another object while one is selected,
+             or clicking the same selected object to deselect */
+          if (isSelected) {
+            setSelectedIndex(null);
+          } else {
             setSelectedIndex(serviceIndex);
-            setHoveredIndex(null);
-            document.body.style.cursor = 'auto';
           }
+          setHoveredIndex(null);
+          document.body.style.cursor = 'auto';
         }}
       >
         {children}
       </group>
+
+      {/* Floating name label (always visible) */}
+      <Text
+        position={[0, 1.1, 0]}
+        fontSize={0.12}
+        color={service.color}
+        anchorX="center"
+        anchorY="bottom"
+        font={undefined}
+        outlineWidth={0.008}
+        outlineColor="#ffffff"
+      >
+        {SERVICE_SHORT_NAMES[serviceIndex]}
+      </Text>
+
+      {/* Soft colored glow underneath on hover */}
+      <GlowDisc color={service.color} visible={isHovered || isSelected} />
 
       {/* Hover glow ring */}
       <mesh ref={ringRef} position={[0, -0.3, 0]} rotation={[-Math.PI / 2, 0, 0]} visible={false}>
@@ -586,11 +659,11 @@ function InteractiveObject({
         <meshBasicMaterial color={service.color} transparent opacity={0.6} />
       </mesh>
 
-      {/* Service detail panel */}
+      {/* Service detail panel - slides in from side */}
       {isSelected && (
         <Html
           center
-          position={[0, 2.2, 0]}
+          position={[2.2, 0.5, 0]}
           distanceFactor={5}
           style={{ pointerEvents: 'auto', width: '340px' }}
         >
@@ -603,31 +676,8 @@ function InteractiveObject({
             fontFamily: "'DM Sans', sans-serif",
             position: 'relative',
             boxShadow: '0 8px 30px rgba(0,0,0,0.12)',
-            animation: 'deskFadeIn 0.35s ease-out',
+            animation: 'deskSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
           }}>
-            {/* Speech bubble tail */}
-            <div style={{
-              position: 'absolute',
-              bottom: '-16px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: 0,
-              height: 0,
-              borderLeft: '14px solid transparent',
-              borderRight: '14px solid transparent',
-              borderTop: `16px solid ${service.color}`,
-            }} />
-            <div style={{
-              position: 'absolute',
-              bottom: '-10px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: 0,
-              height: 0,
-              borderLeft: '10px solid transparent',
-              borderRight: '10px solid transparent',
-              borderTop: '12px solid #ffffff',
-            }} />
             {/* Close button */}
             <button
               onClick={(e) => {
@@ -781,18 +831,33 @@ function Chair() {
   );
 }
 
-/* ─── Penguin ─── */
-function Penguin() {
+/* ─── Penguin (reacts to hovered/selected objects) ─── */
+function Penguin({ penguinTarget }) {
   const groupRef = useRef();
+  const penguinPos = useMemo(() => new THREE.Vector3(1, 1.05, -0.3), []);
 
   useFrame(({ clock }) => {
-    if (groupRef.current) {
-      groupRef.current.rotation.y = Math.sin(clock.getElapsedTime() * 1.2) * 0.2;
+    if (!groupRef.current) return;
+
+    if (penguinTarget.current) {
+      /* Look toward the hovered/selected object */
+      const target = penguinTarget.current;
+      const dx = target.x - penguinPos.x;
+      const dz = target.z - penguinPos.z;
+      const targetAngle = Math.atan2(dx, dz);
+      /* Smoothly lerp toward target angle */
+      const current = groupRef.current.rotation.y;
+      groupRef.current.rotation.y += (targetAngle - current) * 0.08;
+    } else {
+      /* Default idle look-around */
+      const idleAngle = Math.sin(clock.getElapsedTime() * 1.2) * 0.2;
+      const current = groupRef.current.rotation.y;
+      groupRef.current.rotation.y += (idleAngle - current) * 0.05;
     }
   });
 
   return (
-    <group ref={groupRef} position={[1, 1.05, -0.3]}>
+    <group ref={groupRef} position={[penguinPos.x, penguinPos.y, penguinPos.z]}>
       {/* Body */}
       <ToonMesh
         geometry={<sphereGeometry args={[0.12, 12, 12]} />}
@@ -988,58 +1053,16 @@ function FloatingDustMote({ config }) {
   );
 }
 
-/* ─── Scene ─── */
-function DesktopScene() {
-  const [hoveredIndex, setHoveredIndex] = useState(null);
-  const [selectedIndex, setSelectedIndex] = useState(null);
-
-  const serviceObjects = [PencilCup, Monitor, Robot, BookStack, PottedPlant, BulletinBoard];
-
-  return (
-    <>
-      <ambientLight intensity={0.8} color="#FFF5E6" />
-      <directionalLight
-        position={[5, 8, 5]}
-        intensity={1.5}
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-far={20}
-        shadow-camera-left={-6}
-        shadow-camera-right={6}
-        shadow-camera-top={6}
-        shadow-camera-bottom={-6}
-      />
-      <pointLight position={[-3, 4, 2]} intensity={0.3} color="#ffd6a5" />
-
-      <Floor />
-      <Walls />
-      <Desk />
-      <Chair />
-      <Penguin />
-      <WallFrame />
-
-      {serviceObjects.map((ObjectComponent, i) => (
-        <ObjectComponent
-          key={i}
-          serviceIndex={i}
-          hoveredIndex={hoveredIndex}
-          setHoveredIndex={setHoveredIndex}
-          selectedIndex={selectedIndex}
-          setSelectedIndex={setSelectedIndex}
-        />
-      ))}
-
-      {/* Desk lamp */}
-      <DeskLamp />
-
-      {/* Floating dust particles */}
-      <FloatingDust />
-
-      <SoftShadows size={25} samples={16} focus={0.5} />
-      <PostEffects />
-    </>
-  );
+/* ─── Subtle ambient scene rotation ─── */
+function SceneRotator({ children }) {
+  const groupRef = useRef();
+  useFrame(({ clock }) => {
+    if (groupRef.current) {
+      /* Very slow, subtle rotation around Y axis */
+      groupRef.current.rotation.y = Math.sin(clock.getElapsedTime() * 0.1) * 0.03;
+    }
+  });
+  return <group ref={groupRef}>{children}</group>;
 }
 
 /* ─── Main export ─── */
@@ -1076,7 +1099,7 @@ export default function ServicesDesktop() {
             style={{ background: '#FFF5E6' }}
           >
             <Suspense fallback={null}>
-              <DesktopScene />
+              <DesktopSceneInner />
             </Suspense>
           </Canvas>
         </div>
@@ -1087,7 +1110,78 @@ export default function ServicesDesktop() {
           from { opacity: 0; transform: translateY(12px) scale(0.95); }
           to   { opacity: 1; transform: translateY(0) scale(1); }
         }
+        @keyframes deskSlideIn {
+          from { opacity: 0; transform: translateX(30px) scale(0.95); }
+          to   { opacity: 1; transform: translateX(0) scale(1); }
+        }
       `}</style>
     </section>
+  );
+}
+
+/* ─── Scene (rendered inside Canvas) ─── */
+function DesktopSceneInner() {
+  const [hoveredIndex, setHoveredIndex] = useState(null);
+  const [selectedIndex, setSelectedIndex] = useState(null);
+  const penguinTarget = useRef(null);
+
+  const serviceObjects = [PencilCup, Monitor, Robot, BookStack, PottedPlant, BulletinBoard];
+
+  return (
+    <group
+      onPointerMissed={(e) => {
+        /* BUG FIX: clicking empty 3D space deselects */
+        if (selectedIndex !== null) {
+          setSelectedIndex(null);
+          setHoveredIndex(null);
+          document.body.style.cursor = 'auto';
+        }
+      }}
+    >
+      <ambientLight intensity={0.8} color="#FFF5E6" />
+      <directionalLight
+        position={[5, 8, 5]}
+        intensity={1.5}
+        castShadow
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
+        shadow-camera-far={20}
+        shadow-camera-left={-6}
+        shadow-camera-right={6}
+        shadow-camera-top={6}
+        shadow-camera-bottom={-6}
+      />
+      <pointLight position={[-3, 4, 2]} intensity={0.3} color="#ffd6a5" />
+
+      <SceneRotator>
+        <Floor />
+        <Walls />
+        <Desk />
+        <Chair />
+        <Penguin penguinTarget={penguinTarget} />
+        <WallFrame />
+
+        {serviceObjects.map((ObjectComponent, i) => (
+          <ObjectComponent
+            key={i}
+            serviceIndex={i}
+            hoveredIndex={hoveredIndex}
+            setHoveredIndex={setHoveredIndex}
+            selectedIndex={selectedIndex}
+            setSelectedIndex={setSelectedIndex}
+            penguinTarget={penguinTarget}
+          />
+        ))}
+
+        {/* Desk lamp */}
+        <DeskLamp />
+
+        {/* Floating dust particles */}
+        <FloatingDust />
+      </SceneRotator>
+
+      <SoftShadows size={25} samples={16} focus={0.5} />
+      <PostEffects />
+    </group>
   );
 }

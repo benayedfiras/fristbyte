@@ -20,12 +20,14 @@ const DOORS = [
 
 const INITIAL_CAM = new THREE.Vector3(0, 1.6, 12);
 const INITIAL_LOOK = new THREE.Vector3(0, 1.6, -15);
+const BASE_FOG_COLOR = new THREE.Color('#050A18');
 
 /* ── Camera controller ── */
 function CameraController({ target, lookTarget }) {
   const { camera } = useThree();
   const posRef = useRef(INITIAL_CAM.clone());
   const lookRef = useRef(INITIAL_LOOK.clone());
+  const lookSmoothRef = useRef(INITIAL_LOOK.clone());
 
   useEffect(() => {
     posRef.current.copy(target);
@@ -33,8 +35,29 @@ function CameraController({ target, lookTarget }) {
   }, [target, lookTarget]);
 
   useFrame((_, delta) => {
-    damp3(camera.position, posRef.current, 0.25, delta);
-    camera.lookAt(lookRef.current);
+    damp3(camera.position, posRef.current, 0.18, delta);
+    /* Smooth the lookAt target too for cinematic feel */
+    lookSmoothRef.current.lerp(lookRef.current, 1 - Math.exp(-3.5 * delta));
+    camera.lookAt(lookSmoothRef.current);
+  });
+
+  return null;
+}
+
+/* ── Fog color controller ── */
+function FogController({ hoveredIndex }) {
+  const { scene } = useThree();
+  const targetColor = useRef(BASE_FOG_COLOR.clone());
+
+  useFrame((_, delta) => {
+    if (!scene.fog) return;
+    if (hoveredIndex !== null && hoveredIndex < SERVICES.length) {
+      const svcColor = new THREE.Color(SERVICES[hoveredIndex].color);
+      targetColor.current.copy(BASE_FOG_COLOR).lerp(svcColor, 0.08);
+    } else {
+      targetColor.current.copy(BASE_FOG_COLOR);
+    }
+    scene.fog.color.lerp(targetColor.current, 1 - Math.exp(-4 * delta));
   });
 
   return null;
@@ -87,6 +110,34 @@ function Floor() {
   );
 }
 
+/* ── Floor reflection light under each door ── */
+function FloorReflection({ doorConfig, color, isHovered }) {
+  const ref = useRef();
+
+  useFrame((_, delta) => {
+    if (!ref.current) return;
+    const target = isHovered ? 0.18 : 0.06;
+    ref.current.material.opacity += (target - ref.current.material.opacity) * (1 - Math.exp(-6 * delta));
+  });
+
+  return (
+    <mesh
+      ref={ref}
+      position={[doorConfig.x, 0.02, doorConfig.z]}
+      rotation={[-Math.PI / 2, 0, 0]}
+    >
+      <circleGeometry args={[1.2, 32]} />
+      <meshBasicMaterial
+        color={color}
+        transparent
+        opacity={0.06}
+        blending={THREE.AdditiveBlending}
+        depthWrite={false}
+      />
+    </mesh>
+  );
+}
+
 /* ── Walls and ceiling ── */
 function Hallway() {
   return (
@@ -110,12 +161,48 @@ function Hallway() {
   );
 }
 
+/* ── Instruction hint text ── */
+function InstructionHint() {
+  const ref = useRef();
+  const matRef = useRef();
+
+  useFrame(({ clock }) => {
+    if (!ref.current || !matRef.current) return;
+    const t = clock.getElapsedTime();
+    /* Fade in over 3 seconds, starting after 1s delay */
+    const fadeIn = Math.min(1, Math.max(0, (t - 1) / 3));
+    /* Gentle bob */
+    ref.current.position.y = 1.0 + Math.sin(t * 0.8) * 0.05;
+    matRef.current.opacity = fadeIn * (0.5 + Math.sin(t * 1.5) * 0.1);
+  });
+
+  return (
+    <Billboard>
+      <group ref={ref} position={[0, 1.0, 8]}>
+        <Text
+          fontSize={0.14}
+          color="#ffffff"
+          anchorX="center"
+          anchorY="middle"
+          maxWidth={4}
+          textAlign="center"
+        >
+          Hover the doors to peek inside
+          <meshBasicMaterial ref={matRef} transparent opacity={0} color="#ffffff" />
+        </Text>
+      </group>
+    </Billboard>
+  );
+}
+
 /* ── Portal door ── */
 function PortalDoor({ service, index, doorConfig, hoveredIndex, setHoveredIndex, onSelect, isSelected }) {
   const frameRef = useRef();
+  const burstRef = useRef();
   const isHovered = hoveredIndex === index;
   const rotY = doorConfig.side === 'left' ? Math.PI / 2 : -Math.PI / 2;
-  const openAngle = doorConfig.side === 'left' ? 0.4 : -0.4;
+  /* More dramatic open angle */
+  const openAngle = doorConfig.side === 'left' ? 0.75 : -0.75;
 
   /* Pulsing glow */
   useFrame(({ clock }) => {
@@ -127,10 +214,18 @@ function PortalDoor({ service, index, doorConfig, hoveredIndex, setHoveredIndex,
 
   /* Door swing angle */
   const doorRef = useRef();
-  useFrame(() => {
+  useFrame((_, delta) => {
     if (doorRef.current) {
       const target = isHovered ? openAngle : 0;
-      doorRef.current.rotation.y += (target - doorRef.current.rotation.y) * 0.08;
+      doorRef.current.rotation.y += (target - doorRef.current.rotation.y) * (1 - Math.exp(-5 * delta));
+    }
+  });
+
+  /* Light burst when door opens */
+  useFrame((_, delta) => {
+    if (burstRef.current) {
+      const targetIntensity = isHovered ? 4 : 0;
+      burstRef.current.intensity += (targetIntensity - burstRef.current.intensity) * (1 - Math.exp(-6 * delta));
     }
   });
 
@@ -147,6 +242,22 @@ function PortalDoor({ service, index, doorConfig, hoveredIndex, setHoveredIndex,
     return arr;
   }, []);
 
+  /* Shared event handlers for click area */
+  const handlePointerOver = (e) => {
+    e.stopPropagation();
+    setHoveredIndex(index);
+    document.body.style.cursor = 'pointer';
+  };
+  const handlePointerOut = (e) => {
+    e.stopPropagation();
+    setHoveredIndex(null);
+    document.body.style.cursor = 'auto';
+  };
+  const handleClick = (e) => {
+    e.stopPropagation();
+    onSelect(index);
+  };
+
   return (
     <group position={[doorConfig.x, 2, doorConfig.z]} rotation={[0, rotY, 0]}>
       {/* Glow plane behind door */}
@@ -160,8 +271,13 @@ function PortalDoor({ service, index, doorConfig, hoveredIndex, setHoveredIndex,
         />
       </mesh>
 
-      {/* Door frame glow */}
-      <mesh ref={frameRef}>
+      {/* Door frame glow - also clickable */}
+      <mesh
+        ref={frameRef}
+        onPointerOver={handlePointerOver}
+        onPointerOut={handlePointerOut}
+        onClick={handleClick}
+      >
         <planeGeometry args={[1.6, 2.8]} />
         <meshStandardMaterial
           color={service.color}
@@ -184,20 +300,9 @@ function PortalDoor({ service, index, doorConfig, hoveredIndex, setHoveredIndex,
       <group
         ref={doorRef}
         position={[-0.8, 0, 0]}
-        onPointerOver={(e) => {
-          e.stopPropagation();
-          setHoveredIndex(index);
-          document.body.style.cursor = 'pointer';
-        }}
-        onPointerOut={(e) => {
-          e.stopPropagation();
-          setHoveredIndex(null);
-          document.body.style.cursor = 'auto';
-        }}
-        onClick={(e) => {
-          e.stopPropagation();
-          onSelect(index);
-        }}
+        onPointerOver={handlePointerOver}
+        onPointerOut={handlePointerOut}
+        onClick={handleClick}
       >
         <mesh position={[0.8, 0, 0.02]}>
           <planeGeometry args={[1.5, 2.7]} />
@@ -210,15 +315,14 @@ function PortalDoor({ service, index, doorConfig, hoveredIndex, setHoveredIndex,
         </mesh>
       </group>
 
-      {/* Light spill when hovered */}
-      {isHovered && (
-        <pointLight
-          position={[0, 0, 0.5]}
-          color={service.color}
-          intensity={2}
-          distance={4}
-        />
-      )}
+      {/* Light burst when door opens */}
+      <pointLight
+        ref={burstRef}
+        position={[0, 0, 0.5]}
+        color={service.color}
+        intensity={0}
+        distance={6}
+      />
 
       {/* Icon above door */}
       <Billboard>
@@ -273,8 +377,9 @@ function PortalScene() {
   const camTarget = useMemo(() => {
     if (selectedIndex === null) return INITIAL_CAM.clone();
     const d = DOORS[selectedIndex];
-    const offsetX = d.side === 'left' ? -2 : 2;
-    return new THREE.Vector3(d.x * 0.4 + offsetX * 0.2, 1.6, d.z + 2);
+    /* "Step through" camera: move closer to door, offset to side, lower slightly */
+    const sideOffset = d.side === 'left' ? -1.5 : 1.5;
+    return new THREE.Vector3(d.x * 0.5 + sideOffset, 1.5, d.z + 0.8);
   }, [selectedIndex]);
 
   const lookTarget = useMemo(() => {
@@ -286,6 +391,7 @@ function PortalScene() {
   return (
     <>
       <CameraController target={camTarget} lookTarget={lookTarget} />
+      <FogController hoveredIndex={hoveredIndex} />
       <ambientLight intensity={0.15} />
       <fog attach="fog" args={['#050A18', 8, 22]} />
       <Floor />
@@ -293,21 +399,30 @@ function PortalScene() {
       <CeilingLights />
 
       {SERVICES.map((service, i) => (
-        <PortalDoor
-          key={i}
-          service={service}
-          index={i}
-          doorConfig={DOORS[i]}
-          hoveredIndex={hoveredIndex}
-          setHoveredIndex={setHoveredIndex}
-          isSelected={selectedIndex === i}
-          onSelect={(idx) => {
-            setSelectedIndex(idx);
-            setHoveredIndex(null);
-            document.body.style.cursor = 'auto';
-          }}
-        />
+        <React.Fragment key={i}>
+          <PortalDoor
+            service={service}
+            index={i}
+            doorConfig={DOORS[i]}
+            hoveredIndex={hoveredIndex}
+            setHoveredIndex={setHoveredIndex}
+            isSelected={selectedIndex === i}
+            onSelect={(idx) => {
+              setSelectedIndex(idx);
+              setHoveredIndex(null);
+              document.body.style.cursor = 'auto';
+            }}
+          />
+          <FloorReflection
+            doorConfig={DOORS[i]}
+            color={service.color}
+            isHovered={hoveredIndex === i}
+          />
+        </React.Fragment>
       ))}
+
+      {/* Instruction hint near entrance */}
+      {selectedIndex === null && <InstructionHint />}
 
       {/* Selected service detail panel */}
       {selectedIndex !== null && (
@@ -397,7 +512,6 @@ function PortalScene() {
 /* ── Floating dust particles ── */
 function DustMotes() {
   const count = 30;
-  const refs = useRef([]);
   const data = useMemo(() => {
     const arr = [];
     for (let i = 0; i < count; i++) {
@@ -415,13 +529,13 @@ function DustMotes() {
   return (
     <>
       {data.map((d, i) => (
-        <DustMote key={i} config={d} index={i} refs={refs} />
+        <DustMote key={i} config={d} />
       ))}
     </>
   );
 }
 
-function DustMote({ config, index, refs }) {
+function DustMote({ config }) {
   const ref = useRef();
   useFrame(({ clock }) => {
     if (!ref.current) return;
@@ -466,6 +580,7 @@ export default function ServicesPortal() {
           <Canvas
             shadows
             dpr={[1, 2]}
+            camera={{ position: [0, 1.6, 12], fov: 60 }}
             gl={{ powerPreference: 'high-performance', antialias: false, toneMapping: THREE.ACESFilmicToneMapping }}
             style={{ background: '#050A18' }}
           >

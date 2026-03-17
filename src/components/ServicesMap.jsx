@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { SERVICES } from '../data/services';
 import SectionHeader from './shared/SectionHeader';
 import MobileServiceCards from './shared/MobileServiceCards';
@@ -13,6 +13,18 @@ const BUILDINGS = [
   { x: 78, y: 60, w: 14, h: 8  },
 ];
 
+/* Connection lines between related buildings (index pairs) */
+const CONNECTIONS = [
+  [0, 1], // Branding <-> Web Dev
+  [1, 2], // Web Dev <-> AI/Automation
+  [1, 4], // Web Dev <-> Growth Marketing
+  [2, 3], // AI/Automation <-> Dashboards
+  [3, 4], // Dashboards <-> Growth Marketing
+  [4, 5], // Growth Marketing <-> Infrastructure
+  [0, 3], // Branding <-> Dashboards
+  [2, 5], // AI/Automation <-> Infrastructure
+];
+
 /* Moving cars on streets */
 const CARS = [
   { startX: -5, y: 48, speed: 18, color: '#FF5F57', dir: 1 },
@@ -20,10 +32,18 @@ const CARS = [
   { startX: -5, y: 75, speed: 22, color: '#28C840', dir: 1 },
 ];
 
+/* Get center point of a building in SVG coords */
+function getBuildingCenter(i) {
+  const b = BUILDINGS[i];
+  return { x: b.x + b.w / 2, y: b.y + b.h / 2 };
+}
+
 export default function ServicesMap() {
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef(null);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -38,6 +58,23 @@ export default function ServicesMap() {
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
+  }, []);
+
+  /* Intersection Observer for scroll-triggered entrance */
+  useEffect(() => {
+    const node = sectionRef.current;
+    if (!node) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.unobserve(node);
+        }
+      },
+      { threshold: 0.15 }
+    );
+    observer.observe(node);
+    return () => observer.unobserve(node);
   }, []);
 
   const handleBuildingClick = useCallback((i) => {
@@ -59,6 +96,7 @@ export default function ServicesMap() {
 
   return (
     <section
+      ref={sectionRef}
       style={{
         background: '#050A18',
         minHeight: '100vh',
@@ -114,7 +152,7 @@ export default function ServicesMap() {
               perspective: '800px',
             }}
           ><div style={{ transform: selectedIndex === null ? 'rotateX(5deg)' : 'rotateX(0deg)', transition: 'transform 0.8s ease', transformStyle: 'preserve-3d' }}>
-            {/* Grid streets */}
+            {/* Grid streets with pulse effect */}
             <svg
               style={{
                 position: 'absolute',
@@ -125,7 +163,34 @@ export default function ServicesMap() {
               viewBox="0 0 100 100"
               preserveAspectRatio="none"
             >
-              {/* Horizontal streets */}
+              <defs>
+                {/* Gradient for horizontal grid pulse */}
+                <linearGradient id="gridPulseH" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#1D9E75" stopOpacity="0">
+                    <animate attributeName="offset" values="-0.3;1" dur="4s" repeatCount="indefinite" />
+                  </stop>
+                  <stop offset="5%" stopColor="#1D9E75" stopOpacity="0.5">
+                    <animate attributeName="offset" values="-0.2;1.05" dur="4s" repeatCount="indefinite" />
+                  </stop>
+                  <stop offset="15%" stopColor="#1D9E75" stopOpacity="0">
+                    <animate attributeName="offset" values="0;1.15" dur="4s" repeatCount="indefinite" />
+                  </stop>
+                </linearGradient>
+                {/* Gradient for vertical grid pulse */}
+                <linearGradient id="gridPulseV" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stopColor="#1D9E75" stopOpacity="0">
+                    <animate attributeName="offset" values="-0.3;1" dur="5s" repeatCount="indefinite" />
+                  </stop>
+                  <stop offset="5%" stopColor="#1D9E75" stopOpacity="0.5">
+                    <animate attributeName="offset" values="-0.2;1.05" dur="5s" repeatCount="indefinite" />
+                  </stop>
+                  <stop offset="15%" stopColor="#1D9E75" stopOpacity="0">
+                    <animate attributeName="offset" values="0;1.15" dur="5s" repeatCount="indefinite" />
+                  </stop>
+                </linearGradient>
+              </defs>
+
+              {/* Horizontal streets - base */}
               {[20, 35, 48, 65, 80].map((y) => (
                 <line
                   key={`h${y}`}
@@ -138,7 +203,21 @@ export default function ServicesMap() {
                   opacity="0.15"
                 />
               ))}
-              {/* Vertical streets */}
+              {/* Horizontal streets - pulse overlay */}
+              {[20, 35, 48, 65, 80].map((y, yi) => (
+                <line
+                  key={`hp${y}`}
+                  x1="0"
+                  y1={y}
+                  x2="100"
+                  y2={y}
+                  stroke="url(#gridPulseH)"
+                  strokeWidth="0.3"
+                  opacity="0.4"
+                  style={{ animationDelay: `${yi * 0.8}s` }}
+                />
+              ))}
+              {/* Vertical streets - base */}
               {[12, 30, 48, 70, 90].map((x) => (
                 <line
                   key={`v${x}`}
@@ -149,6 +228,20 @@ export default function ServicesMap() {
                   stroke="#1D9E75"
                   strokeWidth="0.15"
                   opacity="0.15"
+                />
+              ))}
+              {/* Vertical streets - pulse overlay */}
+              {[12, 30, 48, 70, 90].map((x, xi) => (
+                <line
+                  key={`vp${x}`}
+                  x1={x}
+                  y1="0"
+                  x2={x}
+                  y2="100"
+                  stroke="url(#gridPulseV)"
+                  strokeWidth="0.3"
+                  opacity="0.4"
+                  style={{ animationDelay: `${xi * 0.6}s` }}
                 />
               ))}
               {/* Grid block fills */}
@@ -172,6 +265,57 @@ export default function ServicesMap() {
                   opacity="0.08"
                 />
               ))}
+
+              {/* Glowing connection lines between related buildings */}
+              {CONNECTIONS.map(([a, b], ci) => {
+                const from = getBuildingCenter(a);
+                const to = getBuildingCenter(b);
+                const mx = (from.x + to.x) / 2;
+                const my = (from.y + to.y) / 2 - 3;
+                const colorA = SERVICES[a].color;
+                const colorB = SERVICES[b].color;
+                const gradId = `connGrad${ci}`;
+                const isHighlighted = hoveredIndex === a || hoveredIndex === b
+                  || selectedIndex === a || selectedIndex === b;
+                return (
+                  <g key={`conn${ci}`}>
+                    <defs>
+                      <linearGradient id={gradId} x1={from.x} y1={from.y} x2={to.x} y2={to.y} gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stopColor={colorA} />
+                        <stop offset="100%" stopColor={colorB} />
+                      </linearGradient>
+                    </defs>
+                    {/* Glow layer */}
+                    <path
+                      d={`M ${from.x} ${from.y} Q ${mx} ${my} ${to.x} ${to.y}`}
+                      fill="none"
+                      stroke={`url(#${gradId})`}
+                      strokeWidth={isHighlighted ? '0.7' : '0.3'}
+                      opacity={isHighlighted ? '0.5' : '0.1'}
+                      strokeLinecap="round"
+                      style={{ transition: 'all 0.5s ease', filter: isHighlighted ? 'blur(1.5px)' : 'none' }}
+                    />
+                    {/* Crisp line layer */}
+                    <path
+                      d={`M ${from.x} ${from.y} Q ${mx} ${my} ${to.x} ${to.y}`}
+                      fill="none"
+                      stroke={`url(#${gradId})`}
+                      strokeWidth={isHighlighted ? '0.35' : '0.12'}
+                      opacity={isHighlighted ? '0.7' : '0.15'}
+                      strokeLinecap="round"
+                      strokeDasharray="1.5 2"
+                      style={{ transition: 'all 0.5s ease' }}
+                    >
+                      <animate
+                        attributeName="stroke-dashoffset"
+                        values="0;-7"
+                        dur={`${3 + ci * 0.4}s`}
+                        repeatCount="indefinite"
+                      />
+                    </path>
+                  </g>
+                );
+              })}
             </svg>
 
             {/* Moving cars */}
@@ -228,8 +372,52 @@ export default function ServicesMap() {
                       ? 'translateY(-8px) scale(1.04)'
                       : 'none',
                     zIndex: isHovered || isSelected ? 10 : 2,
+                    /* Stagger fade-in entrance */
+                    opacity: isVisible ? 1 : 0,
+                    animation: isVisible ? `buildingEntrance 0.7s cubic-bezier(0.22,1,0.36,1) ${i * 0.12}s both` : 'none',
                   }}
                 >
+                  {/* Hover tooltip */}
+                  {isHovered && !isSelected && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '-32px',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        background: 'rgba(5,10,24,0.92)',
+                        border: `1px solid ${service.color}88`,
+                        borderRadius: '6px',
+                        padding: '4px 10px',
+                        color: service.color,
+                        fontSize: '11px',
+                        fontFamily: "'Syne', sans-serif",
+                        fontWeight: 600,
+                        whiteSpace: 'nowrap',
+                        pointerEvents: 'none',
+                        zIndex: 15,
+                        animation: 'tooltipFadeIn 0.22s ease-out',
+                        boxShadow: `0 2px 12px ${service.color}22`,
+                      }}
+                    >
+                      {service.title}
+                      {/* Tooltip arrow */}
+                      <div
+                        style={{
+                          position: 'absolute',
+                          bottom: '-5px',
+                          left: '50%',
+                          transform: 'translateX(-50%) rotate(45deg)',
+                          width: '8px',
+                          height: '8px',
+                          background: 'rgba(5,10,24,0.92)',
+                          borderRight: `1px solid ${service.color}88`,
+                          borderBottom: `1px solid ${service.color}88`,
+                        }}
+                      />
+                    </div>
+                  )}
+
                   {/* Pulsing radar circle at building location */}
                   <div
                     style={{
@@ -345,66 +533,102 @@ export default function ServicesMap() {
 
                   {/* Expanded detail panel when selected */}
                   {isSelected && (
-                    <div
-                      style={{
-                        position: 'absolute',
-                        top: '110%',
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        width: '280px',
-                        background: 'rgba(5,10,24,0.97)',
-                        border: `1px solid ${service.color}`,
-                        borderRadius: '14px',
-                        padding: '22px',
-                        color: '#fff',
-                        fontFamily: "'DM Sans', sans-serif",
-                        animation: 'mapPanelIn 0.35s ease-out',
-                        zIndex: 20,
-                      }}
-                    >
-                      <h3
+                    <>
+                      {/* Connecting line from building to panel */}
+                      <div
                         style={{
-                          fontSize: '16px',
-                          fontWeight: 700,
-                          fontFamily: "'Syne', sans-serif",
-                          color: service.color,
-                          marginBottom: '10px',
+                          position: 'absolute',
+                          top: '100%',
+                          left: '50%',
+                          width: '1px',
+                          height: '10%',
+                          background: `linear-gradient(to bottom, ${service.color}cc, ${service.color}33)`,
+                          transformOrigin: 'top',
+                          animation: 'connectorGrow 0.25s ease-out',
+                          zIndex: 19,
+                        }}
+                      />
+                      {/* Small dot at connector start */}
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '100%',
+                          left: '50%',
+                          width: '5px',
+                          height: '5px',
+                          borderRadius: '50%',
+                          background: service.color,
+                          transform: 'translate(-50%, -50%)',
+                          boxShadow: `0 0 6px ${service.color}`,
+                          animation: 'tooltipFadeIn 0.2s ease-out',
+                          zIndex: 20,
+                        }}
+                      />
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '110%',
+                          left: '50%',
+                          transform: 'translateX(-50%)',
+                          width: '280px',
+                          background: 'rgba(5,10,24,0.97)',
+                          border: `1px solid ${service.color}`,
+                          borderRadius: '14px',
+                          padding: '22px',
+                          color: '#fff',
+                          fontFamily: "'DM Sans', sans-serif",
+                          animation: 'panelSlideUp 0.45s cubic-bezier(0.22,1,0.36,1)',
+                          zIndex: 20,
+                          boxShadow: `0 4px 30px ${service.color}18, 0 0 1px ${service.color}44`,
                         }}
                       >
-                        {service.icon} {service.title}
-                      </h3>
-                      <ul
-                        style={{
-                          listStyle: 'none',
-                          padding: 0,
-                          margin: '0 0 10px 0',
-                        }}
-                      >
-                        {service.bullets.map((b, j) => (
-                          <li
-                            key={j}
-                            style={{
-                              padding: '3px 0',
-                              fontSize: '12px',
-                              opacity: 0.9,
-                              borderBottom:
-                                '1px solid rgba(255,255,255,0.06)',
-                            }}
-                          >
-                            — {b}
-                          </li>
-                        ))}
-                      </ul>
-                      <p
-                        style={{
-                          fontStyle: 'italic',
-                          color: service.color,
-                          fontSize: '12px',
-                        }}
-                      >
-                        {service.tagline}
-                      </p>
-                    </div>
+                        <h3
+                          style={{
+                            fontSize: '16px',
+                            fontWeight: 700,
+                            fontFamily: "'Syne', sans-serif",
+                            color: service.color,
+                            marginBottom: '10px',
+                          }}
+                        >
+                          {service.icon} {service.title}
+                        </h3>
+                        <ul
+                          style={{
+                            listStyle: 'none',
+                            padding: 0,
+                            margin: '0 0 10px 0',
+                          }}
+                        >
+                          {service.bullets.map((bul, j) => (
+                            <li
+                              key={j}
+                              style={{
+                                padding: '3px 0',
+                                fontSize: '12px',
+                                opacity: 0,
+                                borderBottom:
+                                  '1px solid rgba(255,255,255,0.06)',
+                                animation: `bulletFadeIn 0.3s ease-out ${0.15 + j * 0.06}s forwards`,
+                              }}
+                            >
+                              — {bul}
+                            </li>
+                          ))}
+                        </ul>
+                        <p
+                          style={{
+                            fontStyle: 'italic',
+                            color: service.color,
+                            fontSize: '12px',
+                            opacity: 0,
+                            animation: 'bulletFadeIn 0.3s ease-out 0.5s forwards',
+                          }}
+                        >
+                          {service.tagline}
+                        </p>
+                      </div>
+                    </>
                   )}
                 </div>
               );
@@ -420,9 +644,42 @@ export default function ServicesMap() {
         @keyframes blink0 { 0%,100%{opacity:1} 50%{opacity:0.15} }
         @keyframes blink1 { 0%,100%{opacity:0.15} 50%{opacity:1} }
         @keyframes blink2 { 0%,100%{opacity:0.6} 30%{opacity:0.1} 70%{opacity:1} }
-        @keyframes mapPanelIn {
-          from { opacity:0; transform:translateX(-50%) translateY(8px); }
-          to   { opacity:1; transform:translateX(-50%) translateY(0); }
+
+        @keyframes radarPulse {
+          0%   { transform: translate(-50%,-50%) scale(0.8); opacity: 0.6; }
+          100% { transform: translate(-50%,-50%) scale(1.8); opacity: 0; }
+        }
+
+        @keyframes windowBlink {
+          0%,100% { opacity: 0.08; }
+          40%     { opacity: 0.35; }
+          60%     { opacity: 0.12; }
+          80%     { opacity: 0.3; }
+        }
+
+        @keyframes buildingEntrance {
+          0%   { opacity: 0; transform: translateY(20px) scale(0.92); }
+          100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes tooltipFadeIn {
+          0%   { opacity: 0; transform: translateX(-50%) translateY(4px); }
+          100% { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        @keyframes panelSlideUp {
+          0%   { opacity: 0; transform: translateX(-50%) translateY(24px) scale(0.95); }
+          100% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+        }
+
+        @keyframes connectorGrow {
+          0%   { transform: scaleY(0); opacity: 0; }
+          100% { transform: scaleY(1); opacity: 1; }
+        }
+
+        @keyframes bulletFadeIn {
+          0%   { opacity: 0; transform: translateX(-6px); }
+          100% { opacity: 0.9; transform: translateX(0); }
         }
       `}</style>
     </section>
