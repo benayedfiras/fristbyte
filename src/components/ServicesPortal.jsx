@@ -1,9 +1,11 @@
-import React, { useRef, useState, useMemo, useEffect } from 'react';
+import React, { Suspense, useRef, useState, useMemo, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Text, Html, Billboard, Environment } from '@react-three/drei';
 import * as THREE from 'three';
 import { damp3 } from 'maath/easing';
 import PostEffects from './shared/PostEffects';
+import SectionHeader from './shared/SectionHeader';
+import MobileServiceCards from './shared/MobileServiceCards';
 import { SERVICES } from '../data/services';
 
 /* Door layout: 3 on each wall */
@@ -147,6 +149,17 @@ function PortalDoor({ service, index, doorConfig, hoveredIndex, setHoveredIndex,
 
   return (
     <group position={[doorConfig.x, 2, doorConfig.z]} rotation={[0, rotY, 0]}>
+      {/* Glow plane behind door */}
+      <mesh position={[0, 0, -0.05]}>
+        <planeGeometry args={[2, 3.2]} />
+        <meshBasicMaterial
+          color={service.color}
+          transparent
+          opacity={isHovered ? 0.12 : 0.04}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
+
       {/* Door frame glow */}
       <mesh ref={frameRef}>
         <planeGeometry args={[1.6, 2.8]} />
@@ -373,9 +386,56 @@ function PortalScene() {
           </div>
         </Html>
       )}
+      {/* Ambient dust motes */}
+      <DustMotes />
       <Environment preset="city" />
       <PostEffects />
     </>
+  );
+}
+
+/* ── Floating dust particles ── */
+function DustMotes() {
+  const count = 30;
+  const refs = useRef([]);
+  const data = useMemo(() => {
+    const arr = [];
+    for (let i = 0; i < count; i++) {
+      arr.push({
+        x: (Math.random() - 0.5) * 8,
+        y: Math.random() * 3.5 + 0.3,
+        z: (Math.random() - 0.5) * 20,
+        speed: 0.1 + Math.random() * 0.3,
+        offset: Math.random() * Math.PI * 2,
+      });
+    }
+    return arr;
+  }, []);
+
+  return (
+    <>
+      {data.map((d, i) => (
+        <DustMote key={i} config={d} index={i} refs={refs} />
+      ))}
+    </>
+  );
+}
+
+function DustMote({ config, index, refs }) {
+  const ref = useRef();
+  useFrame(({ clock }) => {
+    if (!ref.current) return;
+    const t = clock.getElapsedTime() * config.speed + config.offset;
+    ref.current.position.x = config.x + Math.sin(t) * 0.3;
+    ref.current.position.y = config.y + Math.sin(t * 0.7) * 0.2;
+    ref.current.position.z = config.z + Math.cos(t * 0.5) * 0.4;
+    ref.current.material.opacity = 0.15 + Math.sin(t * 2) * 0.1;
+  });
+  return (
+    <mesh ref={ref}>
+      <sphereGeometry args={[0.015, 6, 6]} />
+      <meshBasicMaterial color="#ffffff" transparent opacity={0.15} />
+    </mesh>
   );
 }
 
@@ -437,55 +497,15 @@ export default function ServicesPortal() {
 
   return (
     <section style={{ background: '#050A18', position: 'relative' }}>
-      <div
-        style={{
-          textAlign: 'center',
-          padding: '80px 20px 40px',
-          maxWidth: '800px',
-          margin: '0 auto',
-        }}
-      >
-        <p
-          style={{
-            color: '#3B8BD4',
-            fontSize: '13px',
-            fontWeight: 600,
-            letterSpacing: '3px',
-            textTransform: 'uppercase',
-            fontFamily: "'DM Sans', sans-serif",
-            marginBottom: '16px',
-          }}
-        >
-          PORTAL DOORS
-        </p>
-        <h2
-          style={{
-            color: '#ffffff',
-            fontSize: 'clamp(28px, 4vw, 48px)',
-            fontWeight: 700,
-            fontFamily: "'Syne', sans-serif",
-            marginBottom: '16px',
-            lineHeight: 1.2,
-          }}
-        >
-          Walk Through Our Portals
-        </h2>
-        <p
-          style={{
-            color: 'rgba(255,255,255,0.7)',
-            fontSize: 'clamp(15px, 2vw, 18px)',
-            fontFamily: "'DM Sans', sans-serif",
-            lineHeight: 1.6,
-            maxWidth: '640px',
-            margin: '0 auto',
-          }}
-        >
-          Hover to peek inside. Click to step through.
-        </p>
-      </div>
+      <SectionHeader
+        label="PORTAL DOORS"
+        title="Walk Through Our Portals"
+        description="Hover to peek inside. Click to step through."
+        accentColor="#3B8BD4"
+      />
 
       {isMobile ? (
-        <MobilePortal />
+        <MobileServiceCards />
       ) : (
         <div style={{ width: '100%', height: '100vh' }}>
           <Canvas
@@ -494,8 +514,11 @@ export default function ServicesPortal() {
             gl={{ powerPreference: 'high-performance', antialias: false, toneMapping: THREE.ACESFilmicToneMapping }}
             style={{ background: '#050A18' }}
           >
-            <PortalScene />
+            <Suspense fallback={null}>
+              <PortalScene />
+            </Suspense>
           </Canvas>
+          {/* Suspense HTML overlay */}
         </div>
       )}
 

@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { SERVICES } from '../data/services';
+import SectionHeader from './shared/SectionHeader';
+import MobileServiceCards from './shared/MobileServiceCards';
 
 /* ── Live clock ── */
 function Clock() {
@@ -126,7 +128,7 @@ function OSWindow({
       style={{
         ...windowStyle,
         overflow: 'hidden',
-        boxShadow: '0 16px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06)',
+        boxShadow: `0 16px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06), 0 0 60px ${service.color}15`,
         display: 'flex',
         flexDirection: 'column',
         transition: closing
@@ -489,59 +491,15 @@ export default function ServicesOS() {
         overflow: 'hidden',
       }}
     >
-      {/* Header */}
-      <div
-        style={{
-          textAlign: 'center',
-          padding: '80px 20px 40px',
-          maxWidth: '800px',
-          margin: '0 auto',
-          position: 'relative',
-          zIndex: 1,
-        }}
-      >
-        <p
-          style={{
-            color: '#06B6D4',
-            fontSize: '13px',
-            fontWeight: 600,
-            letterSpacing: '3px',
-            textTransform: 'uppercase',
-            fontFamily: "'DM Sans', sans-serif",
-            marginBottom: '16px',
-          }}
-        >
-          THE DESKTOP EXPERIENCE
-        </p>
-        <h2
-          style={{
-            color: '#ffffff',
-            fontSize: 'clamp(28px, 4vw, 48px)',
-            fontWeight: 700,
-            fontFamily: "'Syne', sans-serif",
-            marginBottom: '16px',
-            lineHeight: 1.2,
-          }}
-        >
-          Your Business Operating System
-        </h2>
-        <p
-          style={{
-            color: 'rgba(255,255,255,0.7)',
-            fontSize: 'clamp(15px, 2vw, 18px)',
-            fontFamily: "'DM Sans', sans-serif",
-            lineHeight: 1.6,
-            maxWidth: '640px',
-            margin: '0 auto',
-          }}
-        >
-          Click the dock icons to explore each service. Drag, stack, and manage
-          windows like a real desktop.
-        </p>
-      </div>
+      <SectionHeader
+        label="THE DESKTOP EXPERIENCE"
+        title="Your Business Operating System"
+        description="Click the dock icons to explore each service. Drag, stack, and manage windows like a real desktop."
+        accentColor="#06B6D4"
+      />
 
       {isMobile ? (
-        <MobileOS />
+        <MobileServiceCards />
       ) : (
         /* Desktop area */
         <div
@@ -553,6 +511,49 @@ export default function ServicesOS() {
               'radial-gradient(ellipse at 50% 40%, #0c1a30 0%, #050A18 60%)',
           }}
         >
+          {/* Menu bar */}
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: '32px',
+              background: 'rgba(255,255,255,0.06)',
+              borderBottom: '1px solid rgba(255,255,255,0.08)',
+              backdropFilter: 'blur(16px)',
+              display: 'flex',
+              alignItems: 'center',
+              padding: '0 16px',
+              zIndex: 200,
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: '13px',
+              color: 'rgba(255,255,255,0.7)',
+              gap: '20px',
+            }}
+          >
+            <span style={{ fontWeight: 700, color: '#06B6D4' }}>FristByte</span>
+            <span>File</span>
+            <span>Edit</span>
+            <span>View</span>
+            <span>Services</span>
+            <span style={{ marginLeft: 'auto' }}>
+              <Clock />
+            </span>
+          </div>
+
+          {/* Dot grid background */}
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              backgroundImage: 'radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px)',
+              backgroundSize: '24px 24px',
+              pointerEvents: 'none',
+              zIndex: 0,
+            }}
+          />
+
           {/* Animated aurora blobs */}
           <div
             style={{
@@ -682,6 +683,9 @@ export default function ServicesOS() {
               const hasOpenWindow = windows.some(
                 (w) => w.serviceIndex === i && !w.minimized
               );
+              const hasMinimized = windows.some(
+                (w) => w.serviceIndex === i && w.minimized
+              );
               return (
                 <div
                   key={i}
@@ -737,6 +741,22 @@ export default function ServicesOS() {
                   >
                     {s.icon}
                   </button>
+                  {/* Minimized badge */}
+                  {hasMinimized && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '-4px',
+                        right: '-4px',
+                        width: '12px',
+                        height: '12px',
+                        borderRadius: '50%',
+                        background: '#FFBD2E',
+                        border: '2px solid rgba(0,0,0,0.3)',
+                        zIndex: 201,
+                      }}
+                    />
+                  )}
                   {/* Open indicator dot */}
                   {hasOpenWindow && (
                     <div

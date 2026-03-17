@@ -1,8 +1,11 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { Suspense, useRef, useState, useMemo, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Text, Html, Environment } from '@react-three/drei';
 import * as THREE from 'three';
 import PostEffects from './shared/PostEffects';
+import SectionHeader from './shared/SectionHeader';
+import MobileServiceCards from './shared/MobileServiceCards';
+import CanvasLoader from './shared/CanvasLoader';
 import { SERVICES } from '../data/services';
 
 const CARD_COUNT = SERVICES.length;
@@ -38,6 +41,17 @@ function CylinderCard({ service, index, frontIndex, onSelect, selectedIndex }) {
 
   return (
     <group ref={groupRef} position={[x, 0, z]} rotation={[0, angle, 0]}>
+      {/* Card depth shadow (offset plane behind for thickness) */}
+      <mesh position={[0.04, -0.04, -0.06]}>
+        <planeGeometry args={[2.4, 3.2]} />
+        <meshBasicMaterial
+          color="#000000"
+          transparent
+          opacity={isFront ? 0.35 : 0.15}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
+
       {/* Card plane */}
       <mesh
         ref={meshRef}
@@ -61,6 +75,18 @@ function CylinderCard({ service, index, frontIndex, onSelect, selectedIndex }) {
           transparent
           opacity={0.1}
           side={THREE.DoubleSide}
+        />
+      </mesh>
+
+      {/* Gradient overlay on card */}
+      <mesh position={[0, 0, 0.005]}>
+        <planeGeometry args={[2.4, 3.2]} />
+        <meshBasicMaterial
+          color="#ffffff"
+          transparent
+          opacity={isFront ? 0.04 : 0.01}
+          side={THREE.DoubleSide}
+          blending={THREE.AdditiveBlending}
         />
       </mesh>
 
@@ -179,18 +205,119 @@ function CylinderCard({ service, index, frontIndex, onSelect, selectedIndex }) {
   );
 }
 
+/* ── Floating particles inside cylinder ── */
+function CylinderParticles({ count = 40 }) {
+  const ref = useRef();
+  const particles = useMemo(() => {
+    const arr = [];
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const r = Math.random() * (RADIUS - 0.3);
+      arr.push({
+        x: Math.sin(angle) * r,
+        y: (Math.random() - 0.5) * 3.5,
+        z: Math.cos(angle) * r,
+        speed: 0.1 + Math.random() * 0.2,
+        offset: Math.random() * Math.PI * 2,
+        drift: 0.1 + Math.random() * 0.2,
+      });
+    }
+    return arr;
+  }, [count]);
+
+  const positions = useMemo(() => new Float32Array(count * 3), [count]);
+  const opacities = useMemo(() => new Float32Array(count), [count]);
+
+  useFrame(({ clock }) => {
+    if (!ref.current) return;
+    const t = clock.getElapsedTime();
+    for (let i = 0; i < count; i++) {
+      const p = particles[i];
+      const y = ((p.y + t * p.speed) % 3.5) - 1.75;
+      positions[i * 3] = p.x + Math.sin(t * p.drift + p.offset) * 0.15;
+      positions[i * 3 + 1] = y;
+      positions[i * 3 + 2] = p.z + Math.cos(t * p.drift + p.offset) * 0.15;
+      opacities[i] = 0.15 + Math.sin(t * 0.8 + p.offset) * 0.1;
+    }
+    ref.current.geometry.attributes.position.needsUpdate = true;
+  });
+
+  return (
+    <points ref={ref}>
+      <bufferGeometry>
+        <bufferAttribute
+          attach="attributes-position"
+          count={count}
+          array={positions}
+          itemSize={3}
+        />
+      </bufferGeometry>
+      <pointsMaterial
+        color="#EC4899"
+        size={0.04}
+        transparent
+        opacity={0.3}
+        sizeAttenuation
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
+      />
+    </points>
+  );
+}
+
 /* ── Cylinder wireframe shell ── */
 function CylinderShell() {
   return (
-    <mesh>
-      <cylinderGeometry args={[RADIUS, RADIUS, 4, 32, 1, true]} />
-      <meshBasicMaterial
-        wireframe
-        color="#1D9E75"
-        transparent
-        opacity={0.06}
-      />
-    </mesh>
+    <>
+      {/* Outer wireframe */}
+      <mesh>
+        <cylinderGeometry args={[RADIUS, RADIUS, 4, 32, 1, true]} />
+        <meshBasicMaterial
+          wireframe
+          color="#1D9E75"
+          transparent
+          opacity={0.12}
+        />
+      </mesh>
+      {/* Inner wireframe for depth */}
+      <mesh>
+        <cylinderGeometry args={[RADIUS - 0.15, RADIUS - 0.15, 3.8, 24, 1, true]} />
+        <meshBasicMaterial
+          wireframe
+          color="#EC4899"
+          transparent
+          opacity={0.04}
+        />
+      </mesh>
+      {/* Floating particles */}
+      <CylinderParticles />
+    </>
+  );
+}
+
+/* ── Spotlight that follows the front card ── */
+function FrontCardSpotlight({ frontIndex }) {
+  const lightRef = useRef();
+  const angle = frontIndex * STEP;
+  const targetX = Math.sin(angle) * RADIUS;
+  const targetZ = Math.cos(angle) * RADIUS;
+
+  useFrame((_, delta) => {
+    if (!lightRef.current) return;
+    lightRef.current.position.x += (targetX - lightRef.current.position.x) * 0.08;
+    lightRef.current.position.z += (targetZ + 2 - lightRef.current.position.z) * 0.08;
+  });
+
+  const color = SERVICES[frontIndex]?.color || '#EC4899';
+
+  return (
+    <pointLight
+      ref={lightRef}
+      position={[targetX, 0, targetZ + 2]}
+      color={color}
+      intensity={2.5}
+      distance={6}
+    />
   );
 }
 
@@ -265,6 +392,7 @@ function TimelineScene({ frontIndex, setFrontIndex }) {
       <ambientLight intensity={0.4} />
       <pointLight position={[0, 5, 8]} intensity={1.5} />
       <pointLight position={[0, -3, 5]} intensity={0.4} color="#8B5CF6" />
+      <FrontCardSpotlight frontIndex={frontIndex} />
 
       <group
         ref={groupRef}
@@ -291,51 +419,6 @@ function TimelineScene({ frontIndex, setFrontIndex }) {
   );
 }
 
-/* ── Mobile fallback ── */
-function MobileTimeline() {
-  return (
-    <div style={{ padding: '0 20px 60px' }}>
-      {SERVICES.map((s, i) => (
-        <div
-          key={i}
-          style={{
-            background: 'rgba(255,255,255,0.04)',
-            border: `1px solid ${s.color}33`,
-            borderRadius: '16px',
-            padding: '28px',
-            marginBottom: '16px',
-            color: '#fff',
-            fontFamily: "'DM Sans', sans-serif",
-          }}
-        >
-          <div style={{ fontSize: '32px', marginBottom: '8px' }}>{s.icon}</div>
-          <h3
-            style={{
-              fontSize: '18px',
-              fontWeight: 700,
-              marginBottom: '12px',
-              fontFamily: "'Syne', sans-serif",
-              color: s.color,
-            }}
-          >
-            {s.title}
-          </h3>
-          <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 12px 0' }}>
-            {s.bullets.map((b, j) => (
-              <li key={j} style={{ padding: '3px 0', fontSize: '14px', opacity: 0.8 }}>
-                — {b}
-              </li>
-            ))}
-          </ul>
-          <p style={{ fontStyle: 'italic', color: s.color, fontSize: '14px' }}>
-            {s.tagline}
-          </p>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 /* ── Main export ── */
 export default function ServicesTimeline() {
   const [isMobile, setIsMobile] = useState(false);
@@ -352,71 +435,35 @@ export default function ServicesTimeline() {
     setFrontIndex((prev) => (prev + dir + CARD_COUNT) % CARD_COUNT);
   };
 
+  const currentColor = SERVICES[frontIndex]?.color || '#EC4899';
+
   return (
     <section style={{ background: '#050A18', position: 'relative' }}>
-      <div
-        style={{
-          textAlign: 'center',
-          padding: '80px 20px 40px',
-          maxWidth: '800px',
-          margin: '0 auto',
-        }}
-      >
-        <p
-          style={{
-            color: '#EC4899',
-            fontSize: '13px',
-            fontWeight: 600,
-            letterSpacing: '3px',
-            textTransform: 'uppercase',
-            fontFamily: "'DM Sans', sans-serif",
-            marginBottom: '16px',
-          }}
-        >
-          CYLINDER TIMELINE
-        </p>
-        <h2
-          style={{
-            color: '#ffffff',
-            fontSize: 'clamp(28px, 4vw, 48px)',
-            fontWeight: 700,
-            fontFamily: "'Syne', sans-serif",
-            marginBottom: '16px',
-            lineHeight: 1.2,
-          }}
-        >
-          Spin Through Our Services
-        </h2>
-        <p
-          style={{
-            color: 'rgba(255,255,255,0.7)',
-            fontSize: 'clamp(15px, 2vw, 18px)',
-            fontFamily: "'DM Sans', sans-serif",
-            lineHeight: 1.6,
-            maxWidth: '640px',
-            margin: '0 auto',
-          }}
-        >
-          Drag to rotate the cylinder. Click the front card to explore.
-        </p>
-      </div>
+      <SectionHeader
+        label="CYLINDER TIMELINE"
+        title="Spin Through Our Services"
+        description="Drag to rotate the cylinder. Click the front card to explore."
+        accentColor="#EC4899"
+      />
 
       {isMobile ? (
-        <MobileTimeline />
+        <MobileServiceCards />
       ) : (
         <>
           <div style={{ width: '100%', height: '100vh', position: 'relative' }}>
-            <Canvas
-              shadows
-              dpr={[1, 2]}
-              gl={{ powerPreference: 'high-performance', antialias: false, toneMapping: THREE.ACESFilmicToneMapping }}
-              style={{ background: '#050A18' }}
-            >
-              <TimelineScene
-                frontIndex={frontIndex}
-                setFrontIndex={setFrontIndex}
-              />
-            </Canvas>
+            <Suspense fallback={<CanvasLoader color="#EC4899" />}>
+              <Canvas
+                shadows
+                dpr={[1, 2]}
+                gl={{ powerPreference: 'high-performance', antialias: false, toneMapping: THREE.ACESFilmicToneMapping }}
+                style={{ background: '#050A18' }}
+              >
+                <TimelineScene
+                  frontIndex={frontIndex}
+                  setFrontIndex={setFrontIndex}
+                />
+              </Canvas>
+            </Suspense>
 
             {/* Prev / Next buttons */}
             <div
@@ -433,12 +480,16 @@ export default function ServicesTimeline() {
               <button
                 onClick={() => goTo(-1)}
                 style={navBtnStyle}
-                onMouseEnter={(e) =>
-                  (e.target.style.background = 'rgba(255,255,255,0.12)')
-                }
-                onMouseLeave={(e) =>
-                  (e.target.style.background = 'rgba(255,255,255,0.06)')
-                }
+                onMouseEnter={(e) => {
+                  e.target.style.background = `${currentColor}22`;
+                  e.target.style.borderColor = `${currentColor}88`;
+                  e.target.style.boxShadow = `0 0 16px ${currentColor}33`;
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = 'rgba(255,255,255,0.06)';
+                  e.target.style.borderColor = 'rgba(255,255,255,0.15)';
+                  e.target.style.boxShadow = 'none';
+                }}
               >
                 ← Prev
               </button>
@@ -455,12 +506,16 @@ export default function ServicesTimeline() {
               <button
                 onClick={() => goTo(1)}
                 style={navBtnStyle}
-                onMouseEnter={(e) =>
-                  (e.target.style.background = 'rgba(255,255,255,0.12)')
-                }
-                onMouseLeave={(e) =>
-                  (e.target.style.background = 'rgba(255,255,255,0.06)')
-                }
+                onMouseEnter={(e) => {
+                  e.target.style.background = `${currentColor}22`;
+                  e.target.style.borderColor = `${currentColor}88`;
+                  e.target.style.boxShadow = `0 0 16px ${currentColor}33`;
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = 'rgba(255,255,255,0.06)';
+                  e.target.style.borderColor = 'rgba(255,255,255,0.15)';
+                  e.target.style.boxShadow = 'none';
+                }}
               >
                 Next →
               </button>
@@ -488,5 +543,6 @@ const navBtnStyle = {
   fontSize: '14px',
   fontFamily: "'DM Sans', sans-serif",
   cursor: 'pointer',
-  transition: 'background 0.2s',
+  transition: 'all 0.3s ease',
+  boxShadow: 'none',
 };

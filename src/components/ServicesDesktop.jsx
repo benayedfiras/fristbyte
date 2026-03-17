@@ -1,8 +1,10 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { Suspense, useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Html, SoftShadows } from '@react-three/drei';
 import * as THREE from 'three';
 import PostEffects from './shared/PostEffects';
+import SectionHeader from './shared/SectionHeader';
+import MobileServiceCards from './shared/MobileServiceCards';
 import gsap from 'gsap';
 import { SERVICES } from '../data/services';
 
@@ -906,6 +908,86 @@ function Walls() {
   );
 }
 
+/* ─── Desk Lamp ─── */
+function DeskLamp() {
+  const lightRef = useRef();
+  useFrame(({ clock }) => {
+    if (lightRef.current) {
+      lightRef.current.intensity = 0.8 + Math.sin(clock.getElapsedTime() * 0.5) * 0.1;
+    }
+  });
+  return (
+    <group position={[-1.8, 0.82, -0.4]}>
+      {/* Base */}
+      <ToonMesh
+        geometry={<cylinderGeometry args={[0.12, 0.15, 0.04, 12]} />}
+        color="#333333"
+        position={[0, 0, 0]}
+      />
+      {/* Arm */}
+      <ToonMesh
+        geometry={<cylinderGeometry args={[0.015, 0.015, 0.6, 8]} />}
+        color="#555555"
+        position={[0, 0.32, 0]}
+        rotation={[0.15, 0, 0]}
+      />
+      {/* Shade */}
+      <ToonMesh
+        geometry={<coneGeometry args={[0.12, 0.15, 12, 1, true]} />}
+        color="#1D9E75"
+        position={[0, 0.62, -0.05]}
+        rotation={[0.2, 0, 0]}
+      />
+      {/* Light glow */}
+      <pointLight ref={lightRef} position={[0, 0.55, -0.05]} color="#ffd6a5" intensity={0.8} distance={3} />
+    </group>
+  );
+}
+
+/* ─── Floating Dust ─── */
+function FloatingDust() {
+  const count = 20;
+  const data = React.useMemo(() => {
+    const arr = [];
+    for (let i = 0; i < count; i++) {
+      arr.push({
+        x: (Math.random() - 0.5) * 6,
+        y: Math.random() * 4 + 0.5,
+        z: (Math.random() - 0.5) * 6,
+        speed: 0.05 + Math.random() * 0.15,
+        offset: Math.random() * Math.PI * 2,
+      });
+    }
+    return arr;
+  }, []);
+
+  return (
+    <>
+      {data.map((d, i) => (
+        <FloatingDustMote key={i} config={d} />
+      ))}
+    </>
+  );
+}
+
+function FloatingDustMote({ config }) {
+  const ref = useRef();
+  useFrame(({ clock }) => {
+    if (!ref.current) return;
+    const t = clock.getElapsedTime() * config.speed + config.offset;
+    ref.current.position.x = config.x + Math.sin(t) * 0.4;
+    ref.current.position.y = config.y + Math.sin(t * 0.7) * 0.3;
+    ref.current.position.z = config.z + Math.cos(t * 0.5) * 0.3;
+    ref.current.material.opacity = 0.12 + Math.sin(t * 2) * 0.08;
+  });
+  return (
+    <mesh ref={ref}>
+      <sphereGeometry args={[0.01, 6, 6]} />
+      <meshBasicMaterial color="#ffd6a5" transparent opacity={0.12} />
+    </mesh>
+  );
+}
+
 /* ─── Scene ─── */
 function DesktopScene() {
   const [hoveredIndex, setHoveredIndex] = useState(null);
@@ -947,6 +1029,13 @@ function DesktopScene() {
           setSelectedIndex={setSelectedIndex}
         />
       ))}
+
+      {/* Desk lamp */}
+      <DeskLamp />
+
+      {/* Floating dust particles */}
+      <FloatingDust />
+
       <SoftShadows size={25} samples={16} focus={0.5} />
       <PostEffects />
     </>
@@ -1012,56 +1101,16 @@ export default function ServicesDesktop() {
 
   return (
     <section style={{ background: '#FFF5E6', position: 'relative' }}>
-      <div
-        style={{
-          textAlign: 'center',
-          padding: '80px 20px 40px',
-          maxWidth: '800px',
-          margin: '0 auto',
-        }}
-      >
-        <p
-          style={{
-            color: '#1D9E75',
-            fontSize: '13px',
-            fontWeight: 600,
-            letterSpacing: '3px',
-            textTransform: 'uppercase',
-            fontFamily: "'DM Sans', sans-serif",
-            marginBottom: '16px',
-          }}
-        >
-          OUR CONNECTED ECOSYSTEM
-        </p>
-        <h2
-          style={{
-            color: '#222222',
-            fontSize: 'clamp(28px, 4vw, 48px)',
-            fontWeight: 700,
-            fontFamily: "'Syne', sans-serif",
-            marginBottom: '16px',
-            lineHeight: 1.2,
-          }}
-        >
-          Everything Your Business Needs Connected.
-        </h2>
-        <p
-          style={{
-            color: '#666666',
-            fontSize: 'clamp(15px, 2vw, 18px)',
-            fontFamily: "'DM Sans', sans-serif",
-            lineHeight: 1.6,
-            maxWidth: '640px',
-            margin: '0 auto',
-          }}
-        >
-          From brand to backend, from traffic to automation, our services work
-          together as one scalable system.
-        </p>
-      </div>
+      <SectionHeader
+        label="OUR CONNECTED ECOSYSTEM"
+        title="Everything Your Business Needs Connected."
+        description="From brand to backend, from traffic to automation, our services work together as one scalable system."
+        accentColor="#1D9E75"
+        dark={false}
+      />
 
       {isMobile ? (
-        <MobileDesktopCards />
+        <MobileServiceCards variant="light" />
       ) : (
         <div style={{ width: '100%', height: '100vh' }}>
           <Canvas
@@ -1072,7 +1121,9 @@ export default function ServicesDesktop() {
             onCreated={({ camera }) => camera.lookAt(0, 1, 0)}
             style={{ background: '#FFF5E6' }}
           >
-            <DesktopScene />
+            <Suspense fallback={null}>
+              <DesktopScene />
+            </Suspense>
           </Canvas>
         </div>
       )}

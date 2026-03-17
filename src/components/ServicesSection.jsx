@@ -1,7 +1,10 @@
-import React, { useRef, useState, useMemo, useEffect } from 'react';
+import React, { useRef, useState, useMemo, useEffect, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Text, Html, Points, PointMaterial, Environment } from '@react-three/drei';
 import PostEffects from './shared/PostEffects';
+import SectionHeader from './shared/SectionHeader';
+import MobileServiceCards from './shared/MobileServiceCards';
+import CanvasLoader from './shared/CanvasLoader';
 import * as THREE from 'three';
 import gsap from 'gsap';
 import { SERVICES as BASE_SERVICES } from '../data/services';
@@ -20,17 +23,40 @@ const SERVICES = BASE_SERVICES.map((s, i) => ({
   position: HEX_POSITIONS[i],
 }));
 
-/* ── Floating Particles ── */
+/* ── Floating Particles with color tinting ── */
 function Particles({ count = 300 }) {
   const ref = useRef();
-  const positions = useMemo(() => {
-    const arr = new Float32Array(count * 3);
+  const { positions, colors } = useMemo(() => {
+    const posArr = new Float32Array(count * 3);
+    const colArr = new Float32Array(count * 3);
+    const hexColors = SERVICES.map((s) => new THREE.Color(s.color));
     for (let i = 0; i < count; i++) {
-      arr[i * 3] = (Math.random() - 0.5) * 20;
-      arr[i * 3 + 1] = (Math.random() - 0.5) * 20;
-      arr[i * 3 + 2] = (Math.random() - 0.5) * 10 - 5;
+      const x = (Math.random() - 0.5) * 20;
+      const y = (Math.random() - 0.5) * 20;
+      const z = (Math.random() - 0.5) * 10 - 5;
+      posArr[i * 3] = x;
+      posArr[i * 3 + 1] = y;
+      posArr[i * 3 + 2] = z;
+      // Find nearest hex and tint toward its color
+      let minDist = Infinity;
+      let nearestColor = new THREE.Color('#ffffff');
+      SERVICES.forEach((s, si) => {
+        const dx = x - s.position[0];
+        const dy = y - s.position[1];
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < minDist) {
+          minDist = dist;
+          nearestColor = hexColors[si];
+        }
+      });
+      const blend = Math.max(0, 1 - minDist / 6);
+      const white = new THREE.Color('#ffffff');
+      white.lerp(nearestColor, blend * 0.6);
+      colArr[i * 3] = white.r;
+      colArr[i * 3 + 1] = white.g;
+      colArr[i * 3 + 2] = white.b;
     }
-    return arr;
+    return { positions: posArr, colors: colArr };
   }, [count]);
 
   useFrame(() => {
@@ -46,15 +72,72 @@ function Particles({ count = 300 }) {
 
   return (
     <Points ref={ref} positions={positions} stride={3} frustumCulled={false}>
+      <bufferAttribute attach="geometry-attributes-color" array={colors} count={count} itemSize={3} />
       <PointMaterial
         transparent
-        color="#ffffff"
+        vertexColors
         size={0.03}
         sizeAttenuation
         depthWrite={false}
-        opacity={0.2}
+        opacity={0.25}
       />
     </Points>
+  );
+}
+
+/* ── Pulsing connection lines between adjacent hexes ── */
+function ConnectionLines() {
+  const linesRef = useRef([]);
+
+  // Compute adjacency: hexes within ~2.5 units are "adjacent"
+  const adjacentPairs = useMemo(() => {
+    const pairs = [];
+    for (let i = 0; i < SERVICES.length; i++) {
+      for (let j = i + 1; j < SERVICES.length; j++) {
+        const dx = SERVICES[i].position[0] - SERVICES[j].position[0];
+        const dy = SERVICES[i].position[1] - SERVICES[j].position[1];
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 2.8) pairs.push([i, j]);
+      }
+    }
+    return pairs;
+  }, []);
+
+  useFrame(({ clock }) => {
+    const t = clock.getElapsedTime();
+    linesRef.current.forEach((linemat, idx) => {
+      if (linemat) {
+        linemat.opacity = 0.08 + Math.sin(t * 1.5 + idx * 1.2) * 0.06;
+      }
+    });
+  });
+
+  return (
+    <>
+      {adjacentPairs.map(([a, b], idx) => {
+        const posA = SERVICES[a].position;
+        const posB = SERVICES[b].position;
+        const points = [
+          new THREE.Vector3(posA[0], posA[1], posA[2]),
+          new THREE.Vector3(posB[0], posB[1], posB[2]),
+        ];
+        const geo = new THREE.BufferGeometry().setFromPoints(points);
+        const colorA = new THREE.Color(SERVICES[a].color);
+        const colorB = new THREE.Color(SERVICES[b].color);
+        const midColor = colorA.clone().lerp(colorB, 0.5);
+        return (
+          <line key={`conn-${idx}`} geometry={geo}>
+            <lineBasicMaterial
+              ref={(el) => { linesRef.current[idx] = el; }}
+              color={midColor}
+              transparent
+              opacity={0.1}
+              depthWrite={false}
+            />
+          </line>
+        );
+      })}
+    </>
   );
 }
 
@@ -66,12 +149,14 @@ function HexPrism({
   setHoveredIndex,
   selectedIndex,
   setSelectedIndex,
+  hasEnteredView,
 }) {
   const groupRef = useRef();
   const meshRef = useRef();
   const edgesRef = useRef();
   const lightRef = useRef();
   const htmlRef = useRef();
+  const entranceCompleteRef = useRef(false);
 
   const isSelected = selectedIndex === index;
   const isOtherSelected = selectedIndex !== null && selectedIndex !== index;
@@ -83,6 +168,19 @@ function HexPrism({
     []
   );
   const edgesGeo = useMemo(() => new THREE.EdgesGeometry(geo), [geo]);
+
+  /* Staggered entrance animation */
+  useEffect(() => {
+    if (!groupRef.current || !hasEnteredView || entranceCompleteRef.current) return;
+    groupRef.current.scale.set(0, 0, 0);
+    gsap.to(groupRef.current.scale, {
+      x: 1, y: 1, z: 1,
+      duration: 0.6,
+      delay: index * 0.12,
+      ease: 'back.out(1.7)',
+      onComplete: () => { entranceCompleteRef.current = true; },
+    });
+  }, [hasEnteredView, index]);
 
   /* idle bobbing */
   useFrame(({ clock }) => {
@@ -339,7 +437,7 @@ function HexPrism({
 }
 
 /* ── Scene (contains all hexes, lights, particles) ── */
-function Scene() {
+function Scene({ mousePos, hasEnteredView }) {
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(null);
   const groupRef = useRef();
@@ -349,6 +447,15 @@ function Scene() {
     if (!groupRef.current) return;
     if (hoveredIndex !== null || selectedIndex !== null) return;
     groupRef.current.rotation.y += 0.001;
+  });
+
+  /* Mouse parallax - subtle tilt based on cursor position */
+  useFrame(() => {
+    if (!groupRef.current || selectedIndex !== null) return;
+    const targetRotX = mousePos.current.y * 0.08;
+    const targetRotZ = -mousePos.current.x * 0.04;
+    groupRef.current.rotation.x += (targetRotX - groupRef.current.rotation.x) * 0.05;
+    groupRef.current.rotation.z += (targetRotZ - groupRef.current.rotation.z) * 0.05;
   });
 
   /* reset rotation on deselect */
@@ -368,6 +475,7 @@ function Scene() {
       <pointLight position={[5, 5, 5]} intensity={1.2} />
       <Particles />
       <group ref={groupRef}>
+        <ConnectionLines />
         {SERVICES.map((service, i) => (
           <HexPrism
             key={i}
@@ -377,6 +485,7 @@ function Scene() {
             setHoveredIndex={setHoveredIndex}
             selectedIndex={selectedIndex}
             setSelectedIndex={setSelectedIndex}
+            hasEnteredView={hasEnteredView}
           />
         ))}
       </group>
@@ -386,67 +495,12 @@ function Scene() {
   );
 }
 
-/* ── Mobile fallback cards ── */
-function MobileServiceCards() {
-  return (
-    <div style={{ padding: '0 20px 60px' }}>
-      {SERVICES.map((s, i) => (
-        <div
-          key={i}
-          style={{
-            background: 'rgba(255,255,255,0.04)',
-            border: `1px solid ${s.color}33`,
-            borderRadius: '16px',
-            padding: '28px',
-            marginBottom: '16px',
-            color: '#fff',
-            fontFamily: "'DM Sans', sans-serif",
-          }}
-        >
-          <div style={{ fontSize: '32px', marginBottom: '8px' }}>{s.icon}</div>
-          <h3
-            style={{
-              fontSize: '18px',
-              fontWeight: 700,
-              marginBottom: '12px',
-              fontFamily: "'Syne', sans-serif",
-              color: s.color,
-            }}
-          >
-            {s.title}
-          </h3>
-          <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 12px 0' }}>
-            {s.bullets.map((b, j) => (
-              <li
-                key={j}
-                style={{
-                  padding: '3px 0',
-                  fontSize: '14px',
-                  opacity: 0.8,
-                }}
-              >
-                — {b}
-              </li>
-            ))}
-          </ul>
-          <p
-            style={{
-              fontStyle: 'italic',
-              color: s.color,
-              fontSize: '14px',
-            }}
-          >
-            {s.tagline}
-          </p>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 /* ── Main Export ── */
 export default function ServicesSection() {
   const [isMobile, setIsMobile] = useState(false);
+  const [hasEnteredView, setHasEnteredView] = useState(false);
+  const sectionRef = useRef(null);
+  const mousePosRef = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -455,62 +509,49 @@ export default function ServicesSection() {
     return () => window.removeEventListener('resize', check);
   }, []);
 
+  /* Detect when section enters viewport for entrance animation */
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setHasEnteredView(true);
+          obs.unobserve(el);
+        }
+      },
+      { threshold: 0.15 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  const handlePointerMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    mousePosRef.current = {
+      x: ((e.clientX - rect.left) / rect.width - 0.5) * 2,
+      y: ((e.clientY - rect.top) / rect.height - 0.5) * 2,
+    };
+  };
+
   return (
-    <section style={{ background: '#050A18', position: 'relative' }}>
-      {/* Section Header */}
-      <div
-        style={{
-          textAlign: 'center',
-          padding: '80px 20px 40px',
-          maxWidth: '800px',
-          margin: '0 auto',
-        }}
-      >
-        <p
-          style={{
-            color: '#1D9E75',
-            fontSize: '13px',
-            fontWeight: 600,
-            letterSpacing: '3px',
-            textTransform: 'uppercase',
-            fontFamily: "'DM Sans', sans-serif",
-            marginBottom: '16px',
-          }}
-        >
-          OUR CONNECTED ECOSYSTEM
-        </p>
-        <h2
-          style={{
-            color: '#ffffff',
-            fontSize: 'clamp(28px, 4vw, 48px)',
-            fontWeight: 700,
-            fontFamily: "'Syne', sans-serif",
-            marginBottom: '16px',
-            lineHeight: 1.2,
-          }}
-        >
-          Everything Your Business Needs Connected.
-        </h2>
-        <p
-          style={{
-            color: 'rgba(255,255,255,0.7)',
-            fontSize: 'clamp(15px, 2vw, 18px)',
-            fontFamily: "'DM Sans', sans-serif",
-            lineHeight: 1.6,
-            maxWidth: '640px',
-            margin: '0 auto',
-          }}
-        >
-          From brand to backend, from traffic to automation, our services work
-          together as one scalable system.
-        </p>
-      </div>
+    <section ref={sectionRef} style={{ background: '#050A18', position: 'relative' }}>
+      <SectionHeader
+        label="OUR CONNECTED ECOSYSTEM"
+        title="Everything Your Business Needs Connected."
+        description="From brand to backend, from traffic to automation, our services work together as one scalable system."
+        accentColor="#1D9E75"
+        dark
+      />
 
       {/* 3D Canvas or Mobile Cards */}
       {isMobile ? (
-        <MobileServiceCards />
+        <MobileServiceCards variant="dark" />
       ) : (
-        <div style={{ width: '100%', height: '100vh' }}>
+        <div
+          style={{ width: '100%', height: '100vh' }}
+          onPointerMove={handlePointerMove}
+        >
           <Canvas
             shadows
             dpr={[1, 2]}
@@ -519,7 +560,9 @@ export default function ServicesSection() {
             style={{ background: '#050A18' }}
             onPointerMissed={() => {}}
           >
-            <Scene />
+            <Suspense fallback={null}>
+              <Scene mousePos={mousePosRef} hasEnteredView={hasEnteredView} />
+            </Suspense>
           </Canvas>
         </div>
       )}

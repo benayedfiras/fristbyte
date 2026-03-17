@@ -1,9 +1,11 @@
-import React, { useRef, useState, useMemo, useEffect } from 'react';
+import React, { Suspense, useRef, useState, useMemo, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Text, Html, Billboard, OrbitControls, Points, PointMaterial, Environment } from '@react-three/drei';
 import * as THREE from 'three';
 import { damp3 } from 'maath/easing';
 import PostEffects from './shared/PostEffects';
+import SectionHeader from './shared/SectionHeader';
+import MobileServiceCards from './shared/MobileServiceCards';
 import gsap from 'gsap';
 import { SERVICES } from '../data/services';
 
@@ -41,8 +43,15 @@ function Stars({ count = 500 }) {
     return arr;
   }, [count]);
 
+  const pointsRef = useRef();
+  useFrame(({ clock }) => {
+    if (pointsRef.current) {
+      pointsRef.current.rotation.y = clock.getElapsedTime() * 0.005;
+    }
+  });
+
   return (
-    <Points positions={positions} stride={3} frustumCulled={false}>
+    <Points ref={pointsRef} positions={positions} stride={3} frustumCulled={false}>
       <PointMaterial transparent color="#ffffff" size={0.06} sizeAttenuation depthWrite={false} opacity={0.5} />
     </Points>
   );
@@ -241,6 +250,17 @@ function GlobeScene() {
           />
         </mesh>
 
+        {/* Atmospheric glow ring */}
+        <mesh>
+          <sphereGeometry args={[GLOBE_RADIUS + 0.08, 36, 36]} />
+          <meshBasicMaterial
+            color="#1D9E75"
+            transparent
+            opacity={0.06}
+            side={THREE.BackSide}
+          />
+        </mesh>
+
         {/* Solid core (very faint) */}
         <mesh>
           <sphereGeometry args={[GLOBE_RADIUS - 0.02, 36, 36]} />
@@ -416,55 +436,15 @@ export default function ServicesGlobe() {
 
   return (
     <section style={{ background: '#050A18', position: 'relative' }}>
-      <div
-        style={{
-          textAlign: 'center',
-          padding: '80px 20px 40px',
-          maxWidth: '800px',
-          margin: '0 auto',
-        }}
-      >
-        <p
-          style={{
-            color: '#06B6D4',
-            fontSize: '13px',
-            fontWeight: 600,
-            letterSpacing: '3px',
-            textTransform: 'uppercase',
-            fontFamily: "'DM Sans', sans-serif",
-            marginBottom: '16px',
-          }}
-        >
-          INTERACTIVE GLOBE
-        </p>
-        <h2
-          style={{
-            color: '#ffffff',
-            fontSize: 'clamp(28px, 4vw, 48px)',
-            fontWeight: 700,
-            fontFamily: "'Syne', sans-serif",
-            marginBottom: '16px',
-            lineHeight: 1.2,
-          }}
-        >
-          Services That Span the Globe
-        </h2>
-        <p
-          style={{
-            color: 'rgba(255,255,255,0.7)',
-            fontSize: 'clamp(15px, 2vw, 18px)',
-            fontFamily: "'DM Sans', sans-serif",
-            lineHeight: 1.6,
-            maxWidth: '640px',
-            margin: '0 auto',
-          }}
-        >
-          Spin the globe. Click any pin to explore the service connected to it.
-        </p>
-      </div>
+      <SectionHeader
+        label="INTERACTIVE GLOBE"
+        title="Services That Span the Globe"
+        description="Spin the globe. Click any pin to explore the service connected to it."
+        accentColor="#06B6D4"
+      />
 
       {isMobile ? (
-        <MobileGlobe />
+        <MobileServiceCards />
       ) : (
         <div style={{ width: '100%', height: '100vh' }}>
           <Canvas
@@ -474,7 +454,9 @@ export default function ServicesGlobe() {
             style={{ background: '#050A18' }}
             camera={{ position: [0, 2, 8], fov: 50 }}
           >
-            <GlobeScene />
+            <Suspense fallback={null}>
+              <GlobeScene />
+            </Suspense>
           </Canvas>
         </div>
       )}

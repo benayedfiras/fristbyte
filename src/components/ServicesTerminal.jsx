@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { SERVICES } from '../data/services';
+import SectionHeader from './shared/SectionHeader';
 
 const BOOT_LINES = [
   '> Initializing FirstByte Services...',
@@ -15,11 +16,127 @@ const MENU_LINES = SERVICES.map(
   (s, i) => `  [${i + 1}] ${s.icon}  ${s.title}`
 );
 
+/* Matrix rain characters */
+const MATRIX_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*()_+-=[]{}|;:,.<>?/~`';
+
+function MatrixRain() {
+  const columnCount = 30;
+  const columns = Array.from({ length: columnCount }, (_, i) => ({
+    left: `${(i / columnCount) * 100}%`,
+    delay: `${Math.random() * 5}s`,
+    duration: `${4 + Math.random() * 6}s`,
+    chars: Array.from({ length: 20 }, () => MATRIX_CHARS[Math.floor(Math.random() * MATRIX_CHARS.length)]),
+    opacity: 0.08 + Math.random() * 0.12,
+  }));
+
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        inset: 0,
+        overflow: 'hidden',
+        pointerEvents: 'none',
+        zIndex: 0,
+      }}
+    >
+      {columns.map((col, i) => (
+        <div
+          key={i}
+          style={{
+            position: 'absolute',
+            left: col.left,
+            top: '-100%',
+            animation: `matrixFall ${col.duration} ${col.delay} linear infinite`,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '4px',
+            opacity: col.opacity,
+          }}
+        >
+          {col.chars.map((char, j) => (
+            <span
+              key={j}
+              style={{
+                color: '#1D9E75',
+                fontFamily: "'SF Mono', 'Fira Code', monospace",
+                fontSize: '12px',
+                textShadow: '0 0 6px rgba(29,158,117,0.6)',
+              }}
+            >
+              {char}
+            </span>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* Typing waveform indicator - 4 bars that bounce */
+function TypingWaveform() {
+  return (
+    <span
+      style={{
+        display: 'inline-flex',
+        gap: '2px',
+        marginLeft: '6px',
+        alignItems: 'flex-end',
+        height: '14px',
+        verticalAlign: 'middle',
+      }}
+    >
+      {[0, 1, 2, 3].map((i) => (
+        <span
+          key={i}
+          style={{
+            display: 'inline-block',
+            width: '3px',
+            background: '#1D9E75',
+            borderRadius: '1px',
+            animation: `waveformBounce 0.6s ${i * 0.1}s ease-in-out infinite alternate`,
+            boxShadow: '0 0 4px rgba(29,158,117,0.5)',
+          }}
+        />
+      ))}
+    </span>
+  );
+}
+
+/* Boot progress bar */
+function BootProgressBar({ progress }) {
+  return (
+    <div
+      style={{
+        width: '100%',
+        height: '3px',
+        background: 'rgba(29,158,117,0.15)',
+        borderRadius: '2px',
+        overflow: 'hidden',
+        margin: '6px 0 10px',
+      }}
+    >
+      <div
+        style={{
+          height: '100%',
+          width: `${progress}%`,
+          background: 'linear-gradient(90deg, #1D9E75, #2dd4a0)',
+          borderRadius: '2px',
+          transition: 'width 0.15s ease-out',
+          boxShadow: '0 0 8px rgba(29,158,117,0.5)',
+        }}
+      />
+    </div>
+  );
+}
+
 export default function ServicesTerminal() {
   const [phase, setPhase] = useState('idle'); // idle, booting, menu, typing, viewing
   const [lines, setLines] = useState([]);
   const [cursorVisible, setCursorVisible] = useState(true);
   const [selectedService, setSelectedService] = useState(null);
+  const [bootProgress, setBootProgress] = useState(0);
+  const [isFlickering, setIsFlickering] = useState(false);
   const sectionRef = useRef(null);
   const termBodyRef = useRef(null);
   const bootedRef = useRef(false);
@@ -46,13 +163,24 @@ export default function ServicesTerminal() {
     }
   }, [lines]);
 
+  /* Screen flicker on boot */
+  useEffect(() => {
+    if (phase === 'booting') {
+      setIsFlickering(true);
+      const timeout = setTimeout(() => setIsFlickering(false), 600);
+      return () => clearTimeout(timeout);
+    }
+  }, [phase]);
+
   const startBoot = useCallback(() => {
     setPhase('booting');
     setLines([]);
+    setBootProgress(0);
     let i = 0;
     const allLines = [...BOOT_LINES, ...MENU_LINES, ''];
     const interval = setInterval(() => {
       setLines((prev) => [...prev, allLines[i]]);
+      setBootProgress(Math.round(((i + 1) / allLines.length) * 100));
       i++;
       if (i >= allLines.length) {
         clearInterval(interval);
@@ -191,220 +319,255 @@ export default function ServicesTerminal() {
         overflow: 'hidden',
       }}
     >
-      {/* Header */}
-      <div
-        style={{
-          textAlign: 'center',
-          padding: '80px 20px 40px',
-          maxWidth: '800px',
-          margin: '0 auto',
-        }}
-      >
-        <p
-          style={{
-            color: '#1D9E75',
-            fontSize: '13px',
-            fontWeight: 600,
-            letterSpacing: '3px',
-            textTransform: 'uppercase',
-            fontFamily: "'DM Sans', sans-serif",
-            marginBottom: '16px',
-          }}
-        >
-          HACKER TERMINAL
-        </p>
-        <h2
-          style={{
-            color: '#ffffff',
-            fontSize: 'clamp(28px, 4vw, 48px)',
-            fontWeight: 700,
-            fontFamily: "'Syne', sans-serif",
-            marginBottom: '16px',
-            lineHeight: 1.2,
-          }}
-        >
-          Access the Service Terminal
-        </h2>
-        <p
-          style={{
-            color: 'rgba(255,255,255,0.7)',
-            fontSize: 'clamp(15px, 2vw, 18px)',
-            fontFamily: "'DM Sans', sans-serif",
-            lineHeight: 1.6,
-            maxWidth: '640px',
-            margin: '0 auto',
-          }}
-        >
-          Type 1-6 on your keyboard or click a service to explore.
-        </p>
-      </div>
+      {/* Matrix Rain Background */}
+      <MatrixRain />
 
-      {/* Terminal window */}
+      {/* Section Header */}
+      <SectionHeader
+        label="HACKER TERMINAL"
+        title="Access the Service Terminal"
+        description="Type 1-6 on your keyboard or click a service to explore."
+        accentColor="#1D9E75"
+      />
+
+      {/* Terminal window with ambient glow */}
       <div
         style={{
+          position: 'relative',
           width: isMobile ? 'calc(100% - 32px)' : '720px',
           maxWidth: '100%',
           margin: '0 auto 80px',
-          borderRadius: '14px',
-          overflow: 'hidden',
-          boxShadow:
-            '0 0 60px rgba(29,158,117,0.08), 0 0 120px rgba(29,158,117,0.04), 0 20px 60px rgba(0,0,0,0.5)',
-          border: '1px solid rgba(29,158,117,0.15)',
-          position: 'relative',
+          zIndex: 2,
         }}
       >
-        {/* Title bar */}
+        {/* Pulsing ambient glow behind terminal */}
         <div
           style={{
-            background: '#111827',
-            padding: '12px 16px',
-            display: 'flex',
-            alignItems: 'center',
-            borderBottom: '1px solid rgba(255,255,255,0.06)',
+            position: 'absolute',
+            inset: '-20px',
+            borderRadius: '30px',
+            background: 'radial-gradient(ellipse at center, rgba(29,158,117,0.12) 0%, transparent 70%)',
+            animation: 'ambientGlow 3s ease-in-out infinite',
+            pointerEvents: 'none',
+            zIndex: -1,
           }}
-        >
-          <div style={{ display: 'flex', gap: '8px', marginRight: '16px' }}>
-            <div
-              style={{
-                width: '12px',
-                height: '12px',
-                borderRadius: '50%',
-                background: '#FF5F57',
-              }}
-            />
-            <div
-              style={{
-                width: '12px',
-                height: '12px',
-                borderRadius: '50%',
-                background: '#FFBD2E',
-              }}
-            />
-            <div
-              style={{
-                width: '12px',
-                height: '12px',
-                borderRadius: '50%',
-                background: '#28C840',
-              }}
-            />
-          </div>
-          <span
-            style={{
-              flex: 1,
-              textAlign: 'center',
-              color: 'rgba(255,255,255,0.5)',
-              fontSize: '13px',
-              fontFamily: "'SF Mono', 'Fira Code', monospace",
-              marginRight: '60px',
-            }}
-          >
-            firstbyte@services:~$
-          </span>
-        </div>
+        />
 
-        {/* Terminal body */}
         <div
-          ref={termBodyRef}
+          className={isFlickering ? 'terminal-flicker' : ''}
           style={{
-            background: '#0a0f1c',
-            padding: '20px',
-            minHeight: '400px',
-            maxHeight: '500px',
-            overflowY: 'auto',
+            borderRadius: '14px',
+            overflow: 'hidden',
+            boxShadow:
+              '0 0 60px rgba(29,158,117,0.12), 0 0 120px rgba(29,158,117,0.06), 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(29,158,117,0.1)',
+            border: '1px solid rgba(29,158,117,0.2)',
             position: 'relative',
           }}
         >
-          {/* Scanline overlay */}
+          {/* Title bar */}
+          <div
+            style={{
+              background: '#111827',
+              padding: '12px 16px',
+              display: 'flex',
+              alignItems: 'center',
+              borderBottom: '1px solid rgba(255,255,255,0.06)',
+            }}
+          >
+            <div style={{ display: 'flex', gap: '8px', marginRight: '16px' }}>
+              <div
+                style={{
+                  width: '12px',
+                  height: '12px',
+                  borderRadius: '50%',
+                  background: '#FF5F57',
+                }}
+              />
+              <div
+                style={{
+                  width: '12px',
+                  height: '12px',
+                  borderRadius: '50%',
+                  background: '#FFBD2E',
+                }}
+              />
+              <div
+                style={{
+                  width: '12px',
+                  height: '12px',
+                  borderRadius: '50%',
+                  background: '#28C840',
+                }}
+              />
+            </div>
+            <span
+              style={{
+                flex: 1,
+                textAlign: 'center',
+                color: 'rgba(255,255,255,0.5)',
+                fontSize: '13px',
+                fontFamily: "'SF Mono', 'Fira Code', monospace",
+                marginRight: '60px',
+              }}
+            >
+              firstbyte@services:~$
+            </span>
+          </div>
+
+          {/* Terminal body with CRT effects */}
+          <div
+            ref={termBodyRef}
+            style={{
+              background: '#0a0f1c',
+              padding: '20px',
+              minHeight: '400px',
+              maxHeight: '500px',
+              overflowY: 'auto',
+              position: 'relative',
+            }}
+          >
+            {/* Scanline overlay */}
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                background:
+                  'repeating-linear-gradient(0deg, rgba(0,0,0,0.12) 0px, rgba(0,0,0,0.12) 1px, transparent 1px, transparent 3px)',
+                pointerEvents: 'none',
+                zIndex: 2,
+              }}
+            />
+
+            {/* RGB color fringe at edges */}
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                boxShadow:
+                  'inset 3px 0 8px rgba(255,0,0,0.03), inset -3px 0 8px rgba(0,0,255,0.03), inset 0 3px 8px rgba(0,255,0,0.02), inset 0 -3px 8px rgba(255,0,255,0.02)',
+                pointerEvents: 'none',
+                zIndex: 3,
+              }}
+            />
+
+            {/* Boot progress bar */}
+            {phase === 'booting' && (
+              <div style={{ position: 'relative', zIndex: 1, marginBottom: '4px' }}>
+                <BootProgressBar progress={bootProgress} />
+              </div>
+            )}
+
+            {/* Terminal content */}
+            <div style={{ position: 'relative', zIndex: 1 }}>
+              {lines.map((line, i) => {
+                if (line == null) return null;
+                /* Check if this is a clickable menu item */
+                const menuMatch = line.match(/^\s+\[(\d)\]/);
+                const isMenuLine = menuMatch && phase === 'menu';
+                const menuIdx = menuMatch ? parseInt(menuMatch[1]) - 1 : -1;
+
+                return (
+                  <div
+                    key={i}
+                    onClick={isMenuLine ? () => handleMenuClick(menuIdx) : undefined}
+                    style={{
+                      fontFamily: "'SF Mono', 'Fira Code', 'Courier New', monospace",
+                      fontSize: isMobile ? '13px' : '14px',
+                      lineHeight: '1.7',
+                      color: line.startsWith('>')
+                        ? '#1D9E75'
+                        : line.startsWith('╔') ||
+                          line.startsWith('║') ||
+                          line.startsWith('╚')
+                        ? SERVICES[selectedService]?.color || '#1D9E75'
+                        : isMenuLine
+                        ? '#1D9E75'
+                        : line.includes('"')
+                        ? '#F59E0B'
+                        : 'rgba(29,158,117,0.85)',
+                      cursor: isMenuLine ? 'pointer' : 'default',
+                      transition: 'color 0.2s',
+                      whiteSpace: 'pre-wrap',
+                      textShadow: line.startsWith('>') ? '0 0 8px rgba(29,158,117,0.4)' : 'none',
+                      ...(isMenuLine
+                        ? {
+                            padding: '2px 6px',
+                            borderRadius: '4px',
+                            background: 'rgba(29,158,117,0.04)',
+                          }
+                        : {}),
+                    }}
+                    onMouseEnter={(e) => {
+                      if (isMenuLine) e.target.style.background = 'rgba(29,158,117,0.12)';
+                    }}
+                    onMouseLeave={(e) => {
+                      if (isMenuLine) e.target.style.background = 'rgba(29,158,117,0.04)';
+                    }}
+                  >
+                    {line}
+                  </div>
+                );
+              })}
+
+              {/* Cursor line with typing waveform */}
+              {(phase === 'menu' || phase === 'viewing') && (
+                <div
+                  style={{
+                    fontFamily: "'SF Mono', 'Fira Code', 'Courier New', monospace",
+                    fontSize: isMobile ? '13px' : '14px',
+                    color: '#1D9E75',
+                    lineHeight: '1.7',
+                    textShadow: '0 0 8px rgba(29,158,117,0.4)',
+                  }}
+                >
+                  {'> '}{cursor}
+                </div>
+              )}
+              {phase === 'typing' && (
+                <div
+                  style={{
+                    fontFamily: "'SF Mono', 'Fira Code', 'Courier New', monospace",
+                    fontSize: isMobile ? '13px' : '14px',
+                    color: '#1D9E75',
+                    lineHeight: '1.7',
+                    display: 'flex',
+                    alignItems: 'center',
+                    textShadow: '0 0 8px rgba(29,158,117,0.4)',
+                  }}
+                >
+                  {'> '}{cursor}
+                  <TypingWaveform />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* CRT barrel distortion + screen glow border */}
           <div
             style={{
               position: 'absolute',
               inset: 0,
-              background:
-                'repeating-linear-gradient(0deg, rgba(0,0,0,0.12) 0px, rgba(0,0,0,0.12) 1px, transparent 1px, transparent 3px)',
+              borderRadius: '14px',
+              boxShadow:
+                'inset 0 0 80px rgba(29,158,117,0.04), inset 0 0 120px rgba(0,0,0,0.3)',
               pointerEvents: 'none',
-              zIndex: 2,
+              /* Subtle barrel distortion via border radius trick */
+              border: '2px solid transparent',
+              backgroundClip: 'padding-box',
             }}
           />
 
-          {/* Terminal content */}
-          <div style={{ position: 'relative', zIndex: 1 }}>
-            {lines.map((line, i) => {
-              if (line == null) return null;
-              /* Check if this is a clickable menu item */
-              const menuMatch = line.match(/^\s+\[(\d)\]/);
-              const isMenuLine = menuMatch && phase === 'menu';
-              const menuIdx = menuMatch ? parseInt(menuMatch[1]) - 1 : -1;
-
-              return (
-                <div
-                  key={i}
-                  onClick={isMenuLine ? () => handleMenuClick(menuIdx) : undefined}
-                  style={{
-                    fontFamily: "'SF Mono', 'Fira Code', 'Courier New', monospace",
-                    fontSize: isMobile ? '13px' : '14px',
-                    lineHeight: '1.7',
-                    color: line.startsWith('>')
-                      ? '#1D9E75'
-                      : line.startsWith('╔') ||
-                        line.startsWith('║') ||
-                        line.startsWith('╚')
-                      ? SERVICES[selectedService]?.color || '#1D9E75'
-                      : isMenuLine
-                      ? '#1D9E75'
-                      : line.includes('"')
-                      ? '#F59E0B'
-                      : 'rgba(29,158,117,0.85)',
-                    cursor: isMenuLine ? 'pointer' : 'default',
-                    transition: 'color 0.2s',
-                    whiteSpace: 'pre-wrap',
-                    ...(isMenuLine
-                      ? {
-                          padding: '2px 6px',
-                          borderRadius: '4px',
-                          background: 'rgba(29,158,117,0.04)',
-                        }
-                      : {}),
-                  }}
-                  onMouseEnter={(e) => {
-                    if (isMenuLine) e.target.style.background = 'rgba(29,158,117,0.12)';
-                  }}
-                  onMouseLeave={(e) => {
-                    if (isMenuLine) e.target.style.background = 'rgba(29,158,117,0.04)';
-                  }}
-                >
-                  {line}
-                </div>
-              );
-            })}
-
-            {/* Cursor line */}
-            {(phase === 'menu' || phase === 'viewing') && (
-              <div
-                style={{
-                  fontFamily: "'SF Mono', 'Fira Code', 'Courier New', monospace",
-                  fontSize: isMobile ? '13px' : '14px',
-                  color: '#1D9E75',
-                  lineHeight: '1.7',
-                }}
-              >
-                {'> '}{cursor}
-              </div>
-            )}
-          </div>
+          {/* CRT vignette corners */}
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              borderRadius: '14px',
+              background: 'radial-gradient(ellipse at center, transparent 65%, rgba(0,0,0,0.3) 100%)',
+              pointerEvents: 'none',
+            }}
+          />
         </div>
-
-        {/* CRT screen glow border */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            borderRadius: '14px',
-            boxShadow:
-              'inset 0 0 80px rgba(29,158,117,0.03)',
-            pointerEvents: 'none',
-          }}
-        />
       </div>
 
       {/* Back button when viewing */}
@@ -422,6 +585,8 @@ export default function ServicesTerminal() {
             fontFamily: "'DM Sans', sans-serif",
             cursor: 'pointer',
             transition: 'all 0.2s',
+            position: 'relative',
+            zIndex: 2,
           }}
           onMouseEnter={(e) => {
             e.target.style.background = 'rgba(29,158,117,0.2)';
@@ -433,6 +598,35 @@ export default function ServicesTerminal() {
           ← Back to menu (ESC)
         </button>
       )}
+
+      <style>{`
+        @keyframes matrixFall {
+          0% { transform: translateY(-100%); }
+          100% { transform: translateY(calc(100vh + 100%)); }
+        }
+        @keyframes ambientGlow {
+          0%, 100% { opacity: 0.6; transform: scale(1); }
+          50% { opacity: 1; transform: scale(1.02); }
+        }
+        @keyframes waveformBounce {
+          0% { height: 3px; }
+          100% { height: 12px; }
+        }
+        .terminal-flicker {
+          animation: termFlicker 0.6s ease-out;
+        }
+        @keyframes termFlicker {
+          0% { opacity: 0.3; }
+          10% { opacity: 1; }
+          20% { opacity: 0.7; }
+          30% { opacity: 1; }
+          40% { opacity: 0.85; }
+          50% { opacity: 1; }
+          60% { opacity: 0.92; }
+          80% { opacity: 0.97; }
+          100% { opacity: 1; }
+        }
+      `}</style>
     </section>
   );
 }

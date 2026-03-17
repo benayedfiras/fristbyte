@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { SERVICES } from '../data/services';
+import SectionHeader from './shared/SectionHeader';
+import MobileServiceCards from './shared/MobileServiceCards';
 
 /* Building positions and sizes on the city grid */
 const BUILDINGS = [
@@ -64,58 +66,15 @@ export default function ServicesMap() {
         overflow: 'hidden',
       }}
     >
-      {/* Header */}
-      <div
-        style={{
-          textAlign: 'center',
-          padding: '80px 20px 40px',
-          maxWidth: '800px',
-          margin: '0 auto',
-          position: 'relative',
-          zIndex: 5,
-        }}
-      >
-        <p
-          style={{
-            color: '#1D9E75',
-            fontSize: '13px',
-            fontWeight: 600,
-            letterSpacing: '3px',
-            textTransform: 'uppercase',
-            fontFamily: "'DM Sans', sans-serif",
-            marginBottom: '16px',
-          }}
-        >
-          CITY BLUEPRINT
-        </p>
-        <h2
-          style={{
-            color: '#ffffff',
-            fontSize: 'clamp(28px, 4vw, 48px)',
-            fontWeight: 700,
-            fontFamily: "'Syne', sans-serif",
-            marginBottom: '16px',
-            lineHeight: 1.2,
-          }}
-        >
-          Navigate the Service City
-        </h2>
-        <p
-          style={{
-            color: 'rgba(255,255,255,0.7)',
-            fontSize: 'clamp(15px, 2vw, 18px)',
-            fontFamily: "'DM Sans', sans-serif",
-            lineHeight: 1.6,
-            maxWidth: '640px',
-            margin: '0 auto',
-          }}
-        >
-          Hover to raise buildings. Click to zoom in and explore.
-        </p>
-      </div>
+      <SectionHeader
+        label="CITY BLUEPRINT"
+        title="Navigate the Service City"
+        description="Hover to raise buildings. Click to zoom in and explore."
+        accentColor="#1D9E75"
+      />
 
       {isMobile ? (
-        <MobileMap />
+        <MobileServiceCards />
       ) : (
         <div
           style={{
@@ -143,7 +102,7 @@ export default function ServicesMap() {
             />
           )}
 
-          {/* Map container */}
+          {/* Map container with isometric perspective tilt */}
           <div
             style={{
               position: 'absolute',
@@ -152,8 +111,9 @@ export default function ServicesMap() {
               transform: getMapTransform(),
               transformOrigin: '50% 50%',
               zIndex: selectedIndex !== null ? 4 : 1,
+              perspective: '800px',
             }}
-          >
+          ><div style={{ transform: selectedIndex === null ? 'rotateX(5deg)' : 'rotateX(0deg)', transition: 'transform 0.8s ease', transformStyle: 'preserve-3d' }}>
             {/* Grid streets */}
             <svg
               style={{
@@ -270,21 +230,37 @@ export default function ServicesMap() {
                     zIndex: isHovered || isSelected ? 10 : 2,
                   }}
                 >
-                  {/* Spotlight under building */}
-                  {isHovered && (
-                    <div
-                      style={{
-                        position: 'absolute',
-                        bottom: '-20%',
-                        left: '10%',
-                        width: '80%',
-                        height: '40%',
-                        borderRadius: '50%',
-                        background: `radial-gradient(ellipse, ${service.color}22 0%, transparent 70%)`,
-                        pointerEvents: 'none',
-                      }}
-                    />
-                  )}
+                  {/* Pulsing radar circle at building location */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      width: '120%',
+                      height: '120%',
+                      transform: 'translate(-50%, -50%)',
+                      borderRadius: '50%',
+                      border: `1px solid ${service.color}`,
+                      opacity: 0,
+                      animation: `radarPulse 3s ease-out ${i * 0.5}s infinite`,
+                      pointerEvents: 'none',
+                    }}
+                  />
+
+                  {/* Spotlight under building - enhanced on hover */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: '-30%',
+                      left: '-10%',
+                      width: '120%',
+                      height: '60%',
+                      borderRadius: '50%',
+                      background: `radial-gradient(ellipse, ${service.color}${isHovered ? '33' : '0a'} 0%, transparent 70%)`,
+                      pointerEvents: 'none',
+                      transition: 'all 0.5s ease',
+                    }}
+                  />
 
                   {/* Building body */}
                   <div
@@ -319,6 +295,35 @@ export default function ServicesMap() {
                         animation: `blink${i % 3} ${1.5 + i * 0.3}s ease-in-out infinite`,
                       }}
                     />
+
+                    {/* Building windows */}
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '15%',
+                        left: '8%',
+                        right: '8%',
+                        bottom: '35%',
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(3, 1fr)',
+                        gridTemplateRows: 'repeat(2, 1fr)',
+                        gap: '3px',
+                        pointerEvents: 'none',
+                      }}
+                    >
+                      {[0,1,2,3,4,5].map((wi) => (
+                        <div
+                          key={wi}
+                          style={{
+                            background: service.color,
+                            borderRadius: '1px',
+                            opacity: 0.15,
+                            animation: `windowBlink ${2 + (wi + i) * 0.7}s ease-in-out infinite`,
+                            animationDelay: `${wi * 0.4 + i * 0.3}s`,
+                          }}
+                        />
+                      ))}
+                    </div>
 
                     <span style={{ fontSize: 'clamp(16px, 2vw, 28px)' }}>
                       {service.icon}
@@ -404,7 +409,7 @@ export default function ServicesMap() {
                 </div>
               );
             })}
-          </div>
+          </div></div>
         </div>
       )}
 

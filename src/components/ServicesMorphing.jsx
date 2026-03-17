@@ -1,8 +1,10 @@
-import React, { useRef, useState, useMemo, useEffect, useCallback } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import React, { useRef, useState, useMemo, useEffect, useCallback, Suspense } from 'react';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Points, PointMaterial, Environment } from '@react-three/drei';
 import * as THREE from 'three';
 import PostEffects from './shared/PostEffects';
+import SectionHeader from './shared/SectionHeader';
+import CanvasLoader from './shared/CanvasLoader';
 import gsap from 'gsap';
 import { SERVICES } from '../data/services';
 
@@ -16,8 +18,8 @@ const BLOB_CONFIGS = [
   { freq: 2.2, speed: 0.8, amplitude: 0.28 },
 ];
 
-/* ── Morphing blob mesh ── */
-function MorphBlob({ activeIndex }) {
+/* ── Morphing blob mesh with mouse-follow distortion ── */
+function MorphBlob({ activeIndex, mouseRef }) {
   const meshRef = useRef();
   const geo = useMemo(() => new THREE.SphereGeometry(2, 64, 64), []);
   const origPositions = useMemo(
@@ -46,7 +48,7 @@ function MorphBlob({ activeIndex }) {
     gsap.to(mat.emissive, { r: target.r, g: target.g, b: target.b, duration: 0.8 });
   }, [activeIndex]);
 
-  /* Vertex displacement */
+  /* Vertex displacement with mouse-follow distortion */
   useFrame(({ clock }) => {
     if (!meshRef.current) return;
     const positions = geo.attributes.position;
@@ -54,6 +56,11 @@ function MorphBlob({ activeIndex }) {
     const freq = freqRef.current;
     const speed = speedRef.current;
     const amp = ampRef.current;
+
+    /* Get mouse influence direction */
+    const mx = mouseRef.current.x;
+    const my = mouseRef.current.y;
+    const mouseStrength = 0.15;
 
     for (let i = 0; i < positions.count; i++) {
       const ox = origPositions[i * 3];
@@ -67,7 +74,14 @@ function MorphBlob({ activeIndex }) {
         amp;
 
       const len = Math.sqrt(ox * ox + oy * oy + oz * oz);
-      const scale = 1 + displacement / len;
+      const nx = ox / len;
+      const ny = oy / len;
+
+      /* Mouse-follow: pull vertices toward mouse direction */
+      const mouseDot = nx * mx + ny * my;
+      const mouseDisplacement = mouseDot * mouseStrength;
+
+      const scale = 1 + (displacement + mouseDisplacement) / len;
 
       positions.array[i * 3] = ox * scale;
       positions.array[i * 3 + 1] = oy * scale;
@@ -94,62 +108,164 @@ function MorphBlob({ activeIndex }) {
   );
 }
 
-/* ── Floating particles ── */
-function BlobParticles({ activeIndex }) {
-  const ref = useRef();
-  const count = 200;
-  const positions = useMemo(() => {
-    const arr = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) {
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
-      const r = 2.5 + Math.random() * 2;
-      arr[i * 3] = r * Math.sin(phi) * Math.cos(theta);
-      arr[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-      arr[i * 3 + 2] = r * Math.cos(phi);
-    }
-    return arr;
-  }, []);
+/* ── Rim light shell (Fresnel approximation) ── */
+function RimLightShell({ activeIndex }) {
+  const meshRef = useRef();
+  const colorRef = useRef(new THREE.Color(SERVICES[0].color));
 
-  /* Animate particle color */
   useEffect(() => {
-    if (!ref.current) return;
     const target = new THREE.Color(SERVICES[activeIndex].color);
-    gsap.to(ref.current.material.color, {
+    gsap.to(colorRef.current, {
       r: target.r,
       g: target.g,
       b: target.b,
       duration: 0.8,
+      onUpdate: () => {
+        if (meshRef.current) {
+          meshRef.current.material.color.copy(colorRef.current);
+        }
+      },
+    });
+  }, [activeIndex]);
+
+  return (
+    <mesh ref={meshRef} scale={[2.15, 2.15, 2.15]}>
+      <sphereGeometry args={[1, 32, 32]} />
+      <meshBasicMaterial
+        color={SERVICES[0].color}
+        transparent
+        opacity={0.06}
+        side={THREE.BackSide}
+      />
+    </mesh>
+  );
+}
+
+/* ── Orbital particles in organized rings ── */
+function OrbitalParticles({ activeIndex }) {
+  const groupRef = useRef();
+  const ring1Ref = useRef();
+  const ring2Ref = useRef();
+  const ring3Ref = useRef();
+
+  const rings = useMemo(() => {
+    const createRing = (count, radius) => {
+      const arr = new Float32Array(count * 3);
+      for (let i = 0; i < count; i++) {
+        const angle = (i / count) * Math.PI * 2;
+        arr[i * 3] = radius * Math.cos(angle);
+        arr[i * 3 + 1] = (Math.random() - 0.5) * 0.2;
+        arr[i * 3 + 2] = radius * Math.sin(angle);
+      }
+      return arr;
+    };
+    return {
+      ring1: createRing(80, 3.0),
+      ring2: createRing(60, 3.8),
+      ring3: createRing(50, 4.5),
+    };
+  }, []);
+
+  /* Animate particle colors */
+  const matRef1 = useRef();
+  const matRef2 = useRef();
+  const matRef3 = useRef();
+
+  useEffect(() => {
+    const target = new THREE.Color(SERVICES[activeIndex].color);
+    [matRef1, matRef2, matRef3].forEach((ref) => {
+      if (ref.current) {
+        gsap.to(ref.current.color, {
+          r: target.r,
+          g: target.g,
+          b: target.b,
+          duration: 0.8,
+        });
+      }
     });
   }, [activeIndex]);
 
   useFrame(({ clock }) => {
-    if (!ref.current) return;
-    const pos = ref.current.geometry.attributes.position;
-    const time = clock.getElapsedTime();
-    for (let i = 0; i < count; i++) {
-      pos.array[i * 3 + 1] += Math.sin(time + i * 0.1) * 0.002;
+    const t = clock.getElapsedTime();
+    if (ring1Ref.current) {
+      ring1Ref.current.rotation.y = t * 0.15;
+      ring1Ref.current.rotation.x = 0.3;
     }
-    pos.needsUpdate = true;
-    ref.current.rotation.y = time * 0.05;
+    if (ring2Ref.current) {
+      ring2Ref.current.rotation.y = -t * 0.1;
+      ring2Ref.current.rotation.z = 0.5;
+    }
+    if (ring3Ref.current) {
+      ring3Ref.current.rotation.y = t * 0.08;
+      ring3Ref.current.rotation.x = -0.4;
+      ring3Ref.current.rotation.z = 0.2;
+    }
   });
 
   return (
-    <Points ref={ref} positions={positions} stride={3} frustumCulled={false}>
-      <PointMaterial
-        transparent
-        color={SERVICES[0].color}
-        size={0.04}
-        sizeAttenuation
-        depthWrite={false}
-        opacity={0.4}
-      />
-    </Points>
+    <group ref={groupRef}>
+      <Points ref={ring1Ref} positions={rings.ring1} stride={3} frustumCulled={false}>
+        <PointMaterial
+          ref={matRef1}
+          transparent
+          color={SERVICES[0].color}
+          size={0.05}
+          sizeAttenuation
+          depthWrite={false}
+          opacity={0.5}
+        />
+      </Points>
+      <Points ref={ring2Ref} positions={rings.ring2} stride={3} frustumCulled={false}>
+        <PointMaterial
+          ref={matRef2}
+          transparent
+          color={SERVICES[0].color}
+          size={0.04}
+          sizeAttenuation
+          depthWrite={false}
+          opacity={0.35}
+        />
+      </Points>
+      <Points ref={ring3Ref} positions={rings.ring3} stride={3} frustumCulled={false}>
+        <PointMaterial
+          ref={matRef3}
+          transparent
+          color={SERVICES[0].color}
+          size={0.03}
+          sizeAttenuation
+          depthWrite={false}
+          opacity={0.25}
+        />
+      </Points>
+    </group>
   );
 }
 
+/* ── Rim PointLight behind blob ── */
+function RimLight({ activeIndex }) {
+  const lightRef = useRef();
+  const colorRef = useRef(new THREE.Color(SERVICES[0].color));
+
+  useEffect(() => {
+    const target = new THREE.Color(SERVICES[activeIndex].color);
+    gsap.to(colorRef.current, {
+      r: target.r,
+      g: target.g,
+      b: target.b,
+      duration: 0.8,
+      onUpdate: () => {
+        if (lightRef.current) {
+          lightRef.current.color.copy(colorRef.current);
+        }
+      },
+    });
+  }, [activeIndex]);
+
+  return <pointLight ref={lightRef} position={[0, 0, -4]} intensity={2} color={SERVICES[0].color} />;
+}
+
 /* ── Scene ── */
-function MorphScene({ activeIndex }) {
+function MorphScene({ activeIndex, mouseRef }) {
   return (
     <>
       <ambientLight intensity={0.3} />
@@ -159,9 +275,11 @@ function MorphScene({ activeIndex }) {
         intensity={0.5}
         color={SERVICES[activeIndex].color}
       />
+      <RimLight activeIndex={activeIndex} />
       <fog attach="fog" args={[SERVICES[activeIndex].color, 8, 18]} />
-      <MorphBlob activeIndex={activeIndex} />
-      <BlobParticles activeIndex={activeIndex} />
+      <MorphBlob activeIndex={activeIndex} mouseRef={mouseRef} />
+      <RimLightShell activeIndex={activeIndex} />
+      <OrbitalParticles activeIndex={activeIndex} />
       <Environment preset="city" />
       <PostEffects />
     </>
@@ -173,7 +291,10 @@ export default function ServicesMorphing() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [userInteracted, setUserInteracted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [bgColor, setBgColor] = useState(SERVICES[0].color);
   const timerRef = useRef(null);
+  const mouseRef = useRef({ x: 0, y: 0 });
+  const containerRef = useRef(null);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -181,6 +302,11 @@ export default function ServicesMorphing() {
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
   }, []);
+
+  /* Update background gradient color on service change */
+  useEffect(() => {
+    setBgColor(SERVICES[activeIndex].color);
+  }, [activeIndex]);
 
   /* Auto-cycle every 4 seconds if user hasn't interacted */
   useEffect(() => {
@@ -213,81 +339,55 @@ export default function ServicesMorphing() {
     setUserInteracted(true);
   }, []);
 
+  /* Mouse tracking for blob distortion */
+  const handlePointerMove = useCallback((e) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    mouseRef.current.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    mouseRef.current.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+  }, []);
+
   const service = SERVICES[activeIndex];
 
   return (
     <section style={{ background: '#050A18', position: 'relative' }}>
-      {/* Header */}
-      <div
-        style={{
-          textAlign: 'center',
-          padding: '80px 20px 40px',
-          maxWidth: '800px',
-          margin: '0 auto',
-        }}
-      >
-        <p
-          style={{
-            color: '#EC4899',
-            fontSize: '13px',
-            fontWeight: 600,
-            letterSpacing: '3px',
-            textTransform: 'uppercase',
-            fontFamily: "'DM Sans', sans-serif",
-            marginBottom: '16px',
-          }}
-        >
-          MORPHING BLOB
-        </p>
-        <h2
-          style={{
-            color: '#ffffff',
-            fontSize: 'clamp(28px, 4vw, 48px)',
-            fontWeight: 700,
-            fontFamily: "'Syne', sans-serif",
-            marginBottom: '16px',
-            lineHeight: 1.2,
-          }}
-        >
-          One Shape, Many Services
-        </h2>
-        <p
-          style={{
-            color: 'rgba(255,255,255,0.7)',
-            fontSize: 'clamp(15px, 2vw, 18px)',
-            fontFamily: "'DM Sans', sans-serif",
-            lineHeight: 1.6,
-            maxWidth: '640px',
-            margin: '0 auto',
-          }}
-        >
-          Watch the blob morph as it cycles through each service. Click a dot to
-          jump to any service.
-        </p>
-      </div>
+      {/* Section Header */}
+      <SectionHeader
+        label="MORPHING BLOB"
+        title="One Shape, Many Services"
+        description="Watch the blob morph as it cycles through each service. Click a dot to jump to any service."
+        accentColor="#EC4899"
+      />
 
       <div
+        ref={containerRef}
+        onPointerMove={handlePointerMove}
         style={{
           width: '100%',
           height: '100vh',
           position: 'relative',
           display: 'flex',
+          /* Background gradient that shifts with service color */
+          background: `radial-gradient(ellipse at 40% 50%, ${bgColor}12 0%, transparent 60%)`,
+          transition: 'background 1.2s ease',
         }}
       >
-        {/* Canvas */}
+        {/* Canvas with Suspense + CanvasLoader */}
         <div style={{ flex: 1, position: 'relative' }}>
-          <Canvas
-            shadows
-            dpr={[1, 2]}
-            gl={{ powerPreference: 'high-performance', antialias: false, toneMapping: THREE.ACESFilmicToneMapping }}
-            style={{ background: 'transparent' }}
-            camera={{ position: [0, 0, 6], fov: 50 }}
-          >
-            <MorphScene activeIndex={activeIndex} />
-          </Canvas>
+          <Suspense fallback={<CanvasLoader />}>
+            <Canvas
+              shadows
+              dpr={[1, 2]}
+              gl={{ powerPreference: 'high-performance', antialias: false, toneMapping: THREE.ACESFilmicToneMapping }}
+              style={{ background: 'transparent' }}
+              camera={{ position: [0, 0, 6], fov: 50 }}
+            >
+              <MorphScene activeIndex={activeIndex} mouseRef={mouseRef} />
+            </Canvas>
+          </Suspense>
         </div>
 
-        {/* Info overlay */}
+        {/* Info overlay with staggered bullet animation */}
         <div
           style={{
             position: 'absolute',
@@ -331,8 +431,9 @@ export default function ServicesMorphing() {
                   style={{
                     padding: '4px 0',
                     fontSize: '14px',
-                    opacity: 0.85,
+                    opacity: 0,
                     borderBottom: '1px solid rgba(255,255,255,0.06)',
+                    animation: `bulletFadeIn 0.4s ${0.2 + i * 0.1}s ease-out forwards`,
                   }}
                 >
                   — {b}
@@ -344,6 +445,8 @@ export default function ServicesMorphing() {
                 fontStyle: 'italic',
                 color: service.color,
                 fontSize: '14px',
+                opacity: 0,
+                animation: `bulletFadeIn 0.4s ${0.2 + service.bullets.length * 0.1}s ease-out forwards`,
               }}
             >
               {service.tagline}
@@ -351,7 +454,7 @@ export default function ServicesMorphing() {
           </div>
         </div>
 
-        {/* Navigation: dots + arrows */}
+        {/* Navigation: dots with connecting track + arrows */}
         <div
           style={{
             position: 'absolute',
@@ -367,7 +470,38 @@ export default function ServicesMorphing() {
           <button onClick={goPrev} style={arrowBtnStyle}>
             ←
           </button>
-          <div style={{ display: 'flex', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0px', position: 'relative' }}>
+            {/* Connecting track line */}
+            <div
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '5px',
+                right: '5px',
+                height: '2px',
+                background: 'rgba(255,255,255,0.1)',
+                transform: 'translateY(-50%)',
+                borderRadius: '1px',
+                zIndex: 0,
+              }}
+            />
+            {/* Progress fill on track */}
+            <div
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '5px',
+                width: `${(activeIndex / (SERVICES.length - 1)) * 100}%`,
+                maxWidth: 'calc(100% - 10px)',
+                height: '2px',
+                background: service.color,
+                transform: 'translateY(-50%)',
+                borderRadius: '1px',
+                zIndex: 0,
+                transition: 'width 0.4s ease, background 0.4s ease',
+                boxShadow: `0 0 6px ${service.color}66`,
+              }}
+            />
             {SERVICES.map((s, i) => (
               <button
                 key={i}
@@ -377,12 +511,15 @@ export default function ServicesMorphing() {
                   height: i === activeIndex ? '14px' : '10px',
                   borderRadius: '50%',
                   background: i === activeIndex ? s.color : 'rgba(255,255,255,0.2)',
-                  border: 'none',
+                  border: i === activeIndex ? `2px solid ${s.color}` : '2px solid transparent',
                   cursor: 'pointer',
                   transition: 'all 0.3s ease',
                   boxShadow:
                     i === activeIndex ? `0 0 12px ${s.color}88` : 'none',
                   padding: 0,
+                  margin: '0 5px',
+                  position: 'relative',
+                  zIndex: 1,
                 }}
               />
             ))}
@@ -397,6 +534,10 @@ export default function ServicesMorphing() {
         @keyframes morphFadeIn {
           from { opacity: 0; transform: translateY(12px); }
           to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes bulletFadeIn {
+          from { opacity: 0; transform: translateX(-8px); }
+          to   { opacity: 0.85; transform: translateX(0); }
         }
       `}</style>
     </section>

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { SERVICES } from '../data/services';
+import SectionHeader from './shared/SectionHeader';
 
 export default function ServicesCards3D() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -7,8 +8,17 @@ export default function ServicesCards3D() {
   const [swipingIndex, setSwipingIndex] = useState(null);
   const [isHovering, setIsHovering] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const touchStartRef = useRef(null);
   const containerRef = useRef(null);
+
+  const handleMouseMove = useCallback((e) => {
+    if (!containerRef.current || isFlipped) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    setTilt({ x: y * -8, y: x * 8 });
+  }, [isFlipped]);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -75,54 +85,12 @@ export default function ServicesCards3D() {
         overflow: 'hidden',
       }}
     >
-      {/* Header */}
-      <div
-        style={{
-          textAlign: 'center',
-          padding: '80px 20px 40px',
-          maxWidth: '800px',
-          margin: '0 auto',
-        }}
-      >
-        <p
-          style={{
-            color: '#F59E0B',
-            fontSize: '13px',
-            fontWeight: 600,
-            letterSpacing: '3px',
-            textTransform: 'uppercase',
-            fontFamily: "'DM Sans', sans-serif",
-            marginBottom: '16px',
-          }}
-        >
-          PHYSICAL CARD DECK
-        </p>
-        <h2
-          style={{
-            color: '#ffffff',
-            fontSize: 'clamp(28px, 4vw, 48px)',
-            fontWeight: 700,
-            fontFamily: "'Syne', sans-serif",
-            marginBottom: '16px',
-            lineHeight: 1.2,
-          }}
-        >
-          Deal Yourself the Full Stack
-        </h2>
-        <p
-          style={{
-            color: 'rgba(255,255,255,0.7)',
-            fontSize: 'clamp(15px, 2vw, 18px)',
-            fontFamily: "'DM Sans', sans-serif",
-            lineHeight: 1.6,
-            maxWidth: '640px',
-            margin: '0 auto',
-          }}
-        >
-          Flip each card to explore our services. Swipe through the deck to see
-          them all.
-        </p>
-      </div>
+      <SectionHeader
+        label="PHYSICAL CARD DECK"
+        title="Deal Yourself the Full Stack"
+        description="Flip each card to explore our services. Swipe through the deck to see them all."
+        accentColor="#F59E0B"
+      />
 
       {/* Card deck area */}
       <div
@@ -134,6 +102,8 @@ export default function ServicesCards3D() {
           margin: '40px auto 60px',
           perspective: '1200px',
         }}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={() => setTilt({ x: 0, y: 0 })}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
@@ -157,13 +127,15 @@ export default function ServicesCards3D() {
               zIndex = SERVICES.length + 1;
             } else if (isTop) {
               pointerEvents = 'auto';
+              const tiltX = !isFlipped ? tilt.x : 0;
+              const tiltY = !isFlipped ? tilt.y : 0;
               const hoverLift =
-                isHovering && !isFlipped ? 'translateY(-12px) rotateX(-2deg)' : '';
+                isHovering && !isFlipped ? `translateY(-12px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)` : '';
               const flipTransform = isFlipped ? 'rotateY(180deg)' : '';
               transform = `${hoverLift} ${flipTransform}`.trim() || 'none';
               transition = isFlipped
-                ? 'transform 0.7s ease'
-                : 'transform 0.5s ease';
+                ? 'transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)'
+                : 'transform 0.4s ease';
             } else {
               transform = `translateY(${deckPos * 6}px) translateX(${deckPos * 3}px)`;
               opacity = Math.max(0.3, 1 - deckPos * 0.15);
@@ -207,14 +179,35 @@ export default function ServicesCards3D() {
                     justifyContent: 'center',
                     padding: '32px',
                     boxSizing: 'border-box',
-                    boxShadow: `0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)`,
+                    boxShadow: isTop && isHovering && !isFlipped
+                      ? `0 ${16 + tilt.x * 2}px 48px rgba(0,0,0,0.5), 0 0 40px ${service.color}22`
+                      : `0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)`,
+                    overflow: 'hidden',
                   }}
                 >
+                  {/* Shine sweep overlay */}
+                  {isTop && !isFlipped && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        background: `linear-gradient(${105 + tilt.y * 10}deg, transparent 40%, rgba(255,255,255,0.06) 50%, transparent 60%)`,
+                        pointerEvents: 'none',
+                        borderRadius: '20px',
+                        zIndex: 2,
+                      }}
+                    />
+                  )}
                   <div
                     style={{
                       fontSize: isMobile ? '48px' : '56px',
                       marginBottom: '16px',
                       filter: `drop-shadow(0 0 12px ${service.color}88)`,
+                      transition: 'transform 0.3s ease',
+                      transform: isTop && isHovering && !isFlipped ? 'scale(1.1)' : 'scale(1)',
                     }}
                   >
                     {service.icon}
@@ -358,10 +351,16 @@ export default function ServicesCards3D() {
         {SERVICES.map((s, i) => (
           <div
             key={i}
+            onClick={() => {
+              setCurrentIndex(i);
+              setIsFlipped(false);
+              setSwipingIndex(null);
+            }}
             style={{
               width: '10px',
               height: '10px',
               borderRadius: '50%',
+              cursor: 'pointer',
               background:
                 i < currentIndex
                   ? s.color
