@@ -4,7 +4,6 @@ import { Text, Html, Points, PointMaterial, Environment } from '@react-three/dre
 import PostEffects from './shared/PostEffects';
 import SectionHeader from './shared/SectionHeader';
 import MobileServiceCards from './shared/MobileServiceCards';
-import CanvasLoader from './shared/CanvasLoader';
 import * as THREE from 'three';
 import gsap from 'gsap';
 import { SERVICES as BASE_SERVICES } from '../data/services';

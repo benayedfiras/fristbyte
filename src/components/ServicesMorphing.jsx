@@ -1,5 +1,5 @@
 import React, { useRef, useState, useMemo, useEffect, useCallback, Suspense } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { Points, PointMaterial, Environment } from '@react-three/drei';
 import * as THREE from 'three';
 import PostEffects from './shared/PostEffects';

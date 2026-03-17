@@ -1042,52 +1042,6 @@ function DesktopScene() {
   );
 }
 
-/* ─── Mobile fallback ─── */
-function MobileDesktopCards() {
-  return (
-    <div style={{ padding: '0 20px 60px' }}>
-      {SERVICES.map((s, i) => (
-        <div
-          key={i}
-          style={{
-            background: '#ffffff',
-            border: `3px solid ${s.color}`,
-            borderRadius: '20px',
-            padding: '28px',
-            marginBottom: '16px',
-            color: '#222',
-            fontFamily: "'DM Sans', sans-serif",
-            boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
-          }}
-        >
-          <div style={{ fontSize: '36px', marginBottom: '8px' }}>{s.icon}</div>
-          <h3
-            style={{
-              fontSize: '18px',
-              fontWeight: 700,
-              marginBottom: '12px',
-              fontFamily: "'Syne', sans-serif",
-              color: s.color,
-            }}
-          >
-            {s.title}
-          </h3>
-          <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 12px 0' }}>
-            {s.bullets.map((b, j) => (
-              <li key={j} style={{ padding: '3px 0', fontSize: '14px', color: '#555' }}>
-                — {b}
-              </li>
-            ))}
-          </ul>
-          <p style={{ fontStyle: 'italic', color: s.color, fontSize: '14px', fontWeight: 600 }}>
-            {s.tagline}
-          </p>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 /* ─── Main export ─── */
 export default function ServicesDesktop() {
   const [isMobile, setIsMobile] = useState(false);

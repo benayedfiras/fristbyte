@@ -1,11 +1,10 @@
 import React, { useRef, useState, useMemo, useEffect, Suspense } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Text, Html, Billboard, Points, PointMaterial, Environment } from '@react-three/drei';
+import { Text, Html, Billboard, Environment } from '@react-three/drei';
 import * as THREE from 'three';
 import PostEffects from './shared/PostEffects';
 import SectionHeader from './shared/SectionHeader';
 import MobileServiceCards from './shared/MobileServiceCards';
-import CanvasLoader from './shared/CanvasLoader';
 import gsap from 'gsap';
 import { SERVICES } from '../data/services';
 

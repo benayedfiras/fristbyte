@@ -378,51 +378,6 @@ function GlobeScene() {
   );
 }
 
-/* ── Mobile fallback ── */
-function MobileGlobe() {
-  return (
-    <div style={{ padding: '0 20px 60px' }}>
-      {SERVICES.map((s, i) => (
-        <div
-          key={i}
-          style={{
-            background: 'rgba(255,255,255,0.04)',
-            border: `1px solid ${s.color}33`,
-            borderRadius: '16px',
-            padding: '28px',
-            marginBottom: '16px',
-            color: '#fff',
-            fontFamily: "'DM Sans', sans-serif",
-          }}
-        >
-          <div style={{ fontSize: '32px', marginBottom: '8px' }}>{s.icon}</div>
-          <h3
-            style={{
-              fontSize: '18px',
-              fontWeight: 700,
-              marginBottom: '12px',
-              fontFamily: "'Syne', sans-serif",
-              color: s.color,
-            }}
-          >
-            {s.title}
-          </h3>
-          <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 12px 0' }}>
-            {s.bullets.map((b, j) => (
-              <li key={j} style={{ padding: '3px 0', fontSize: '14px', opacity: 0.8 }}>
-                — {b}
-              </li>
-            ))}
-          </ul>
-          <p style={{ fontStyle: 'italic', color: s.color, fontSize: '14px' }}>
-            {s.tagline}
-          </p>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 /* ── Main export ── */
 export default function ServicesGlobe() {
   const [isMobile, setIsMobile] = useState(false);
