@@ -37,7 +37,7 @@ export default function ServicesCards3D() {
       setSwipingIndex(currentIndex);
       setTimeout(() => {
         setSwipingIndex(null);
-        setCurrentIndex((prev) => Math.min(prev + 1, SERVICES.length - 1));
+        setCurrentIndex((prev) => prev + 1);
       }, 600);
     }
   }, [isFlipped, swipingIndex, currentIndex]);
@@ -64,7 +64,7 @@ export default function ServicesCards3D() {
         setSwipingIndex(currentIndex);
         setTimeout(() => {
           setSwipingIndex(null);
-          setCurrentIndex((prev) => Math.min(prev + 1, SERVICES.length - 1));
+          setCurrentIndex((prev) => prev + 1);
         }, 600);
       }
     },
@@ -76,7 +76,7 @@ export default function ServicesCards3D() {
   return (
     <section
       style={{
-        background: '#050A18',
+        background: '#0D1B2A',
         minHeight: '100vh',
         position: 'relative',
         display: 'flex',
@@ -89,7 +89,7 @@ export default function ServicesCards3D() {
         label="PHYSICAL CARD DECK"
         title="Deal Yourself the Full Stack"
         description="Flip each card to explore our services. Swipe through the deck to see them all."
-        accentColor="#F59E0B"
+        accentColor="#2E9DB5"
       />
 
       {/* Card deck area */}
@@ -170,9 +170,9 @@ export default function ServicesCards3D() {
                     height: '100%',
                     backfaceVisibility: 'hidden',
                     borderRadius: '20px',
-                    background: `linear-gradient(135deg, #0D1B2A 0%, #0a1628 100%)`,
-                    border: `2px solid ${service.color}44`,
-                    borderLeft: `4px solid ${service.color}`,
+                    background: `linear-gradient(135deg, #0D1B2A 0%, #0D1B2A 100%)`,
+                    border: `2px solid #2E9DB544`,
+                    borderLeft: `4px solid #2E9DB5`,
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
@@ -180,7 +180,7 @@ export default function ServicesCards3D() {
                     padding: '32px',
                     boxSizing: 'border-box',
                     boxShadow: isTop && isHovering && !isFlipped
-                      ? `0 ${16 + tilt.x * 2}px 48px rgba(0,0,0,0.5), 0 0 40px ${service.color}22`
+                      ? `0 ${16 + tilt.x * 2}px 48px rgba(0,0,0,0.5), 0 0 40px #2E9DB522`
                       : `0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)`,
                     overflow: 'hidden',
                   }}
@@ -205,7 +205,7 @@ export default function ServicesCards3D() {
                     style={{
                       fontSize: isMobile ? '48px' : '56px',
                       marginBottom: '16px',
-                      filter: `drop-shadow(0 0 12px ${service.color}88)`,
+                      filter: `drop-shadow(0 0 12px #2E9DB588)`,
                       transition: 'transform 0.3s ease',
                       transform: isTop && isHovering && !isFlipped ? 'scale(1.1)' : 'scale(1)',
                     }}
@@ -217,7 +217,7 @@ export default function ServicesCards3D() {
                       fontSize: isMobile ? '18px' : '22px',
                       fontWeight: 700,
                       color: '#ffffff',
-                      fontFamily: "'Syne', sans-serif",
+                      fontFamily: "'Nunito', sans-serif",
                       textAlign: 'center',
                       marginBottom: '12px',
                     }}
@@ -228,7 +228,7 @@ export default function ServicesCards3D() {
                     style={{
                       width: '40px',
                       height: '3px',
-                      background: service.color,
+                      background: '#2E9DB5',
                       borderRadius: '2px',
                     }}
                   />
@@ -253,8 +253,8 @@ export default function ServicesCards3D() {
                     backfaceVisibility: 'hidden',
                     transform: 'rotateY(180deg)',
                     borderRadius: '20px',
-                    background: `linear-gradient(135deg, #0D1B2A 0%, #0a1628 100%)`,
-                    border: `2px solid ${service.color}66`,
+                    background: '#1C2E44',
+                    border: '2px solid #2E9DB5',
                     padding: isMobile ? '24px' : '28px',
                     boxSizing: 'border-box',
                     display: 'flex',
@@ -268,8 +268,8 @@ export default function ServicesCards3D() {
                     style={{
                       fontSize: '17px',
                       fontWeight: 700,
-                      color: service.color,
-                      fontFamily: "'Syne', sans-serif",
+                      color: '#ffffff',
+                      fontFamily: "'Nunito', sans-serif",
                       marginBottom: '14px',
                     }}
                   >
@@ -288,8 +288,9 @@ export default function ServicesCards3D() {
                         style={{
                           padding: '3px 0',
                           fontSize: '13px',
-                          color: 'rgba(255,255,255,0.85)',
+                          color: 'rgba(255,255,255,0.75)',
                           fontFamily: "'DM Sans', sans-serif",
+                          fontWeight: 300,
                           borderBottom: '1px solid rgba(255,255,255,0.06)',
                         }}
                       >
@@ -300,7 +301,7 @@ export default function ServicesCards3D() {
                   <p
                     style={{
                       fontStyle: 'italic',
-                      color: service.color,
+                      color: '#2E9DB5',
                       fontSize: '13px',
                       fontFamily: "'DM Sans', sans-serif",
                     }}
@@ -363,7 +364,7 @@ export default function ServicesCards3D() {
               cursor: 'pointer',
               background:
                 i < currentIndex
-                  ? s.color
+                  ? '#2E9DB5'
                   : i === currentIndex
                   ? '#ffffff'
                   : 'rgba(255,255,255,0.2)',
@@ -380,23 +381,21 @@ export default function ServicesCards3D() {
         style={{
           marginBottom: '60px',
           padding: '10px 28px',
-          background: 'rgba(255,255,255,0.06)',
-          border: '1px solid rgba(255,255,255,0.15)',
-          borderRadius: '999px',
+          background: 'linear-gradient(135deg, #1A6B7C, #2E9DB5)',
+          border: 'none',
+          borderRadius: '100px',
           color: '#ffffff',
           fontSize: '14px',
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "'Nunito', sans-serif",
+          fontWeight: 700,
           cursor: 'pointer',
           transition: 'all 0.3s ease',
-          backdropFilter: 'blur(8px)',
         }}
         onMouseEnter={(e) => {
-          e.target.style.background = 'rgba(255,255,255,0.12)';
-          e.target.style.borderColor = 'rgba(255,255,255,0.3)';
+          e.target.style.opacity = '0.85';
         }}
         onMouseLeave={(e) => {
-          e.target.style.background = 'rgba(255,255,255,0.06)';
-          e.target.style.borderColor = 'rgba(255,255,255,0.15)';
+          e.target.style.opacity = '1';
         }}
       >
         ↻ Shuffle Back

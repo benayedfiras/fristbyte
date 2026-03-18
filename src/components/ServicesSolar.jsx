@@ -90,7 +90,7 @@ function Sun({ shrunk }) {
     }
     // Emissive pulse on sun
     if (matRef.current) {
-      matRef.current.emissiveIntensity = 3 + Math.sin(clock.getElapsedTime() * 1.8) * 0.5;
+      matRef.current.emissiveIntensity = 0.4 + Math.sin(clock.getElapsedTime() * 1.8) * 0.2;
     }
   });
 
@@ -113,9 +113,9 @@ function Sun({ shrunk }) {
       <sphereGeometry args={[0.8, 32, 32]} />
       <meshStandardMaterial
         ref={matRef}
-        color="#ffffff"
-        emissive="#ffffff"
-        emissiveIntensity={3}
+        color="#2E9DB5"
+        emissive="#2E9DB5"
+        emissiveIntensity={0.4}
         toneMapped={false}
         transparent
         opacity={0.9}
@@ -262,7 +262,7 @@ function Planet({
   useFrame(({ clock }) => {
     if (isHovered && meshRef.current && !isSelected) {
       meshRef.current.material.emissiveIntensity =
-        1.0 + Math.sin(clock.getElapsedTime() * 5) * 0.4;
+        1.8 + Math.sin(clock.getElapsedTime() * 5) * 0.4;
     }
   });
 
@@ -278,7 +278,7 @@ function Planet({
     });
     if (!isHovered) {
       gsap.to(meshRef.current.material, {
-        emissiveIntensity: 0.6,
+        emissiveIntensity: 0.4,
         duration: 0.3,
       });
     }
@@ -305,7 +305,7 @@ function Planet({
         duration: 0.7,
         ease: 'power2.out',
       });
-      gsap.to(mat, { emissiveIntensity: 2, opacity: 1, duration: 0.7 });
+      gsap.to(mat, { emissiveIntensity: 3.0, opacity: 1, duration: 0.7 });
     } else if (isOtherSelected) {
       gsap.to(mat, { opacity: 0.15, emissiveIntensity: 0.1, duration: 0.6 });
     } else {
@@ -331,7 +331,7 @@ function Planet({
           ease: 'power2.out',
         });
       }
-      gsap.to(mat, { opacity: 1, emissiveIntensity: 0.6, duration: 0.6 });
+      gsap.to(mat, { opacity: 1, emissiveIntensity: 0.4, duration: 0.6 });
     }
   }, [isSelected, isOtherSelected, config.radius]);
 
@@ -340,7 +340,7 @@ function Planet({
 
   return (
     <>
-    <CometTrail color={service.color} groupRef={groupRef} trailLength={24} />
+    <CometTrail color={'#2E9DB5'} groupRef={groupRef} trailLength={24} />
     <group ref={groupRef} position={[initX, 0, initZ]}>
       <mesh
         ref={meshRef}
@@ -369,9 +369,9 @@ function Planet({
       >
         <sphereGeometry args={[0.55, 32, 32]} />
         <meshStandardMaterial
-          color={service.color}
-          emissive={service.color}
-          emissiveIntensity={3}
+          color={'#1A6B7C'}
+          emissive={'#2E9DB5'}
+          emissiveIntensity={0.4}
           toneMapped={false}
           transparent
           opacity={1}
@@ -412,9 +412,9 @@ function Planet({
         >
           <div
             style={{
-              background: 'rgba(5, 10, 24, 0.95)',
-              border: `1px solid ${service.color}`,
-              borderRadius: '16px',
+              background: '#1C2E44',
+              border: '2px solid #2E9DB5',
+              borderRadius: '20px',
               padding: '28px',
               color: '#fff',
               fontFamily: "'DM Sans', sans-serif",
@@ -433,13 +433,18 @@ function Planet({
                 position: 'absolute',
                 top: '12px',
                 right: '16px',
-                background: 'none',
+                background: '#2E9DB5',
                 border: 'none',
                 color: '#fff',
-                fontSize: '20px',
+                fontSize: '16px',
                 cursor: 'pointer',
-                opacity: 0.7,
                 lineHeight: 1,
+                width: '28px',
+                height: '28px',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
               ✕
@@ -452,8 +457,8 @@ function Planet({
                 fontSize: '18px',
                 fontWeight: 700,
                 marginBottom: '14px',
-                fontFamily: "'Syne', sans-serif",
-                color: service.color,
+                fontFamily: "'Nunito', sans-serif",
+                color: '#ffffff',
               }}
             >
               {service.title}
@@ -471,7 +476,9 @@ function Planet({
                   style={{
                     padding: '4px 0',
                     fontSize: '13px',
-                    opacity: 0.9,
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontWeight: 300,
+                    color: 'rgba(255,255,255,0.75)',
                     borderBottom: '1px solid rgba(255,255,255,0.06)',
                   }}
                 >
@@ -482,7 +489,8 @@ function Planet({
             <p
               style={{
                 fontStyle: 'italic',
-                color: service.color,
+                fontFamily: "'DM Sans', sans-serif",
+                color: '#2E9DB5',
                 fontSize: '13px',
                 marginTop: '12px',
               }}
@@ -513,7 +521,7 @@ function SolarScene() {
         <React.Fragment key={i}>
           <OrbitRing
             radius={ORBIT_CONFIG[i].radius}
-            color={service.color}
+            color={'#2E9DB5'}
             opacity={selectedIndex !== null && selectedIndex !== i ? 0.05 : 0.2}
           />
           <Planet
@@ -545,12 +553,12 @@ export default function ServicesSolar() {
   }, []);
 
   return (
-    <section style={{ background: '#050A18', position: 'relative' }}>
+    <section style={{ background: '#0D1B2A', position: 'relative' }}>
       <SectionHeader
         label="THE SOLAR SYSTEM"
         title="Our Services Orbit Your Success"
         description="Each service revolves around your core business — connected, balanced, and always in motion."
-        accentColor="#8B5CF6"
+        accentColor="#2E9DB5"
         dark
       />
 
@@ -562,7 +570,7 @@ export default function ServicesSolar() {
             shadows
             dpr={[1, 2]}
             gl={{ powerPreference: 'high-performance', antialias: false, toneMapping: THREE.ACESFilmicToneMapping }}
-            style={{ background: '#050A18' }}
+            style={{ background: '#0D1B2A' }}
             camera={{ position: [0, 8, 14], fov: 50 }}
             onCreated={({ camera }) => camera.lookAt(0, 0, 0)}
           >

@@ -32,10 +32,10 @@ function MobileCard({ service, index }) {
     <div
       ref={ref}
       style={{
-        background: 'rgba(255,255,255,0.03)',
-        border: `1px solid ${service.color}33`,
-        borderLeft: `3px solid ${service.color}`,
-        borderRadius: '16px',
+        background: '#1C2E44',
+        border: `2px solid #2E9DB5`,
+        borderLeft: `4px solid #2E9DB5`,
+        borderRadius: '20px',
         padding: '28px',
         marginBottom: '16px',
         color: '#fff',
@@ -62,7 +62,7 @@ function MobileCard({ service, index }) {
           style={{
             fontSize: '18px',
             fontWeight: 700,
-            fontFamily: "'Syne', sans-serif",
+            fontFamily: "'Nunito', sans-serif",
             color: service.color,
             margin: 0,
           }}
@@ -183,7 +183,7 @@ function LightMobileCard({ service, index }) {
           style={{
             fontSize: '18px',
             fontWeight: 700,
-            fontFamily: "'Syne', sans-serif",
+            fontFamily: "'Nunito', sans-serif",
             color: service.color,
             margin: 0,
           }}

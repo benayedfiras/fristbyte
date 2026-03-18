@@ -1,7 +1,7 @@
 import React from 'react';
 import useScrollReveal from '../../hooks/useScrollReveal';
 
-export default function SectionHeader({ label, title, description, accentColor = '#1D9E75', dark = true }) {
+export default function SectionHeader({ label, title, description, accentColor = '#2E9DB5', dark = true }) {
   const ref = useScrollReveal();
 
   return (
@@ -19,11 +19,12 @@ export default function SectionHeader({ label, title, description, accentColor =
       <p
         style={{
           color: accentColor,
-          fontSize: '13px',
+          fontSize: '12px',
           fontWeight: 600,
-          letterSpacing: '3px',
+          letterSpacing: '0.15em',
           textTransform: 'uppercase',
           fontFamily: "'DM Sans', sans-serif",
+          fontVariant: 'small-caps',
           marginBottom: '16px',
         }}
       >
@@ -34,7 +35,7 @@ export default function SectionHeader({ label, title, description, accentColor =
           color: dark ? '#ffffff' : '#222222',
           fontSize: 'clamp(28px, 4vw, 48px)',
           fontWeight: 700,
-          fontFamily: "'Syne', sans-serif",
+          fontFamily: "'Nunito', sans-serif",
           marginBottom: '16px',
           lineHeight: 1.2,
         }}

@@ -35,7 +35,7 @@ function CylinderCard({ service, index, frontIndex, onSelect, selectedIndex }) {
   useEffect(() => {
     if (!meshRef.current) return;
     const mat = meshRef.current.material;
-    mat.emissiveIntensity = isFront ? 0.8 : 0.2;
+    mat.emissiveIntensity = isFront ? 1.8 : 0.4;
     mat.opacity = isFront ? 0.25 : 0.1;
   }, [isFront]);
 
@@ -68,9 +68,9 @@ function CylinderCard({ service, index, frontIndex, onSelect, selectedIndex }) {
       >
         <planeGeometry args={[2.4, 3.2]} />
         <meshStandardMaterial
-          color={service.color}
-          emissive={service.color}
-          emissiveIntensity={3}
+          color="#1A6B7C"
+          emissive="#2E9DB5"
+          emissiveIntensity={0.4}
           toneMapped={false}
           transparent
           opacity={0.1}
@@ -93,14 +93,14 @@ function CylinderCard({ service, index, frontIndex, onSelect, selectedIndex }) {
       {/* Card border */}
       <lineSegments>
         <edgesGeometry args={[new THREE.PlaneGeometry(2.4, 3.2)]} />
-        <lineBasicMaterial color={service.color} transparent opacity={isFront ? 0.9 : 0.3} />
+        <lineBasicMaterial color="#2E9DB5" transparent opacity={isFront ? 0.9 : 0.3} />
       </lineSegments>
 
       {/* Icon */}
       <Text
         position={[0, 0.6, 0.01]}
         fontSize={0.5}
-        color={isFront ? '#ffffff' : service.color}
+        color={isFront ? '#ffffff' : '#2E9DB5'}
         anchorX="center"
         anchorY="middle"
       >
@@ -131,9 +131,9 @@ function CylinderCard({ service, index, frontIndex, onSelect, selectedIndex }) {
         >
           <div
             style={{
-              background: 'rgba(5,10,24,0.95)',
-              border: `1px solid ${service.color}`,
-              borderRadius: '16px',
+              background: '#1C2E44',
+              border: '2px solid #2E9DB5',
+              borderRadius: '20px',
               padding: '24px',
               color: '#fff',
               fontFamily: "'DM Sans', sans-serif",
@@ -150,12 +150,17 @@ function CylinderCard({ service, index, frontIndex, onSelect, selectedIndex }) {
                 position: 'absolute',
                 top: '10px',
                 right: '14px',
-                background: 'none',
+                background: '#2E9DB5',
                 border: 'none',
+                borderRadius: '50%',
                 color: '#fff',
-                fontSize: '18px',
+                width: '28px',
+                height: '28px',
+                fontSize: '16px',
                 cursor: 'pointer',
-                opacity: 0.7,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
               ✕
@@ -168,8 +173,8 @@ function CylinderCard({ service, index, frontIndex, onSelect, selectedIndex }) {
                 fontSize: '17px',
                 fontWeight: 700,
                 marginBottom: '12px',
-                fontFamily: "'Syne', sans-serif",
-                color: service.color,
+                fontFamily: "'Nunito', sans-serif",
+                color: '#ffffff',
               }}
             >
               {service.title}
@@ -181,7 +186,9 @@ function CylinderCard({ service, index, frontIndex, onSelect, selectedIndex }) {
                   style={{
                     padding: '3px 0',
                     fontSize: '13px',
-                    opacity: 0.9,
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontWeight: 300,
+                    color: 'rgba(255,255,255,0.75)',
                     borderBottom: '1px solid rgba(255,255,255,0.06)',
                   }}
                 >
@@ -191,8 +198,9 @@ function CylinderCard({ service, index, frontIndex, onSelect, selectedIndex }) {
             </ul>
             <p
               style={{
+                fontFamily: "'DM Sans', sans-serif",
                 fontStyle: 'italic',
-                color: service.color,
+                color: '#2E9DB5',
                 fontSize: '13px',
               }}
             >
@@ -253,7 +261,7 @@ function CylinderParticles({ count = 40 }) {
         />
       </bufferGeometry>
       <pointsMaterial
-        color="#EC4899"
+        color="#2E9DB5"
         size={0.04}
         transparent
         opacity={0.3}
@@ -274,7 +282,7 @@ function CylinderShell() {
         <cylinderGeometry args={[RADIUS, RADIUS, 4, 32, 1, true]} />
         <meshBasicMaterial
           wireframe
-          color="#1D9E75"
+          color="#1A6B7C"
           transparent
           opacity={0.12}
         />
@@ -284,7 +292,7 @@ function CylinderShell() {
         <cylinderGeometry args={[RADIUS - 0.15, RADIUS - 0.15, 3.8, 24, 1, true]} />
         <meshBasicMaterial
           wireframe
-          color="#EC4899"
+          color="#2E9DB5"
           transparent
           opacity={0.04}
         />
@@ -308,7 +316,7 @@ function FrontCardSpotlight({ frontIndex }) {
     lightRef.current.position.z += (targetZ + 2 - lightRef.current.position.z) * 0.08;
   });
 
-  const color = SERVICES[frontIndex]?.color || '#EC4899';
+  const color = SERVICES[frontIndex]?.color || '#2E9DB5';
 
   return (
     <pointLight
@@ -338,17 +346,26 @@ function TimelineScene({ frontIndex, setFrontIndex }) {
   }, [frontIndex]);
 
   /* Spring physics rotation */
-  useFrame(() => {
+  const idleTimerRef = useRef(0);
+
+  useFrame((_, delta) => {
     if (!groupRef.current) return;
 
     if (!draggingRef.current) {
-      /* Auto-rotate when idle (not dragging, nothing selected) */
-      if (selectedIndex === null) {
-        targetRotRef.current -= 0.002;
+      const dist = Math.abs(targetRotRef.current - rotRef.current);
+
+      /* Only auto-rotate after settling for 3 seconds with nothing selected */
+      if (selectedIndex === null && dist < 0.01) {
+        idleTimerRef.current += delta;
+        if (idleTimerRef.current > 3) {
+          targetRotRef.current -= 0.002;
+        }
+      } else {
+        idleTimerRef.current = 0;
       }
 
-      const delta = targetRotRef.current - rotRef.current;
-      velRef.current = (velRef.current + delta * 0.08) * 0.82;
+      const d = targetRotRef.current - rotRef.current;
+      velRef.current = (velRef.current + d * 0.08) * 0.82;
       rotRef.current += velRef.current;
     }
 
@@ -396,7 +413,7 @@ function TimelineScene({ frontIndex, setFrontIndex }) {
       <CameraRig />
       <ambientLight intensity={0.4} />
       <pointLight position={[0, 5, 8]} intensity={1.5} />
-      <pointLight position={[0, -3, 5]} intensity={0.4} color="#8B5CF6" />
+      <pointLight position={[0, -3, 5]} intensity={0.4} color="#2E9DB5" />
       <FrontCardSpotlight frontIndex={frontIndex} />
 
       <group
@@ -440,15 +457,13 @@ export default function ServicesTimeline() {
     setFrontIndex((prev) => (prev + dir + CARD_COUNT) % CARD_COUNT);
   };
 
-  const currentColor = SERVICES[frontIndex]?.color || '#EC4899';
-
   return (
-    <section style={{ background: '#050A18', position: 'relative' }}>
+    <section style={{ background: '#0D1B2A', position: 'relative' }}>
       <SectionHeader
         label="CYLINDER TIMELINE"
         title="Spin Through Our Services"
         description="Drag to rotate the cylinder. Click the front card to explore."
-        accentColor="#EC4899"
+        accentColor="#2E9DB5"
       />
 
       {isMobile ? (
@@ -456,12 +471,12 @@ export default function ServicesTimeline() {
       ) : (
         <>
           <div style={{ width: '100%', height: '100vh', position: 'relative' }}>
-            <Suspense fallback={<CanvasLoader color="#EC4899" />}>
+            <Suspense fallback={<CanvasLoader color="#2E9DB5" />}>
               <Canvas
                 shadows
                 dpr={[1, 2]}
                 gl={{ powerPreference: 'high-performance', antialias: false, toneMapping: THREE.ACESFilmicToneMapping }}
-                style={{ background: '#050A18' }}
+                style={{ background: '#0D1B2A' }}
               >
                 <TimelineScene
                   frontIndex={frontIndex}
@@ -486,14 +501,12 @@ export default function ServicesTimeline() {
                 onClick={() => goTo(-1)}
                 style={navBtnStyle}
                 onMouseEnter={(e) => {
-                  e.target.style.background = `${currentColor}22`;
-                  e.target.style.borderColor = `${currentColor}88`;
-                  e.target.style.boxShadow = `0 0 16px ${currentColor}33`;
+                  e.target.style.boxShadow = '0 0 24px rgba(46,157,181,0.5)';
+                  e.target.style.transform = 'scale(1.05)';
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.background = 'rgba(255,255,255,0.06)';
-                  e.target.style.borderColor = 'rgba(255,255,255,0.15)';
                   e.target.style.boxShadow = 'none';
+                  e.target.style.transform = 'scale(1)';
                 }}
               >
                 ← Prev
@@ -512,14 +525,12 @@ export default function ServicesTimeline() {
                 onClick={() => goTo(1)}
                 style={navBtnStyle}
                 onMouseEnter={(e) => {
-                  e.target.style.background = `${currentColor}22`;
-                  e.target.style.borderColor = `${currentColor}88`;
-                  e.target.style.boxShadow = `0 0 16px ${currentColor}33`;
+                  e.target.style.boxShadow = '0 0 24px rgba(46,157,181,0.5)';
+                  e.target.style.transform = 'scale(1.05)';
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.background = 'rgba(255,255,255,0.06)';
-                  e.target.style.borderColor = 'rgba(255,255,255,0.15)';
                   e.target.style.boxShadow = 'none';
+                  e.target.style.transform = 'scale(1)';
                 }}
               >
                 Next →
@@ -541,12 +552,13 @@ export default function ServicesTimeline() {
 
 const navBtnStyle = {
   padding: '10px 24px',
-  background: 'rgba(255,255,255,0.06)',
-  border: '1px solid rgba(255,255,255,0.15)',
-  borderRadius: '999px',
-  color: '#fff',
+  background: 'linear-gradient(135deg, #1A6B7C, #2E9DB5)',
+  border: 'none',
+  borderRadius: '100px',
+  color: '#ffffff',
   fontSize: '14px',
-  fontFamily: "'DM Sans', sans-serif",
+  fontFamily: "'Nunito', sans-serif",
+  fontWeight: 700,
   cursor: 'pointer',
   transition: 'all 0.3s ease',
   boxShadow: 'none',

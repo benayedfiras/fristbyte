@@ -20,7 +20,7 @@ const DOORS = [
 
 const INITIAL_CAM = new THREE.Vector3(0, 1.6, 12);
 const INITIAL_LOOK = new THREE.Vector3(0, 1.6, -15);
-const BASE_FOG_COLOR = new THREE.Color('#050A18');
+const BASE_FOG_COLOR = new THREE.Color('#0D1B2A');
 
 /* ── Camera controller ── */
 function CameraController({ target, lookTarget }) {
@@ -73,7 +73,7 @@ function CeilingLights() {
           <pointLight position={[0, 3.8, z]} intensity={0.6} distance={8} color="#e8e0d0" />
           <mesh position={[0, 3.9, z]}>
             <boxGeometry args={[1.5, 0.05, 0.3]} />
-            <meshStandardMaterial emissive="#ffffff" emissiveIntensity={3} toneMapped={false} color="#ffffff" />
+            <meshStandardMaterial emissive="#2E9DB5" emissiveIntensity={3} toneMapped={false} color="#2E9DB5" />
           </mesh>
         </React.Fragment>
       ))}
@@ -101,10 +101,10 @@ function Floor() {
     <>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
         <planeGeometry args={[10, 30]} />
-        <meshStandardMaterial color="#080e1a" />
+        <meshStandardMaterial color="#0D1B2A" />
       </mesh>
       <lineSegments geometry={grid}>
-        <lineBasicMaterial color="#1D9E75" transparent opacity={0.08} />
+        <lineBasicMaterial color="#2E9DB5" transparent opacity={0.08} />
       </lineSegments>
     </>
   );
@@ -145,17 +145,17 @@ function Hallway() {
       {/* Left wall */}
       <mesh position={[-5, 2, 0]} rotation={[0, Math.PI / 2, 0]}>
         <planeGeometry args={[30, 4]} />
-        <meshStandardMaterial color="#0a1020" side={THREE.DoubleSide} />
+        <meshStandardMaterial color="#0D1B2A" side={THREE.DoubleSide} />
       </mesh>
       {/* Right wall */}
       <mesh position={[5, 2, 0]} rotation={[0, -Math.PI / 2, 0]}>
         <planeGeometry args={[30, 4]} />
-        <meshStandardMaterial color="#0a1020" side={THREE.DoubleSide} />
+        <meshStandardMaterial color="#0D1B2A" side={THREE.DoubleSide} />
       </mesh>
       {/* Ceiling */}
       <mesh position={[0, 4, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <planeGeometry args={[10, 30]} />
-        <meshStandardMaterial color="#060c18" />
+        <meshStandardMaterial color="#0D1B2A" />
       </mesh>
     </>
   );
@@ -208,7 +208,7 @@ function PortalDoor({ service, index, doorConfig, hoveredIndex, setHoveredIndex,
   useFrame(({ clock }) => {
     if (frameRef.current) {
       const pulse = 0.4 + Math.sin(clock.getElapsedTime() * 2 + index) * 0.2;
-      frameRef.current.material.emissiveIntensity = isHovered ? 1.2 : pulse;
+      frameRef.current.material.emissiveIntensity = isHovered ? 1.8 : pulse;
     }
   });
 
@@ -280,8 +280,8 @@ function PortalDoor({ service, index, doorConfig, hoveredIndex, setHoveredIndex,
       >
         <planeGeometry args={[1.6, 2.8]} />
         <meshStandardMaterial
-          color={service.color}
-          emissive={service.color}
+          color="#1A6B7C"
+          emissive="#2E9DB5"
           emissiveIntensity={3}
           toneMapped={false}
           transparent
@@ -293,7 +293,7 @@ function PortalDoor({ service, index, doorConfig, hoveredIndex, setHoveredIndex,
       {/* Frame border */}
       <lineSegments>
         <edgesGeometry args={[new THREE.PlaneGeometry(1.6, 2.8)]} />
-        <lineBasicMaterial color={service.color} transparent opacity={0.8} />
+        <lineBasicMaterial color="#2E9DB5" transparent opacity={0.8} />
       </lineSegments>
 
       {/* Swinging door panel */}
@@ -307,7 +307,7 @@ function PortalDoor({ service, index, doorConfig, hoveredIndex, setHoveredIndex,
         <mesh position={[0.8, 0, 0.02]}>
           <planeGeometry args={[1.5, 2.7]} />
           <meshStandardMaterial
-            color="#0a1428"
+            color="#0D1B2A"
             transparent
             opacity={0.85}
             side={THREE.DoubleSide}
@@ -392,7 +392,7 @@ function PortalScene({ selectedIndex, setSelectedIndex }) {
       <CameraController target={camTarget} lookTarget={lookTarget} />
       <FogController hoveredIndex={hoveredIndex} />
       <ambientLight intensity={0.15} />
-      <fog attach="fog" args={['#050A18', 8, 22]} />
+      <fog attach="fog" args={['#0D1B2A', 8, 22]} />
       <Floor />
       <Hallway />
       <CeilingLights />
@@ -490,12 +490,12 @@ export default function ServicesPortal() {
   const selected = selectedIndex !== null ? SERVICES[selectedIndex] : null;
 
   return (
-    <section style={{ background: '#050A18', position: 'relative' }}>
+    <section style={{ background: '#0D1B2A', position: 'relative' }}>
       <SectionHeader
         label="PORTAL DOORS"
         title="Walk Through Our Portals"
         description="Hover to peek inside. Click to step through."
-        accentColor="#3B8BD4"
+        accentColor="#2E9DB5"
       />
 
       {isMobile ? (
@@ -507,7 +507,13 @@ export default function ServicesPortal() {
             dpr={[1, 2]}
             camera={{ position: [0, 1.6, 12], fov: 60 }}
             gl={{ powerPreference: 'high-performance', antialias: false, toneMapping: THREE.ACESFilmicToneMapping }}
-            style={{ background: '#050A18' }}
+            style={{ background: '#0D1B2A' }}
+            onPointerMissed={() => {
+              if (selectedIndex !== null) {
+                setSelectedIndex(null);
+                document.body.style.cursor = 'auto';
+              }
+            }}
           >
             <Suspense fallback={null}>
               <PortalScene selectedIndex={selectedIndex} setSelectedIndex={setSelectedIndex} />
@@ -534,16 +540,16 @@ export default function ServicesPortal() {
               <div
                 style={{
                   width: '360px',
-                  background: `linear-gradient(135deg, rgba(5,10,24,0.97), ${selected.color}11)`,
-                  border: `1px solid ${selected.color}`,
-                  borderRadius: '16px',
+                  background: 'linear-gradient(135deg, #1C2E44, #2E9DB511)',
+                  border: '2px solid #2E9DB5',
+                  borderRadius: '20px',
                   padding: '28px',
                   color: '#fff',
                   fontFamily: "'DM Sans', sans-serif",
                   backdropFilter: 'blur(16px)',
                   animation: 'portalSlideIn 0.5s cubic-bezier(0.22,1,0.36,1)',
                   pointerEvents: 'auto',
-                  boxShadow: `0 8px 40px rgba(0,0,0,0.5), 0 0 1px ${selected.color}44`,
+                  boxShadow: '0 8px 40px rgba(0,0,0,0.5), 0 0 1px #2E9DB544',
                 }}
               >
                 <button
@@ -552,9 +558,9 @@ export default function ServicesPortal() {
                     position: 'absolute',
                     top: '12px',
                     right: '16px',
-                    background: `${selected.color}18`,
-                    border: `1px solid ${selected.color}44`,
-                    borderRadius: '8px',
+                    background: '#2E9DB5',
+                    border: 'none',
+                    borderRadius: '100px',
                     color: '#fff',
                     fontSize: '14px',
                     cursor: 'pointer',
@@ -563,12 +569,10 @@ export default function ServicesPortal() {
                     transition: 'all 0.2s ease',
                   }}
                   onMouseEnter={(e) => {
-                    e.target.style.background = `${selected.color}33`;
-                    e.target.style.borderColor = `${selected.color}88`;
+                    e.target.style.background = '#3BB0C8';
                   }}
                   onMouseLeave={(e) => {
-                    e.target.style.background = `${selected.color}18`;
-                    e.target.style.borderColor = `${selected.color}44`;
+                    e.target.style.background = '#2E9DB5';
                   }}
                 >
                   ← Back
@@ -581,8 +585,8 @@ export default function ServicesPortal() {
                     fontSize: '18px',
                     fontWeight: 700,
                     marginBottom: '14px',
-                    fontFamily: "'Syne', sans-serif",
-                    color: selected.color,
+                    fontFamily: "'Nunito', sans-serif",
+                    color: '#ffffff',
                   }}
                 >
                   {selected.title}
@@ -594,7 +598,9 @@ export default function ServicesPortal() {
                       style={{
                         padding: '4px 0',
                         fontSize: '13px',
-                        opacity: 0.9,
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontWeight: 300,
+                        color: 'rgba(255,255,255,0.75)',
                         borderBottom: '1px solid rgba(255,255,255,0.06)',
                       }}
                     >
@@ -604,8 +610,9 @@ export default function ServicesPortal() {
                 </ul>
                 <p
                   style={{
+                    fontFamily: "'DM Sans', sans-serif",
                     fontStyle: 'italic',
-                    color: selected.color,
+                    color: '#2E9DB5',
                     fontSize: '13px',
                   }}
                 >

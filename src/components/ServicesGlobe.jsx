@@ -180,7 +180,7 @@ function ArcConnections({ pinPositions }) {
     <>
       {arcs.map((geo, i) => (
         <line key={i} geometry={geo}>
-          <lineBasicMaterial color="#1D9E75" transparent opacity={0.08} />
+          <lineBasicMaterial color="#2E9DB5" transparent opacity={0.08} />
         </line>
       ))}
     </>
@@ -229,7 +229,7 @@ function GlobeScene() {
     <>
       <ambientLight intensity={0.3} />
       <pointLight position={[8, 5, 8]} intensity={1.2} />
-      <pointLight position={[-5, -3, 5]} intensity={0.4} color="#1D9E75" />
+      <pointLight position={[-5, -3, 5]} intensity={0.4} color="#2E9DB5" />
       <Stars />
       <OrbitControls
         ref={controlsRef}
@@ -244,7 +244,7 @@ function GlobeScene() {
           <sphereGeometry args={[GLOBE_RADIUS, 36, 36]} />
           <meshBasicMaterial
             wireframe
-            color="#1D9E75"
+            color="#2E9DB5"
             transparent
             opacity={0.12}
           />
@@ -254,7 +254,7 @@ function GlobeScene() {
         <mesh>
           <sphereGeometry args={[GLOBE_RADIUS + 0.08, 36, 36]} />
           <meshBasicMaterial
-            color="#1D9E75"
+            color="#2E9DB5"
             transparent
             opacity={0.06}
             side={THREE.BackSide}
@@ -264,7 +264,7 @@ function GlobeScene() {
         {/* Solid core (very faint) */}
         <mesh>
           <sphereGeometry args={[GLOBE_RADIUS - 0.02, 36, 36]} />
-          <meshStandardMaterial color="#050A18" transparent opacity={0.6} />
+          <meshStandardMaterial color="#0D1B2A" transparent opacity={0.6} />
         </mesh>
 
         {/* Pins */}
@@ -293,9 +293,9 @@ function GlobeScene() {
         >
           <div
             style={{
-              background: 'rgba(5,10,24,0.95)',
-              border: `1px solid ${SERVICES[selectedIndex].color}`,
-              borderRadius: '16px',
+              background: 'linear-gradient(135deg, #1C2E44, #2E9DB511)',
+              border: '2px solid #2E9DB5',
+              borderRadius: '20px',
               padding: '24px',
               color: '#fff',
               fontFamily: "'DM Sans', sans-serif",
@@ -309,12 +309,18 @@ function GlobeScene() {
                 position: 'absolute',
                 top: '10px',
                 right: '14px',
-                background: 'none',
+                background: '#2E9DB5',
                 border: 'none',
+                borderRadius: '50%',
                 color: '#fff',
                 fontSize: '18px',
                 cursor: 'pointer',
-                opacity: 0.7,
+                width: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: 0,
               }}
             >
               ✕
@@ -327,8 +333,8 @@ function GlobeScene() {
                 fontSize: '17px',
                 fontWeight: 700,
                 marginBottom: '12px',
-                fontFamily: "'Syne', sans-serif",
-                color: SERVICES[selectedIndex].color,
+                fontFamily: "'Nunito', sans-serif",
+                color: '#ffffff',
               }}
             >
               {SERVICES[selectedIndex].title}
@@ -340,7 +346,9 @@ function GlobeScene() {
                   style={{
                     padding: '3px 0',
                     fontSize: '12px',
-                    opacity: 0.9,
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontWeight: 300,
+                    color: 'rgba(255,255,255,0.75)',
                     borderBottom: '1px solid rgba(255,255,255,0.06)',
                   }}
                 >
@@ -350,8 +358,9 @@ function GlobeScene() {
             </ul>
             <p
               style={{
+                fontFamily: "'DM Sans', sans-serif",
                 fontStyle: 'italic',
-                color: SERVICES[selectedIndex].color,
+                color: '#2E9DB5',
                 fontSize: '12px',
               }}
             >
@@ -366,7 +375,7 @@ function GlobeScene() {
                 top: '50%',
                 width: '40px',
                 height: '1px',
-                background: `linear-gradient(90deg, transparent, ${SERVICES[selectedIndex].color})`,
+                background: 'linear-gradient(90deg, transparent, #2E9DB5)',
               }}
             />
           </div>
@@ -390,12 +399,12 @@ export default function ServicesGlobe() {
   }, []);
 
   return (
-    <section style={{ background: '#050A18', position: 'relative' }}>
+    <section style={{ background: '#0D1B2A', position: 'relative' }}>
       <SectionHeader
         label="INTERACTIVE GLOBE"
         title="Services That Span the Globe"
         description="Spin the globe. Click any pin to explore the service connected to it."
-        accentColor="#06B6D4"
+        accentColor="#2E9DB5"
       />
 
       {isMobile ? (
@@ -406,7 +415,7 @@ export default function ServicesGlobe() {
             shadows
             dpr={[1, 2]}
             gl={{ powerPreference: 'high-performance', antialias: false, toneMapping: THREE.ACESFilmicToneMapping }}
-            style={{ background: '#050A18' }}
+            style={{ background: '#0D1B2A' }}
             camera={{ position: [0, 2, 8], fov: 50 }}
           >
             <Suspense fallback={null}>

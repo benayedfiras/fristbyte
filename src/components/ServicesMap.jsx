@@ -64,6 +64,14 @@ export default function ServicesMap() {
   useEffect(() => {
     const node = sectionRef.current;
     if (!node) return;
+
+    /* If already in viewport on mount, show immediately */
+    const rect = node.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      setIsVisible(true);
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -89,7 +97,7 @@ export default function ServicesMap() {
     <section
       ref={sectionRef}
       style={{
-        background: '#050A18',
+        background: '#0D1B2A',
         minHeight: '100vh',
         position: 'relative',
         overflow: 'hidden',
@@ -99,7 +107,7 @@ export default function ServicesMap() {
         label="CITY BLUEPRINT"
         title="Navigate the Service City"
         description="Hover to raise buildings. Click to explore."
-        accentColor="#1D9E75"
+        accentColor="#2E9DB5"
       />
 
       {isMobile ? (
@@ -139,25 +147,25 @@ export default function ServicesMap() {
               <defs>
                 {/* Gradient for horizontal grid pulse */}
                 <linearGradient id="gridPulseH" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#1D9E75" stopOpacity="0">
+                  <stop offset="0%" stopColor="#2E9DB5" stopOpacity="0">
                     <animate attributeName="offset" values="-0.3;1" dur="4s" repeatCount="indefinite" />
                   </stop>
-                  <stop offset="5%" stopColor="#1D9E75" stopOpacity="0.5">
+                  <stop offset="5%" stopColor="#2E9DB5" stopOpacity="0.5">
                     <animate attributeName="offset" values="-0.2;1.05" dur="4s" repeatCount="indefinite" />
                   </stop>
-                  <stop offset="15%" stopColor="#1D9E75" stopOpacity="0">
+                  <stop offset="15%" stopColor="#2E9DB5" stopOpacity="0">
                     <animate attributeName="offset" values="0;1.15" dur="4s" repeatCount="indefinite" />
                   </stop>
                 </linearGradient>
                 {/* Gradient for vertical grid pulse */}
                 <linearGradient id="gridPulseV" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stopColor="#1D9E75" stopOpacity="0">
+                  <stop offset="0%" stopColor="#2E9DB5" stopOpacity="0">
                     <animate attributeName="offset" values="-0.3;1" dur="5s" repeatCount="indefinite" />
                   </stop>
-                  <stop offset="5%" stopColor="#1D9E75" stopOpacity="0.5">
+                  <stop offset="5%" stopColor="#2E9DB5" stopOpacity="0.5">
                     <animate attributeName="offset" values="-0.2;1.05" dur="5s" repeatCount="indefinite" />
                   </stop>
-                  <stop offset="15%" stopColor="#1D9E75" stopOpacity="0">
+                  <stop offset="15%" stopColor="#2E9DB5" stopOpacity="0">
                     <animate attributeName="offset" values="0;1.15" dur="5s" repeatCount="indefinite" />
                   </stop>
                 </linearGradient>
@@ -171,7 +179,7 @@ export default function ServicesMap() {
                   y1={y}
                   x2="100"
                   y2={y}
-                  stroke="#1D9E75"
+                  stroke="#2E9DB5"
                   strokeWidth="0.15"
                   opacity="0.15"
                 />
@@ -198,7 +206,7 @@ export default function ServicesMap() {
                   y1="0"
                   x2={x}
                   y2="100"
-                  stroke="#1D9E75"
+                  stroke="#2E9DB5"
                   strokeWidth="0.15"
                   opacity="0.15"
                 />
@@ -233,7 +241,7 @@ export default function ServicesMap() {
                   width={w}
                   height={h}
                   fill="none"
-                  stroke="#1D9E75"
+                  stroke="#2E9DB5"
                   strokeWidth="0.1"
                   opacity="0.08"
                 />
@@ -359,13 +367,13 @@ export default function ServicesMap() {
                         top: '-32px',
                         left: '50%',
                         transform: 'translateX(-50%)',
-                        background: 'rgba(5,10,24,0.92)',
+                        background: 'rgba(13,27,42,0.92)',
                         border: `1px solid ${service.color}88`,
                         borderRadius: '6px',
                         padding: '4px 10px',
                         color: service.color,
                         fontSize: '11px',
-                        fontFamily: "'Syne', sans-serif",
+                        fontFamily: "'Nunito', sans-serif",
                         fontWeight: 600,
                         whiteSpace: 'nowrap',
                         pointerEvents: 'none',
@@ -384,7 +392,7 @@ export default function ServicesMap() {
                           transform: 'translateX(-50%) rotate(45deg)',
                           width: '8px',
                           height: '8px',
-                          background: 'rgba(5,10,24,0.92)',
+                          background: 'rgba(13,27,42,0.92)',
                           borderRight: `1px solid ${service.color}88`,
                           borderBottom: `1px solid ${service.color}88`,
                         }}
@@ -534,16 +542,16 @@ export default function ServicesMap() {
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
                     width: '360px',
-                    background: 'rgba(5,10,24,0.97)',
-                    border: `1px solid ${svc.color}`,
-                    borderRadius: '16px',
+                    background: '#1C2E44',
+                    border: '2px solid #2E9DB5',
+                    borderRadius: '20px',
                     padding: '28px',
                     color: '#fff',
                     fontFamily: "'DM Sans', sans-serif",
                     backdropFilter: 'blur(16px)',
                     animation: 'panelSlideUp 0.45s cubic-bezier(0.22,1,0.36,1)',
                     zIndex: 20,
-                    boxShadow: `0 8px 40px rgba(0,0,0,0.5), 0 0 1px ${svc.color}44`,
+                    boxShadow: `0 8px 40px rgba(0,0,0,0.5), 0 0 1px #2E9DB544`,
                   }}
                 >
                   <button
@@ -552,18 +560,20 @@ export default function ServicesMap() {
                       position: 'absolute',
                       top: '12px',
                       right: '16px',
-                      background: `${svc.color}18`,
-                      border: `1px solid ${svc.color}44`,
-                      borderRadius: '8px',
+                      background: '#2E9DB5',
+                      border: 'none',
+                      borderRadius: '50%',
                       color: '#fff',
-                      fontSize: '14px',
+                      width: '28px',
+                      height: '28px',
+                      fontSize: '16px',
                       cursor: 'pointer',
-                      padding: '6px 14px',
-                      fontFamily: "'DM Sans', sans-serif",
-                      transition: 'all 0.2s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
                     }}
                   >
-                    ✕ Close
+                    ✕
                   </button>
                   <div style={{ fontSize: '36px', marginBottom: '8px' }}>
                     {svc.icon}
@@ -573,8 +583,8 @@ export default function ServicesMap() {
                       fontSize: '18px',
                       fontWeight: 700,
                       marginBottom: '14px',
-                      fontFamily: "'Syne', sans-serif",
-                      color: svc.color,
+                      fontFamily: "'Nunito', sans-serif",
+                      color: '#ffffff',
                     }}
                   >
                     {svc.title}
@@ -586,8 +596,11 @@ export default function ServicesMap() {
                         style={{
                           padding: '4px 0',
                           fontSize: '13px',
-                          opacity: 0,
+                          fontFamily: "'DM Sans', sans-serif",
+                          fontWeight: 300,
+                          color: 'rgba(255,255,255,0.75)',
                           borderBottom: '1px solid rgba(255,255,255,0.06)',
+                          opacity: 0,
                           animation: `bulletFadeIn 0.3s ease-out ${0.15 + j * 0.06}s forwards`,
                         }}
                       >
@@ -597,8 +610,9 @@ export default function ServicesMap() {
                   </ul>
                   <p
                     style={{
+                      fontFamily: "'DM Sans', sans-serif",
                       fontStyle: 'italic',
-                      color: svc.color,
+                      color: '#2E9DB5',
                       fontSize: '13px',
                       opacity: 0,
                       animation: 'bulletFadeIn 0.3s ease-out 0.5s forwards',
@@ -644,8 +658,8 @@ export default function ServicesMap() {
         }
 
         @keyframes panelSlideUp {
-          0%   { opacity: 0; transform: translateX(-50%) translateY(24px) scale(0.95); }
-          100% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+          0%   { opacity: 0; transform: translate(-50%, -50%) translateY(24px) scale(0.95); }
+          100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
         }
 
         @keyframes connectorGrow {

@@ -211,7 +211,7 @@ function OSWindow({
             color: '#fff',
             fontSize: '14px',
             fontWeight: 600,
-            fontFamily: "'Syne', sans-serif",
+            fontFamily: "'Nunito', sans-serif",
             marginRight: '62px',
           }}
         >
@@ -223,7 +223,7 @@ function OSWindow({
       <div
         style={{
           flex: 1,
-          background: '#0D1B2A',
+          background: '#1C2E44',
           padding: '24px',
           overflowY: 'auto',
           color: '#fff',
@@ -237,7 +237,9 @@ function OSWindow({
               style={{
                 padding: '6px 0',
                 fontSize: '14px',
-                opacity: 0.9,
+                color: 'rgba(255,255,255,0.75)',
+                fontFamily: "'DM Sans', sans-serif",
+                fontWeight: 300,
                 borderBottom: '1px solid rgba(255,255,255,0.06)',
               }}
             >
@@ -248,8 +250,9 @@ function OSWindow({
         <p
           style={{
             fontStyle: 'italic',
-            color: service.color,
+            color: '#2E9DB5',
             fontSize: '14px',
+            fontFamily: "'DM Sans', sans-serif",
             marginTop: '16px',
           }}
         >
@@ -352,7 +355,7 @@ export default function ServicesOS() {
     <section
       ref={sectionRef}
       style={{
-        background: '#050A18',
+        background: '#0D1B2A',
         minHeight: '100vh',
         position: 'relative',
         overflow: 'hidden',
@@ -362,7 +365,7 @@ export default function ServicesOS() {
         label="THE DESKTOP EXPERIENCE"
         title="Your Business Operating System"
         description="Click the dock icons to explore each service. Drag, stack, and manage windows like a real desktop."
-        accentColor="#06B6D4"
+        accentColor="#2E9DB5"
       />
 
       {isMobile ? (
@@ -375,7 +378,7 @@ export default function ServicesOS() {
             width: '100%',
             minHeight: 'calc(100vh - 200px)',
             background:
-              'radial-gradient(ellipse at 50% 40%, #0c1a30 0%, #050A18 60%)',
+              'radial-gradient(ellipse at 50% 40%, #0D1B2A 0%, #0D1B2A 60%)',
           }}
         >
           {/* Menu bar */}
@@ -399,7 +402,7 @@ export default function ServicesOS() {
               gap: '20px',
             }}
           >
-            <span style={{ fontWeight: 700, color: '#06B6D4' }}>FristByte</span>
+            <span style={{ fontWeight: 700, color: '#2E9DB5' }}>FristByte</span>
             <span>File</span>
             <span>Edit</span>
             <span>View</span>
@@ -437,7 +440,7 @@ export default function ServicesOS() {
                 height: '500px',
                 borderRadius: '50%',
                 background:
-                  'radial-gradient(circle, rgba(139,92,246,0.08) 0%, transparent 70%)',
+                  'radial-gradient(circle, rgba(46,157,181,0.08) 0%, transparent 70%)',
                 top: '10%',
                 left: '15%',
                 animation: 'auroraFloat1 12s ease-in-out infinite',
@@ -450,7 +453,7 @@ export default function ServicesOS() {
                 height: '400px',
                 borderRadius: '50%',
                 background:
-                  'radial-gradient(circle, rgba(6,182,212,0.06) 0%, transparent 70%)',
+                  'radial-gradient(circle, rgba(26,107,124,0.06) 0%, transparent 70%)',
                 top: '30%',
                 right: '10%',
                 animation: 'auroraFloat2 15s ease-in-out infinite',
@@ -589,7 +592,7 @@ export default function ServicesOS() {
                     style={{
                       width: '56px',
                       height: '56px',
-                      borderRadius: '14px',
+                      borderRadius: '16px',
                       background: s.color,
                       border: 'none',
                       cursor: 'pointer',
@@ -602,7 +605,7 @@ export default function ServicesOS() {
                       transform: `scale(${scale}) translateY(${translateY}px)`,
                       boxShadow:
                         hoveredDock === i
-                          ? `0 4px 20px ${s.color}66`
+                          ? `0 4px 20px #2E9DB566`
                           : '0 2px 8px rgba(0,0,0,0.3)',
                     }}
                   >

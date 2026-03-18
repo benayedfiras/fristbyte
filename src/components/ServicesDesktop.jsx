@@ -70,14 +70,14 @@ function PencilCup({ serviceIndex, hoveredIndex, setHoveredIndex, selectedIndex,
       {/* Cup */}
       <ToonMesh
         geometry={<cylinderGeometry args={[0.3, 0.25, 0.6, 16]} />}
-        color="#1D9E75"
+        color="#1A6B7C"
         position={[0, 0, 0]}
       />
       {/* Pencils */}
       {[
-        { color: '#F59E0B', x: -0.08, z: 0.05, ref: pencilRefs[0] },
+        { color: '#2E9DB5', x: -0.08, z: 0.05, ref: pencilRefs[0] },
         { color: '#EF4444', x: 0.1, z: -0.05, ref: pencilRefs[1] },
-        { color: '#3B8BD4', x: 0, z: 0.1, ref: pencilRefs[2] },
+        { color: '#2E9DB5', x: 0, z: 0.1, ref: pencilRefs[2] },
       ].map((p, i) => (
         <group key={i} ref={p.ref}>
           <ToonMesh
@@ -134,7 +134,7 @@ function Monitor({ serviceIndex, hoveredIndex, setHoveredIndex, selectedIndex, s
       {/* Monitor body */}
       <ToonMesh
         geometry={<boxGeometry args={[1.1, 0.75, 0.08]} />}
-        color="#3B8BD4"
+        color="#2E9DB5"
         position={[0, 0.3, 0]}
       />
       {/* Screen (slightly inset, dark) */}
@@ -147,11 +147,11 @@ function Monitor({ serviceIndex, hoveredIndex, setHoveredIndex, selectedIndex, s
       {/* Code lines on screen */}
       <group ref={linesRef} position={[0, 0.32, 0.055]}>
         {[
-          { w: 0.5, c: '#1D9E75', y: 0.15 },
-          { w: 0.35, c: '#EC4899', y: 0.07 },
-          { w: 0.6, c: '#F59E0B', y: -0.01 },
-          { w: 0.3, c: '#8B5CF6', y: -0.09 },
-          { w: 0.45, c: '#3B8BD4', y: -0.17 },
+          { w: 0.5, c: '#1A6B7C', y: 0.15 },
+          { w: 0.35, c: '#2E9DB5', y: 0.07 },
+          { w: 0.6, c: '#2E9DB5', y: -0.01 },
+          { w: 0.3, c: '#1A6B7C', y: -0.09 },
+          { w: 0.45, c: '#2E9DB5', y: -0.17 },
         ].map((line, i) => (
           <mesh key={i} position={[-0.15 + line.w / 2 - 0.2, line.y, 0]}>
             <boxGeometry args={[line.w, 0.035, 0.001]} />
@@ -209,13 +209,13 @@ function Robot({ serviceIndex, hoveredIndex, setHoveredIndex, selectedIndex, set
       {/* Body */}
       <ToonMesh
         geometry={<boxGeometry args={[0.55, 0.5, 0.4]} />}
-        color="#8B5CF6"
+        color="#1A6B7C"
         position={[0, 0, 0]}
       />
       {/* Head */}
       <ToonMesh
         geometry={<sphereGeometry args={[0.22, 16, 16]} />}
-        color="#a78bfa"
+        color="#2E9DB5"
         position={[0, 0.42, 0]}
       />
       {/* Eyes */}
@@ -251,19 +251,19 @@ function Robot({ serviceIndex, hoveredIndex, setHoveredIndex, selectedIndex, set
       <group ref={gearRef} position={[0.34, 0.05, 0]}>
         <mesh>
           <torusGeometry args={[0.1, 0.03, 8, 12]} />
-          <meshToonMaterial color="#F59E0B" />
+          <meshToonMaterial color="#2E9DB5" />
         </mesh>
       </group>
       {/* Arms */}
       <ToonMesh
         geometry={<boxGeometry args={[0.12, 0.35, 0.1]} />}
-        color="#7c3aed"
+        color="#1A6B7C"
         position={[-0.38, -0.05, 0]}
         rotation={[0, 0, 0.15]}
       />
       <ToonMesh
         geometry={<boxGeometry args={[0.12, 0.35, 0.1]} />}
-        color="#7c3aed"
+        color="#1A6B7C"
         position={[0.38, -0.05, 0]}
         rotation={[0, 0, -0.15]}
       />
@@ -282,10 +282,10 @@ function BookStack({ serviceIndex, hoveredIndex, setHoveredIndex, selectedIndex,
   });
 
   const books = [
-    { color: '#F59E0B', h: 0.14, w: 0.6 },
-    { color: '#f97316', h: 0.12, w: 0.55 },
-    { color: '#fbbf24', h: 0.16, w: 0.58 },
-    { color: '#fb923c', h: 0.11, w: 0.52 },
+    { color: '#2E9DB5', h: 0.14, w: 0.6 },
+    { color: '#1A6B7C', h: 0.12, w: 0.55 },
+    { color: '#2E9DB5', h: 0.16, w: 0.58 },
+    { color: '#1A6B7C', h: 0.11, w: 0.52 },
   ];
 
   let stackY = 0;
@@ -352,13 +352,13 @@ function PottedPlant({ serviceIndex, hoveredIndex, setHoveredIndex, selectedInde
       {/* Pot */}
       <ToonMesh
         geometry={<cylinderGeometry args={[0.22, 0.18, 0.35, 16]} />}
-        color="#EC4899"
+        color="#2E9DB5"
         position={[0, 0, 0]}
       />
       {/* Pot rim */}
       <ToonMesh
         geometry={<cylinderGeometry args={[0.25, 0.25, 0.05, 16]} />}
-        color="#db2777"
+        color="#1A6B7C"
         position={[0, 0.18, 0]}
       />
       {/* Soil */}
@@ -376,9 +376,9 @@ function PottedPlant({ serviceIndex, hoveredIndex, setHoveredIndex, selectedInde
       />
       {/* Flower blooms */}
       {[
-        { x: 0, y: 0.78, z: 0, c: '#EC4899', s: 0.1 },
-        { x: -0.12, y: 0.65, z: 0.05, c: '#f472b6', s: 0.07 },
-        { x: 0.1, y: 0.7, z: -0.05, c: '#fb7185', s: 0.08 },
+        { x: 0, y: 0.78, z: 0, c: '#2E9DB5', s: 0.1 },
+        { x: -0.12, y: 0.65, z: 0.05, c: '#2E9DB5', s: 0.07 },
+        { x: 0.1, y: 0.7, z: -0.05, c: '#2E9DB5', s: 0.08 },
       ].map((f, i) => (
         <ToonMesh
           key={i}
@@ -416,10 +416,10 @@ function BulletinBoard({ serviceIndex, hoveredIndex, setHoveredIndex, selectedIn
   });
 
   const notes = [
-    { x: -0.2, y: 0.15, c: '#06B6D4', pin: '#EF4444' },
-    { x: 0.2, y: 0.12, c: '#22d3ee', pin: '#F59E0B' },
-    { x: -0.15, y: -0.15, c: '#F59E0B', pin: '#1D9E75' },
-    { x: 0.18, y: -0.12, c: '#EF4444', pin: '#3B8BD4' },
+    { x: -0.2, y: 0.15, c: '#2E9DB5', pin: '#EF4444' },
+    { x: 0.2, y: 0.12, c: '#2E9DB5', pin: '#2E9DB5' },
+    { x: -0.15, y: -0.15, c: '#2E9DB5', pin: '#1A6B7C' },
+    { x: 0.18, y: -0.12, c: '#EF4444', pin: '#2E9DB5' },
   ];
 
   return (
@@ -669,7 +669,7 @@ function InteractiveObject({
         >
           <div style={{
             background: '#ffffff',
-            border: `4px solid ${service.color}`,
+            border: '3px solid #2E9DB5',
             borderRadius: '20px',
             padding: '24px 24px 20px',
             color: '#222',
@@ -689,7 +689,7 @@ function InteractiveObject({
                 position: 'absolute',
                 top: '8px',
                 right: '12px',
-                background: service.color,
+                background: '#2E9DB5',
                 border: 'none',
                 color: '#fff',
                 width: '28px',
@@ -711,8 +711,8 @@ function InteractiveObject({
               fontSize: '18px',
               fontWeight: 700,
               marginBottom: '12px',
-              fontFamily: "'Syne', sans-serif",
-              color: service.color,
+              fontFamily: "'Nunito', sans-serif",
+              color: '#2E9DB5',
             }}>
               {service.title}
             </h3>
@@ -730,7 +730,7 @@ function InteractiveObject({
             </ul>
             <p style={{
               fontStyle: 'italic',
-              color: service.color,
+              color: '#2E9DB5',
               fontSize: '13px',
               fontWeight: 600,
             }}>
@@ -921,7 +921,7 @@ function WallFrame() {
       {/* Sun */}
       <mesh position={[0.2, 0.12, 0.03]}>
         <sphereGeometry args={[0.06, 12, 12]} />
-        <meshToonMaterial color="#F59E0B" />
+        <meshToonMaterial color="#2E9DB5" />
       </mesh>
     </group>
   );
@@ -945,7 +945,7 @@ function Floor() {
         >
           <planeGeometry args={[3.5, 0.25]} />
           <meshToonMaterial
-            color={i % 2 === 0 ? '#F59E0B' : '#ffffff'}
+            color={i % 2 === 0 ? '#2E9DB5' : '#ffffff'}
             transparent
             opacity={i % 2 === 0 ? 0.25 : 0.2}
           />
@@ -999,7 +999,7 @@ function DeskLamp() {
       {/* Shade */}
       <ToonMesh
         geometry={<coneGeometry args={[0.12, 0.15, 12, 1, true]} />}
-        color="#1D9E75"
+        color="#1A6B7C"
         position={[0, 0.62, -0.05]}
         rotation={[0.2, 0, 0]}
       />
@@ -1082,7 +1082,7 @@ export default function ServicesDesktop() {
         label="OUR CONNECTED ECOSYSTEM"
         title="Everything Your Business Needs Connected."
         description="From brand to backend, from traffic to automation, our services work together as one scalable system."
-        accentColor="#1D9E75"
+        accentColor="#2E9DB5"
         dark={false}
       />
 

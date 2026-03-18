@@ -350,13 +350,13 @@ export default function ServicesMorphing() {
   const service = SERVICES[activeIndex];
 
   return (
-    <section style={{ background: '#050A18', position: 'relative' }}>
+    <section style={{ background: '#0D1B2A', position: 'relative' }}>
       {/* Section Header */}
       <SectionHeader
         label="MORPHING BLOB"
         title="One Shape, Many Services"
         description="Watch the blob morph as it cycles through each service. Click a dot to jump to any service."
-        accentColor="#EC4899"
+        accentColor="#2E9DB5"
       />
 
       <div
@@ -417,7 +417,7 @@ export default function ServicesMorphing() {
               style={{
                 fontSize: isMobile ? '20px' : '24px',
                 fontWeight: 700,
-                fontFamily: "'Syne', sans-serif",
+                fontFamily: "'Nunito', sans-serif",
                 color: service.color,
                 marginBottom: '16px',
               }}
@@ -547,11 +547,13 @@ export default function ServicesMorphing() {
 const arrowBtnStyle = {
   width: '36px',
   height: '36px',
-  borderRadius: '50%',
-  background: 'rgba(255,255,255,0.08)',
-  border: '1px solid rgba(255,255,255,0.15)',
-  color: '#fff',
+  borderRadius: '100px',
+  background: 'linear-gradient(135deg, #1A6B7C, #2E9DB5)',
+  border: 'none',
+  color: '#ffffff',
   fontSize: '16px',
+  fontFamily: "'Nunito', sans-serif",
+  fontWeight: 700,
   cursor: 'pointer',
   display: 'flex',
   alignItems: 'center',

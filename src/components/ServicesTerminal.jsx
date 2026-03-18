@@ -58,10 +58,10 @@ function MatrixRain() {
             <span
               key={j}
               style={{
-                color: '#1D9E75',
+                color: '#2E9DB5',
                 fontFamily: "'SF Mono', 'Fira Code', monospace",
                 fontSize: '12px',
-                textShadow: '0 0 6px rgba(29,158,117,0.6)',
+                textShadow: '0 0 6px rgba(46,157,181,0.6)',
               }}
             >
               {char}
@@ -92,10 +92,10 @@ function TypingWaveform() {
           style={{
             display: 'inline-block',
             width: '3px',
-            background: '#1D9E75',
+            background: '#2E9DB5',
             borderRadius: '1px',
             animation: `waveformBounce 0.6s ${i * 0.1}s ease-in-out infinite alternate`,
-            boxShadow: '0 0 4px rgba(29,158,117,0.5)',
+            boxShadow: '0 0 4px rgba(46,157,181,0.5)',
           }}
         />
       ))}
@@ -110,7 +110,7 @@ function BootProgressBar({ progress }) {
       style={{
         width: '100%',
         height: '3px',
-        background: 'rgba(29,158,117,0.15)',
+        background: 'rgba(46,157,181,0.15)',
         borderRadius: '2px',
         overflow: 'hidden',
         margin: '6px 0 10px',
@@ -120,10 +120,10 @@ function BootProgressBar({ progress }) {
         style={{
           height: '100%',
           width: `${progress}%`,
-          background: 'linear-gradient(90deg, #1D9E75, #2dd4a0)',
+          background: 'linear-gradient(90deg, #1A6B7C, #2E9DB5)',
           borderRadius: '2px',
           transition: 'width 0.15s ease-out',
-          boxShadow: '0 0 8px rgba(29,158,117,0.5)',
+          boxShadow: '0 0 8px rgba(46,157,181,0.5)',
         }}
       />
     </div>
@@ -141,6 +141,7 @@ export default function ServicesTerminal() {
   const termBodyRef = useRef(null);
   const bootedRef = useRef(false);
   const typingRef = useRef(null);
+  const isVisibleRef = useRef(false);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -190,11 +191,12 @@ export default function ServicesTerminal() {
     return () => clearInterval(interval);
   }, []);
 
-  /* IntersectionObserver: trigger boot when section enters viewport */
+  /* IntersectionObserver: trigger boot when section enters viewport + track visibility */
   useEffect(() => {
     if (!sectionRef.current) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
+        isVisibleRef.current = entry.isIntersecting;
         if (entry.isIntersecting && !bootedRef.current) {
           bootedRef.current = true;
           startBoot();
@@ -276,9 +278,10 @@ export default function ServicesTerminal() {
     setLines([...BOOT_LINES, ...MENU_LINES, '']);
   }, []);
 
-  /* Keyboard input */
+  /* Keyboard input — only when section is visible */
   useEffect(() => {
     const handleKey = (e) => {
+      if (!isVisibleRef.current) return;
       if (phase === 'menu') {
         const num = parseInt(e.key);
         if (num >= 1 && num <= 6) {
@@ -310,7 +313,7 @@ export default function ServicesTerminal() {
     <section
       ref={sectionRef}
       style={{
-        background: '#050A18',
+        background: '#0D1B2A',
         minHeight: '100vh',
         position: 'relative',
         display: 'flex',
@@ -327,7 +330,7 @@ export default function ServicesTerminal() {
         label="HACKER TERMINAL"
         title="Access the Service Terminal"
         description="Type 1-6 on your keyboard or click a service to explore."
-        accentColor="#1D9E75"
+        accentColor="#2E9DB5"
       />
 
       {/* Terminal window with ambient glow */}
@@ -346,7 +349,7 @@ export default function ServicesTerminal() {
             position: 'absolute',
             inset: '-20px',
             borderRadius: '30px',
-            background: 'radial-gradient(ellipse at center, rgba(29,158,117,0.12) 0%, transparent 70%)',
+            background: 'radial-gradient(ellipse at center, rgba(46,157,181,0.12) 0%, transparent 70%)',
             animation: 'ambientGlow 3s ease-in-out infinite',
             pointerEvents: 'none',
             zIndex: -1,
@@ -359,15 +362,15 @@ export default function ServicesTerminal() {
             borderRadius: '14px',
             overflow: 'hidden',
             boxShadow:
-              '0 0 60px rgba(29,158,117,0.12), 0 0 120px rgba(29,158,117,0.06), 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(29,158,117,0.1)',
-            border: '1px solid rgba(29,158,117,0.2)',
+              '0 0 60px rgba(46,157,181,0.12), 0 0 120px rgba(46,157,181,0.06), 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(46,157,181,0.1)',
+            border: '1px solid rgba(46,157,181,0.2)',
             position: 'relative',
           }}
         >
           {/* Title bar */}
           <div
             style={{
-              background: '#111827',
+              background: '#1C2E44',
               padding: '12px 16px',
               display: 'flex',
               alignItems: 'center',
@@ -418,7 +421,7 @@ export default function ServicesTerminal() {
           <div
             ref={termBodyRef}
             style={{
-              background: '#0a0f1c',
+              background: '#0D1B2A',
               padding: '20px',
               minHeight: '400px',
               maxHeight: '500px',
@@ -475,33 +478,33 @@ export default function ServicesTerminal() {
                       fontSize: isMobile ? '13px' : '14px',
                       lineHeight: '1.7',
                       color: line.startsWith('>')
-                        ? '#1D9E75'
+                        ? '#2E9DB5'
                         : line.startsWith('╔') ||
                           line.startsWith('║') ||
                           line.startsWith('╚')
-                        ? SERVICES[selectedService]?.color || '#1D9E75'
+                        ? SERVICES[selectedService]?.color || '#2E9DB5'
                         : isMenuLine
-                        ? '#1D9E75'
+                        ? '#2E9DB5'
                         : line.includes('"')
-                        ? '#F59E0B'
-                        : 'rgba(29,158,117,0.85)',
+                        ? '#2E9DB5'
+                        : 'rgba(46,157,181,0.85)',
                       cursor: isMenuLine ? 'pointer' : 'default',
                       transition: 'color 0.2s',
                       whiteSpace: 'pre-wrap',
-                      textShadow: line.startsWith('>') ? '0 0 8px rgba(29,158,117,0.4)' : 'none',
+                      textShadow: line.startsWith('>') ? '0 0 8px rgba(46,157,181,0.4)' : 'none',
                       ...(isMenuLine
                         ? {
                             padding: '2px 6px',
                             borderRadius: '4px',
-                            background: 'rgba(29,158,117,0.04)',
+                            background: 'rgba(46,157,181,0.04)',
                           }
                         : {}),
                     }}
                     onMouseEnter={(e) => {
-                      if (isMenuLine) e.target.style.background = 'rgba(29,158,117,0.12)';
+                      if (isMenuLine) e.target.style.background = 'rgba(46,157,181,0.12)';
                     }}
                     onMouseLeave={(e) => {
-                      if (isMenuLine) e.target.style.background = 'rgba(29,158,117,0.04)';
+                      if (isMenuLine) e.target.style.background = 'rgba(46,157,181,0.04)';
                     }}
                   >
                     {line}
@@ -515,9 +518,9 @@ export default function ServicesTerminal() {
                   style={{
                     fontFamily: "'SF Mono', 'Fira Code', 'Courier New', monospace",
                     fontSize: isMobile ? '13px' : '14px',
-                    color: '#1D9E75',
+                    color: '#2E9DB5',
                     lineHeight: '1.7',
-                    textShadow: '0 0 8px rgba(29,158,117,0.4)',
+                    textShadow: '0 0 8px rgba(46,157,181,0.4)',
                   }}
                 >
                   {'> '}{cursor}
@@ -528,11 +531,11 @@ export default function ServicesTerminal() {
                   style={{
                     fontFamily: "'SF Mono', 'Fira Code', 'Courier New', monospace",
                     fontSize: isMobile ? '13px' : '14px',
-                    color: '#1D9E75',
+                    color: '#2E9DB5',
                     lineHeight: '1.7',
                     display: 'flex',
                     alignItems: 'center',
-                    textShadow: '0 0 8px rgba(29,158,117,0.4)',
+                    textShadow: '0 0 8px rgba(46,157,181,0.4)',
                   }}
                 >
                   {'> '}{cursor}
@@ -549,7 +552,7 @@ export default function ServicesTerminal() {
               inset: 0,
               borderRadius: '14px',
               boxShadow:
-                'inset 0 0 80px rgba(29,158,117,0.04), inset 0 0 120px rgba(0,0,0,0.3)',
+                'inset 0 0 80px rgba(46,157,181,0.04), inset 0 0 120px rgba(0,0,0,0.3)',
               pointerEvents: 'none',
               /* Subtle barrel distortion via border radius trick */
               border: '2px solid transparent',
@@ -577,22 +580,23 @@ export default function ServicesTerminal() {
           style={{
             marginBottom: '60px',
             padding: '10px 28px',
-            background: 'rgba(29,158,117,0.1)',
-            border: '1px solid rgba(29,158,117,0.3)',
-            borderRadius: '999px',
-            color: '#1D9E75',
+            background: 'linear-gradient(135deg, #1A6B7C, #2E9DB5)',
+            border: 'none',
+            borderRadius: '100px',
+            color: '#ffffff',
             fontSize: '14px',
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "'Nunito', sans-serif",
+            fontWeight: 700,
             cursor: 'pointer',
             transition: 'all 0.2s',
             position: 'relative',
             zIndex: 2,
           }}
           onMouseEnter={(e) => {
-            e.target.style.background = 'rgba(29,158,117,0.2)';
+            e.target.style.opacity = '0.9';
           }}
           onMouseLeave={(e) => {
-            e.target.style.background = 'rgba(29,158,117,0.1)';
+            e.target.style.opacity = '1';
           }}
         >
           ← Back to menu (ESC)

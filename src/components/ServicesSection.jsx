@@ -9,12 +9,12 @@ import gsap from 'gsap';
 import { SERVICES as BASE_SERVICES } from '../data/services';
 
 const HEX_POSITIONS = [
-  [-2.2, 1.3, 0],
-  [0, 1.3, 0],
-  [-3.3, -0.65, 0],
-  [1.1, -0.65, 0],
-  [-2.2, -2.6, 0],
-  [0, -2.6, 0],
+  [-1.1, 1.3, 0],
+  [1.1, 1.3, 0],
+  [-2.2, -0.65, 0],
+  [0, -0.65, 0],
+  [-1.1, -2.6, 0],
+  [1.1, -2.6, 0],
 ];
 
 const SERVICES = BASE_SERVICES.map((s, i) => ({
@@ -207,7 +207,7 @@ function HexPrism({
         x: 2, y: 2, z: 2,
         duration: 0.6, ease: 'power2.out',
       });
-      gsap.to(mat, { emissiveIntensity: 0.8, opacity: 1, duration: 0.6 });
+      gsap.to(mat, { emissiveIntensity: 3.0, opacity: 1, duration: 0.6 });
     } else if (isOtherSelected) {
       // push away and shrink
       const dir = new THREE.Vector3(
@@ -234,7 +234,7 @@ function HexPrism({
         x: 1.15, y: 1.15, z: 1.15,
         duration: 0.4, ease: 'power2.out',
       });
-      gsap.to(mat, { emissiveIntensity: 0.8, opacity: 0.25, duration: 0.4 });
+      gsap.to(mat, { emissiveIntensity: 1.8, opacity: 0.25, duration: 0.4 });
     } else if (isOtherHovered) {
       gsap.to(mat, { opacity: 0.08, emissiveIntensity: 0.1, duration: 0.4 });
       if (edgeMat) gsap.to(edgeMat, { opacity: 0.4, duration: 0.4 });
@@ -250,7 +250,7 @@ function HexPrism({
         x: 1, y: 1, z: 1,
         duration: 0.6, ease: 'power2.out',
       });
-      gsap.to(mat, { opacity: 0.15, emissiveIntensity: 0.3, duration: 0.6 });
+      gsap.to(mat, { opacity: 0.15, emissiveIntensity: 0.4, duration: 0.6 });
       if (edgeMat) gsap.to(edgeMat, { opacity: 0.8, duration: 0.6 });
     }
   }, [isSelected, isOtherSelected, isHovered, isOtherHovered, service.position, index]);
@@ -264,7 +264,7 @@ function HexPrism({
       <pointLight
         ref={lightRef}
         position={[0, 1.5, 0]}
-        color={service.color}
+        color={'#2E9DB5'}
         intensity={0.3}
         distance={5}
       />
@@ -297,11 +297,11 @@ function HexPrism({
         }}
       >
         <meshStandardMaterial
-          color={service.color}
+          color={'#1A6B7C'}
           transparent
           opacity={0.15}
-          emissive={service.color}
-          emissiveIntensity={3}
+          emissive={'#2E9DB5'}
+          emissiveIntensity={0.4}
           toneMapped={false}
           side={THREE.DoubleSide}
         />
@@ -309,14 +309,14 @@ function HexPrism({
 
       {/* Wireframe edges */}
       <lineSegments ref={edgesRef} geometry={edgesGeo} rotation={[Math.PI / 2, 0, 0]}>
-        <lineBasicMaterial color={service.color} transparent opacity={0.8} />
+        <lineBasicMaterial color={'#2E9DB5'} transparent opacity={0.8} />
       </lineSegments>
 
       {/* Icon on top face */}
       <Text
         position={[0, 0, 0.25]}
         fontSize={0.35}
-        color={service.color}
+        color={'#2E9DB5'}
         anchorX="center"
         anchorY="middle"
         font={undefined}
@@ -352,9 +352,9 @@ function HexPrism({
         >
           <div
             style={{
-              background: 'rgba(5, 10, 24, 0.95)',
-              border: `1px solid ${service.color}`,
-              borderRadius: '16px',
+              background: '#1C2E44',
+              border: '2px solid #2E9DB5',
+              borderRadius: '20px',
               padding: '32px',
               color: '#fff',
               fontFamily: "'DM Sans', sans-serif",
@@ -373,13 +373,18 @@ function HexPrism({
                 position: 'absolute',
                 top: '12px',
                 right: '16px',
-                background: 'none',
+                background: '#2E9DB5',
                 border: 'none',
                 color: '#fff',
-                fontSize: '20px',
+                fontSize: '16px',
                 cursor: 'pointer',
-                opacity: 0.7,
                 lineHeight: 1,
+                width: '28px',
+                height: '28px',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
               ✕
@@ -392,7 +397,8 @@ function HexPrism({
                 fontSize: '20px',
                 fontWeight: 700,
                 marginBottom: '16px',
-                fontFamily: "'Syne', sans-serif",
+                fontFamily: "'Nunito', sans-serif",
+                color: '#ffffff',
               }}
             >
               {service.title}
@@ -410,7 +416,9 @@ function HexPrism({
                   style={{
                     padding: '4px 0',
                     fontSize: '14px',
-                    opacity: 0.9,
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontWeight: 300,
+                    color: 'rgba(255,255,255,0.75)',
                     borderBottom: '1px solid rgba(255,255,255,0.06)',
                   }}
                 >
@@ -421,7 +429,8 @@ function HexPrism({
             <p
               style={{
                 fontStyle: 'italic',
-                color: service.color,
+                fontFamily: "'DM Sans', sans-serif",
+                color: '#2E9DB5',
                 fontSize: '14px',
                 marginTop: '12px',
               }}
@@ -534,12 +543,12 @@ export default function ServicesSection() {
   };
 
   return (
-    <section ref={sectionRef} style={{ background: '#050A18', position: 'relative' }}>
+    <section ref={sectionRef} style={{ background: '#0D1B2A', position: 'relative' }}>
       <SectionHeader
         label="OUR CONNECTED ECOSYSTEM"
         title="Everything Your Business Needs Connected."
         description="From brand to backend, from traffic to automation, our services work together as one scalable system."
-        accentColor="#1D9E75"
+        accentColor="#2E9DB5"
         dark
       />
 
@@ -556,7 +565,7 @@ export default function ServicesSection() {
             dpr={[1, 2]}
             gl={{ powerPreference: 'high-performance', antialias: false, toneMapping: THREE.ACESFilmicToneMapping }}
             camera={{ position: [0, 0, 8], fov: 50 }}
-            style={{ background: '#050A18' }}
+            style={{ background: '#0D1B2A' }}
             onPointerMissed={() => {}}
           >
             <Suspense fallback={null}>
