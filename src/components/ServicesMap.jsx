@@ -3,14 +3,14 @@ import { SERVICES } from '../data/services';
 import SectionHeader from './shared/SectionHeader';
 import MobileServiceCards from './shared/MobileServiceCards';
 
-/* Building positions and sizes on the city grid */
+/* Building positions and sizes on the city grid — larger for visibility */
 const BUILDINGS = [
-  { x: 15, y: 12, w: 14, h: 10 },
-  { x: 55, y: 8,  w: 16, h: 12 },
-  { x: 82, y: 18, w: 12, h: 9  },
-  { x: 25, y: 55, w: 15, h: 11 },
-  { x: 60, y: 52, w: 13, h: 10 },
-  { x: 78, y: 60, w: 14, h: 8  },
+  { x: 5,  y: 5,  w: 22, h: 18 },
+  { x: 40, y: 3,  w: 24, h: 20 },
+  { x: 72, y: 8,  w: 22, h: 18 },
+  { x: 5,  y: 50, w: 24, h: 18 },
+  { x: 40, y: 52, w: 22, h: 18 },
+  { x: 72, y: 50, w: 22, h: 18 },
 ];
 
 /* Connection lines between related buildings (index pairs) */
@@ -85,15 +85,6 @@ export default function ServicesMap() {
     setSelectedIndex(null);
   }, []);
 
-  /* Compute map transform for zoom */
-  const getMapTransform = () => {
-    if (selectedIndex === null) return 'scale(1) translate(0,0)';
-    const b = BUILDINGS[selectedIndex];
-    const cx = b.x + b.w / 2;
-    const cy = b.y + b.h / 2;
-    return `scale(2.2) translate(${50 - cx}%, ${50 - cy}%)`;
-  };
-
   return (
     <section
       ref={sectionRef}
@@ -107,7 +98,7 @@ export default function ServicesMap() {
       <SectionHeader
         label="CITY BLUEPRINT"
         title="Navigate the Service City"
-        description="Hover to raise buildings. Click to zoom in and explore."
+        description="Hover to raise buildings. Click to explore."
         accentColor="#1D9E75"
       />
 
@@ -126,32 +117,14 @@ export default function ServicesMap() {
               handleClose();
           }}
         >
-          {/* Overlay dim when zoomed */}
-          {selectedIndex !== null && (
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                background: 'rgba(0,0,0,0.4)',
-                zIndex: 3,
-                cursor: 'pointer',
-              }}
-              onClick={handleClose}
-            />
-          )}
-
-          {/* Map container with isometric perspective tilt */}
+          {/* Map container */}
           <div
             style={{
               position: 'absolute',
-              inset: '5%',
-              transition: 'transform 0.8s cubic-bezier(0.4,0,0.2,1)',
-              transform: getMapTransform(),
-              transformOrigin: '50% 50%',
-              zIndex: selectedIndex !== null ? 4 : 1,
+              inset: '3%',
               perspective: '800px',
             }}
-          ><div style={{ transform: selectedIndex === null ? 'rotateX(5deg)' : 'rotateX(0deg)', transition: 'transform 0.8s ease', transformStyle: 'preserve-3d' }}>
+          ><div style={{ transform: 'rotateX(3deg)', transformStyle: 'preserve-3d' }}>
             {/* Grid streets with pulse effect */}
             <svg
               style={{
@@ -372,6 +345,7 @@ export default function ServicesMap() {
                       ? 'translateY(-8px) scale(1.04)'
                       : 'none',
                     zIndex: isHovered || isSelected ? 10 : 2,
+                    filter: isSelected ? `drop-shadow(0 0 12px ${service.color}66)` : 'none',
                     /* Stagger fade-in entrance */
                     opacity: isVisible ? 1 : 0,
                     animation: isVisible ? `buildingEntrance 0.7s cubic-bezier(0.22,1,0.36,1) ${i * 0.12}s both` : 'none',
@@ -531,109 +505,111 @@ export default function ServicesMap() {
                     </span>
                   </div>
 
-                  {/* Expanded detail panel when selected */}
-                  {isSelected && (
-                    <>
-                      {/* Connecting line from building to panel */}
-                      <div
-                        style={{
-                          position: 'absolute',
-                          top: '100%',
-                          left: '50%',
-                          width: '1px',
-                          height: '10%',
-                          background: `linear-gradient(to bottom, ${service.color}cc, ${service.color}33)`,
-                          transformOrigin: 'top',
-                          animation: 'connectorGrow 0.25s ease-out',
-                          zIndex: 19,
-                        }}
-                      />
-                      {/* Small dot at connector start */}
-                      <div
-                        style={{
-                          position: 'absolute',
-                          top: '100%',
-                          left: '50%',
-                          width: '5px',
-                          height: '5px',
-                          borderRadius: '50%',
-                          background: service.color,
-                          transform: 'translate(-50%, -50%)',
-                          boxShadow: `0 0 6px ${service.color}`,
-                          animation: 'tooltipFadeIn 0.2s ease-out',
-                          zIndex: 20,
-                        }}
-                      />
-                      <div
-                        style={{
-                          position: 'absolute',
-                          top: '110%',
-                          left: '50%',
-                          transform: 'translateX(-50%)',
-                          width: '280px',
-                          background: 'rgba(5,10,24,0.97)',
-                          border: `1px solid ${service.color}`,
-                          borderRadius: '14px',
-                          padding: '22px',
-                          color: '#fff',
-                          fontFamily: "'DM Sans', sans-serif",
-                          animation: 'panelSlideUp 0.45s cubic-bezier(0.22,1,0.36,1)',
-                          zIndex: 20,
-                          boxShadow: `0 4px 30px ${service.color}18, 0 0 1px ${service.color}44`,
-                        }}
-                      >
-                        <h3
-                          style={{
-                            fontSize: '16px',
-                            fontWeight: 700,
-                            fontFamily: "'Syne', sans-serif",
-                            color: service.color,
-                            marginBottom: '10px',
-                          }}
-                        >
-                          {service.icon} {service.title}
-                        </h3>
-                        <ul
-                          style={{
-                            listStyle: 'none',
-                            padding: 0,
-                            margin: '0 0 10px 0',
-                          }}
-                        >
-                          {service.bullets.map((bul, j) => (
-                            <li
-                              key={j}
-                              style={{
-                                padding: '3px 0',
-                                fontSize: '12px',
-                                opacity: 0,
-                                borderBottom:
-                                  '1px solid rgba(255,255,255,0.06)',
-                                animation: `bulletFadeIn 0.3s ease-out ${0.15 + j * 0.06}s forwards`,
-                              }}
-                            >
-                              — {bul}
-                            </li>
-                          ))}
-                        </ul>
-                        <p
-                          style={{
-                            fontStyle: 'italic',
-                            color: service.color,
-                            fontSize: '12px',
-                            opacity: 0,
-                            animation: 'bulletFadeIn 0.3s ease-out 0.5s forwards',
-                          }}
-                        >
-                          {service.tagline}
-                        </p>
-                      </div>
-                    </>
-                  )}
                 </div>
               );
             })}
           </div></div>
+
+          {/* Fixed overlay detail panel */}
+          {selectedIndex !== null && (() => {
+            const svc = SERVICES[selectedIndex];
+            return (
+              <>
+                {/* Dim overlay */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background: 'rgba(0,0,0,0.5)',
+                    zIndex: 15,
+                    cursor: 'pointer',
+                  }}
+                  onClick={handleClose}
+                />
+                {/* Panel */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: '360px',
+                    background: 'rgba(5,10,24,0.97)',
+                    border: `1px solid ${svc.color}`,
+                    borderRadius: '16px',
+                    padding: '28px',
+                    color: '#fff',
+                    fontFamily: "'DM Sans', sans-serif",
+                    backdropFilter: 'blur(16px)',
+                    animation: 'panelSlideUp 0.45s cubic-bezier(0.22,1,0.36,1)',
+                    zIndex: 20,
+                    boxShadow: `0 8px 40px rgba(0,0,0,0.5), 0 0 1px ${svc.color}44`,
+                  }}
+                >
+                  <button
+                    onClick={handleClose}
+                    style={{
+                      position: 'absolute',
+                      top: '12px',
+                      right: '16px',
+                      background: `${svc.color}18`,
+                      border: `1px solid ${svc.color}44`,
+                      borderRadius: '8px',
+                      color: '#fff',
+                      fontSize: '14px',
+                      cursor: 'pointer',
+                      padding: '6px 14px',
+                      fontFamily: "'DM Sans', sans-serif",
+                      transition: 'all 0.2s ease',
+                    }}
+                  >
+                    ✕ Close
+                  </button>
+                  <div style={{ fontSize: '36px', marginBottom: '8px' }}>
+                    {svc.icon}
+                  </div>
+                  <h3
+                    style={{
+                      fontSize: '18px',
+                      fontWeight: 700,
+                      marginBottom: '14px',
+                      fontFamily: "'Syne', sans-serif",
+                      color: svc.color,
+                    }}
+                  >
+                    {svc.title}
+                  </h3>
+                  <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 14px 0' }}>
+                    {svc.bullets.map((bul, j) => (
+                      <li
+                        key={j}
+                        style={{
+                          padding: '4px 0',
+                          fontSize: '13px',
+                          opacity: 0,
+                          borderBottom: '1px solid rgba(255,255,255,0.06)',
+                          animation: `bulletFadeIn 0.3s ease-out ${0.15 + j * 0.06}s forwards`,
+                        }}
+                      >
+                        — {bul}
+                      </li>
+                    ))}
+                  </ul>
+                  <p
+                    style={{
+                      fontStyle: 'italic',
+                      color: svc.color,
+                      fontSize: '13px',
+                      opacity: 0,
+                      animation: 'bulletFadeIn 0.3s ease-out 0.5s forwards',
+                    }}
+                  >
+                    {svc.tagline}
+                  </p>
+                </div>
+              </>
+            );
+          })()}
         </div>
       )}
 

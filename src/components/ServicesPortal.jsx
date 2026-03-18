@@ -1,6 +1,6 @@
 import React, { Suspense, useRef, useState, useMemo, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Text, Html, Billboard, Environment } from '@react-three/drei';
+import { Text, Billboard, Environment } from '@react-three/drei';
 import * as THREE from 'three';
 import { damp3 } from 'maath/easing';
 import PostEffects from './shared/PostEffects';
@@ -370,16 +370,15 @@ function DriftParticle({ config, color }) {
 }
 
 /* ── Scene ── */
-function PortalScene() {
+function PortalScene({ selectedIndex, setSelectedIndex }) {
   const [hoveredIndex, setHoveredIndex] = useState(null);
-  const [selectedIndex, setSelectedIndex] = useState(null);
 
   const camTarget = useMemo(() => {
     if (selectedIndex === null) return INITIAL_CAM.clone();
     const d = DOORS[selectedIndex];
-    /* "Step through" camera: move closer to door, offset to side, lower slightly */
-    const sideOffset = d.side === 'left' ? -1.5 : 1.5;
-    return new THREE.Vector3(d.x * 0.5 + sideOffset, 1.5, d.z + 0.8);
+    /* Stop camera well in front of the door, offset to side */
+    const sideOffset = d.side === 'left' ? -1.2 : 1.2;
+    return new THREE.Vector3(d.x * 0.4 + sideOffset, 1.6, d.z + 3.5);
   }, [selectedIndex]);
 
   const lookTarget = useMemo(() => {
@@ -424,83 +423,6 @@ function PortalScene() {
       {/* Instruction hint near entrance */}
       {selectedIndex === null && <InstructionHint />}
 
-      {/* Selected service detail panel */}
-      {selectedIndex !== null && (
-        <Html
-          center
-          position={[0, 2, DOORS[selectedIndex].z]}
-          distanceFactor={5}
-          style={{ pointerEvents: 'auto', width: '380px' }}
-        >
-          <div
-            style={{
-              background: `linear-gradient(135deg, rgba(5,10,24,0.97), ${SERVICES[selectedIndex].color}11)`,
-              border: `1px solid ${SERVICES[selectedIndex].color}`,
-              borderRadius: '16px',
-              padding: '28px',
-              color: '#fff',
-              fontFamily: "'DM Sans', sans-serif",
-              backdropFilter: 'blur(16px)',
-              animation: 'portalFadeIn 0.5s ease-out',
-            }}
-          >
-            <button
-              onClick={() => setSelectedIndex(null)}
-              style={{
-                position: 'absolute',
-                top: '12px',
-                right: '16px',
-                background: 'none',
-                border: 'none',
-                color: '#fff',
-                fontSize: '20px',
-                cursor: 'pointer',
-                opacity: 0.7,
-              }}
-            >
-              ← Back
-            </button>
-            <div style={{ fontSize: '36px', marginBottom: '8px' }}>
-              {SERVICES[selectedIndex].icon}
-            </div>
-            <h3
-              style={{
-                fontSize: '18px',
-                fontWeight: 700,
-                marginBottom: '14px',
-                fontFamily: "'Syne', sans-serif",
-                color: SERVICES[selectedIndex].color,
-              }}
-            >
-              {SERVICES[selectedIndex].title}
-            </h3>
-            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 14px 0' }}>
-              {SERVICES[selectedIndex].bullets.map((b, i) => (
-                <li
-                  key={i}
-                  style={{
-                    padding: '4px 0',
-                    fontSize: '13px',
-                    opacity: 0.9,
-                    borderBottom: '1px solid rgba(255,255,255,0.06)',
-                  }}
-                >
-                  — {b}
-                </li>
-              ))}
-            </ul>
-            <p
-              style={{
-                fontStyle: 'italic',
-                color: SERVICES[selectedIndex].color,
-                fontSize: '13px',
-              }}
-            >
-              {SERVICES[selectedIndex].tagline}
-            </p>
-          </div>
-        </Html>
-      )}
       {/* Ambient dust motes */}
       <DustMotes />
       <Environment preset="city" />
@@ -556,6 +478,7 @@ function DustMote({ config }) {
 /* ── Main export ── */
 export default function ServicesPortal() {
   const [isMobile, setIsMobile] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(null);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -563,6 +486,8 @@ export default function ServicesPortal() {
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
   }, []);
+
+  const selected = selectedIndex !== null ? SERVICES[selectedIndex] : null;
 
   return (
     <section style={{ background: '#050A18', position: 'relative' }}>
@@ -576,7 +501,7 @@ export default function ServicesPortal() {
       {isMobile ? (
         <MobileServiceCards />
       ) : (
-        <div style={{ width: '100%', height: '100vh' }}>
+        <div style={{ width: '100%', height: '100vh', position: 'relative' }}>
           <Canvas
             shadows
             dpr={[1, 2]}
@@ -585,10 +510,110 @@ export default function ServicesPortal() {
             style={{ background: '#050A18' }}
           >
             <Suspense fallback={null}>
-              <PortalScene />
+              <PortalScene selectedIndex={selectedIndex} setSelectedIndex={setSelectedIndex} />
             </Suspense>
           </Canvas>
-          {/* Suspense HTML overlay */}
+
+          {/* Fixed CSS overlay info panel */}
+          {selected && (
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                paddingRight: '5%',
+                pointerEvents: 'none',
+                zIndex: 10,
+              }}
+            >
+              <div
+                style={{
+                  width: '360px',
+                  background: `linear-gradient(135deg, rgba(5,10,24,0.97), ${selected.color}11)`,
+                  border: `1px solid ${selected.color}`,
+                  borderRadius: '16px',
+                  padding: '28px',
+                  color: '#fff',
+                  fontFamily: "'DM Sans', sans-serif",
+                  backdropFilter: 'blur(16px)',
+                  animation: 'portalSlideIn 0.5s cubic-bezier(0.22,1,0.36,1)',
+                  pointerEvents: 'auto',
+                  boxShadow: `0 8px 40px rgba(0,0,0,0.5), 0 0 1px ${selected.color}44`,
+                }}
+              >
+                <button
+                  onClick={() => setSelectedIndex(null)}
+                  style={{
+                    position: 'absolute',
+                    top: '12px',
+                    right: '16px',
+                    background: `${selected.color}18`,
+                    border: `1px solid ${selected.color}44`,
+                    borderRadius: '8px',
+                    color: '#fff',
+                    fontSize: '14px',
+                    cursor: 'pointer',
+                    padding: '6px 14px',
+                    fontFamily: "'DM Sans', sans-serif",
+                    transition: 'all 0.2s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.background = `${selected.color}33`;
+                    e.target.style.borderColor = `${selected.color}88`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.background = `${selected.color}18`;
+                    e.target.style.borderColor = `${selected.color}44`;
+                  }}
+                >
+                  ← Back
+                </button>
+                <div style={{ fontSize: '36px', marginBottom: '8px' }}>
+                  {selected.icon}
+                </div>
+                <h3
+                  style={{
+                    fontSize: '18px',
+                    fontWeight: 700,
+                    marginBottom: '14px',
+                    fontFamily: "'Syne', sans-serif",
+                    color: selected.color,
+                  }}
+                >
+                  {selected.title}
+                </h3>
+                <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 14px 0' }}>
+                  {selected.bullets.map((b, bi) => (
+                    <li
+                      key={bi}
+                      style={{
+                        padding: '4px 0',
+                        fontSize: '13px',
+                        opacity: 0.9,
+                        borderBottom: '1px solid rgba(255,255,255,0.06)',
+                      }}
+                    >
+                      — {b}
+                    </li>
+                  ))}
+                </ul>
+                <p
+                  style={{
+                    fontStyle: 'italic',
+                    color: selected.color,
+                    fontSize: '13px',
+                  }}
+                >
+                  {selected.tagline}
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -596,6 +621,10 @@ export default function ServicesPortal() {
         @keyframes portalFadeIn {
           from { opacity: 0; transform: scale(0.95); }
           to   { opacity: 1; transform: scale(1); }
+        }
+        @keyframes portalSlideIn {
+          from { opacity: 0; transform: translateX(30px); }
+          to   { opacity: 1; transform: translateX(0); }
         }
       `}</style>
     </section>

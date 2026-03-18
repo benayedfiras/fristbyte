@@ -332,6 +332,11 @@ function TimelineScene({ frontIndex, setFrontIndex }) {
   const dragRotStartRef = useRef(0);
   const [selectedIndex, setSelectedIndex] = useState(null);
 
+  /* Sync rotation when frontIndex changes from Next/Prev buttons */
+  useEffect(() => {
+    targetRotRef.current = -(frontIndex * STEP);
+  }, [frontIndex]);
+
   /* Spring physics rotation */
   useFrame(() => {
     if (!groupRef.current) return;
