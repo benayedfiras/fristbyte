@@ -340,7 +340,7 @@ function Planet({
 
   return (
     <>
-    <CometTrail color={'#2E9DB5'} groupRef={groupRef} trailLength={24} />
+    <CometTrail color={service.color} groupRef={groupRef} trailLength={24} />
     <group ref={groupRef} position={[initX, 0, initZ]}>
       <mesh
         ref={meshRef}
@@ -412,14 +412,15 @@ function Planet({
         >
           <div
             style={{
-              background: '#1C2E44',
-              border: '2px solid #2E9DB5',
+              background: 'rgba(13,27,42,0.92)',
+              border: `1.5px solid ${service.color}44`,
               borderRadius: '20px',
               padding: '28px',
               color: '#fff',
               fontFamily: "'Archivo', sans-serif",
               position: 'relative',
               backdropFilter: 'blur(12px)',
+              boxShadow: `0 24px 48px rgba(0,0,0,0.4), 0 0 0 1px ${service.color}22, inset 0 1px 0 rgba(255,255,255,0.05)`,
               animation: 'solarFadeIn 0.4s ease-out',
             }}
           >
@@ -433,7 +434,7 @@ function Planet({
                 position: 'absolute',
                 top: '12px',
                 right: '16px',
-                background: '#2E9DB5',
+                background: service.color,
                 border: 'none',
                 color: '#fff',
                 fontSize: '16px',
@@ -490,7 +491,7 @@ function Planet({
               style={{
                 fontStyle: 'italic',
                 fontFamily: "'Archivo', sans-serif",
-                color: '#2E9DB5',
+                color: service.color,
                 fontSize: '13px',
                 marginTop: '12px',
               }}
@@ -521,7 +522,7 @@ function SolarScene() {
         <React.Fragment key={i}>
           <OrbitRing
             radius={ORBIT_CONFIG[i].radius}
-            color={'#2E9DB5'}
+            color={SERVICES[i].color}
             opacity={selectedIndex !== null && selectedIndex !== i ? 0.05 : 0.2}
           />
           <Planet
@@ -553,7 +554,7 @@ export default function ServicesSolar() {
   }, []);
 
   return (
-    <section style={{ background: '#0D1B2A', position: 'relative' }}>
+    <section style={{ background: 'linear-gradient(180deg, #0D1B2A 0%, #0A1628 50%, #0D1B2A 100%)', position: 'relative' }}>
       <SectionHeader
         label="THE SOLAR SYSTEM"
         title="Our Services Orbit Your Success"

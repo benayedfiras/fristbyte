@@ -32,15 +32,16 @@ function MobileCard({ service, index }) {
     <div
       ref={ref}
       style={{
-        background: '#1C2E44',
-        border: `2px solid #2E9DB5`,
-        borderLeft: `4px solid #2E9DB5`,
-        borderRadius: '20px',
-        padding: '28px',
+        background: 'rgba(13,27,42,0.92)',
+        border: `1.5px solid ${service.color}33`,
+        borderLeft: `4px solid ${service.color}`,
+        borderRadius: '16px',
+        padding: '24px',
         marginBottom: '16px',
         color: '#fff',
         fontFamily: "'Archivo', sans-serif",
-        backdropFilter: 'blur(8px)',
+        backdropFilter: 'blur(12px)',
+        boxShadow: `0 8px 24px rgba(0,0,0,0.2), 0 0 0 1px ${service.color}11`,
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
@@ -155,13 +156,14 @@ function LightMobileCard({ service, index }) {
       ref={ref}
       style={{
         background: '#ffffff',
-        border: `3px solid ${service.color}`,
-        borderRadius: '20px',
-        padding: '28px',
+        border: `2px solid ${service.color}33`,
+        borderLeft: `4px solid ${service.color}`,
+        borderRadius: '16px',
+        padding: '24px',
         marginBottom: '16px',
         color: '#222',
         fontFamily: "'Archivo', sans-serif",
-        boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+        boxShadow: `0 4px 16px rgba(0,0,0,0.06), 0 0 0 1px ${service.color}11`,
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>

@@ -264,7 +264,7 @@ function HexPrism({
       <pointLight
         ref={lightRef}
         position={[0, 1.5, 0]}
-        color={'#2E9DB5'}
+        color={service.color}
         intensity={0.3}
         distance={5}
       />
@@ -352,14 +352,15 @@ function HexPrism({
         >
           <div
             style={{
-              background: '#1C2E44',
-              border: '2px solid #2E9DB5',
+              background: 'rgba(13,27,42,0.92)',
+              border: `1.5px solid ${service.color}44`,
               borderRadius: '20px',
               padding: '32px',
               color: '#fff',
               fontFamily: "'Archivo', sans-serif",
               position: 'relative',
               backdropFilter: 'blur(12px)',
+              boxShadow: `0 24px 48px rgba(0,0,0,0.4), 0 0 0 1px ${service.color}22, inset 0 1px 0 rgba(255,255,255,0.05)`,
               animation: 'fadeIn 0.4s ease-out',
             }}
           >
@@ -373,7 +374,7 @@ function HexPrism({
                 position: 'absolute',
                 top: '12px',
                 right: '16px',
-                background: '#2E9DB5',
+                background: service.color,
                 border: 'none',
                 color: '#fff',
                 fontSize: '16px',
@@ -420,9 +421,11 @@ function HexPrism({
                     fontWeight: 300,
                     color: 'rgba(255,255,255,0.75)',
                     borderBottom: '1px solid rgba(255,255,255,0.06)',
+                    borderLeft: `2px solid ${service.color}44`,
+                    paddingLeft: '8px',
                   }}
                 >
-                  — {b}
+                  {b}
                 </li>
               ))}
             </ul>
@@ -430,7 +433,7 @@ function HexPrism({
               style={{
                 fontStyle: 'italic',
                 fontFamily: "'Archivo', sans-serif",
-                color: '#2E9DB5',
+                color: service.color,
                 fontSize: '14px',
                 marginTop: '12px',
               }}
@@ -543,7 +546,7 @@ export default function ServicesSection() {
   };
 
   return (
-    <section ref={sectionRef} style={{ background: '#0D1B2A', position: 'relative' }}>
+    <section ref={sectionRef} style={{ background: 'linear-gradient(180deg, #0D1B2A 0%, #0A1628 50%, #0D1B2A 100%)', position: 'relative' }}>
       <SectionHeader
         label="OUR CONNECTED ECOSYSTEM"
         title="Everything Your Business Needs Connected."

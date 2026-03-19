@@ -250,7 +250,7 @@ function OSWindow({
         <p
           style={{
             fontStyle: 'italic',
-            color: '#2E9DB5',
+            color: service.color,
             fontSize: '14px',
             fontFamily: "'Archivo', sans-serif",
             marginTop: '16px',
@@ -355,7 +355,7 @@ export default function ServicesOS() {
     <section
       ref={sectionRef}
       style={{
-        background: '#0D1B2A',
+        background: 'linear-gradient(180deg, #0D1B2A 0%, #0A1628 50%, #0D1B2A 100%)',
         minHeight: '100vh',
         position: 'relative',
         overflow: 'hidden',
@@ -402,7 +402,7 @@ export default function ServicesOS() {
               gap: '20px',
             }}
           >
-            <span style={{ fontWeight: 700, color: '#2E9DB5' }}>FristByte</span>
+            <span style={{ fontWeight: 700, color: '#2E9DB5' }}>FirstByte</span>
             <span>File</span>
             <span>Edit</span>
             <span>View</span>
@@ -605,7 +605,7 @@ export default function ServicesOS() {
                       transform: `scale(${scale}) translateY(${translateY}px)`,
                       boxShadow:
                         hoveredDock === i
-                          ? `0 4px 20px #2E9DB566`
+                          ? `0 4px 20px ${s.color}66`
                           : '0 2px 8px rgba(0,0,0,0.3)',
                     }}
                   >

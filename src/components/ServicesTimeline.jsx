@@ -131,14 +131,15 @@ function CylinderCard({ service, index, frontIndex, onSelect, selectedIndex }) {
         >
           <div
             style={{
-              background: '#1C2E44',
-              border: '2px solid #2E9DB5',
+              background: 'rgba(13,27,42,0.92)',
+              border: `1.5px solid ${service.color}44`,
               borderRadius: '20px',
               padding: '24px',
               color: '#fff',
               fontFamily: "'Archivo', sans-serif",
               backdropFilter: 'blur(12px)',
               animation: 'tlFadeIn 0.4s ease-out',
+              boxShadow: `0 24px 48px rgba(0,0,0,0.4), 0 0 0 1px ${service.color}22`,
             }}
           >
             <button
@@ -150,7 +151,7 @@ function CylinderCard({ service, index, frontIndex, onSelect, selectedIndex }) {
                 position: 'absolute',
                 top: '10px',
                 right: '14px',
-                background: '#2E9DB5',
+                background: service.color,
                 border: 'none',
                 borderRadius: '50%',
                 color: '#fff',
@@ -200,7 +201,7 @@ function CylinderCard({ service, index, frontIndex, onSelect, selectedIndex }) {
               style={{
                 fontFamily: "'Archivo', sans-serif",
                 fontStyle: 'italic',
-                color: '#2E9DB5',
+                color: service.color,
                 fontSize: '13px',
               }}
             >
@@ -458,7 +459,7 @@ export default function ServicesTimeline() {
   };
 
   return (
-    <section style={{ background: '#0D1B2A', position: 'relative' }}>
+    <section style={{ background: 'linear-gradient(180deg, #0D1B2A 0%, #0A1628 50%, #0D1B2A 100%)', position: 'relative' }}>
       <SectionHeader
         label="CYLINDER TIMELINE"
         title="Spin Through Our Services"

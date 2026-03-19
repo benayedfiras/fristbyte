@@ -293,8 +293,8 @@ function GlobeScene() {
         >
           <div
             style={{
-              background: 'linear-gradient(135deg, #1C2E44, #2E9DB511)',
-              border: '2px solid #2E9DB5',
+              background: `linear-gradient(135deg, rgba(13,27,42,0.92), ${SERVICES[selectedIndex].color}08)`,
+              border: `1.5px solid ${SERVICES[selectedIndex].color}44`,
               borderRadius: '20px',
               padding: '24px',
               color: '#fff',
@@ -309,7 +309,7 @@ function GlobeScene() {
                 position: 'absolute',
                 top: '10px',
                 right: '14px',
-                background: '#2E9DB5',
+                background: SERVICES[selectedIndex].color,
                 border: 'none',
                 borderRadius: '50%',
                 color: '#fff',
@@ -360,7 +360,7 @@ function GlobeScene() {
               style={{
                 fontFamily: "'Archivo', sans-serif",
                 fontStyle: 'italic',
-                color: '#2E9DB5',
+                color: SERVICES[selectedIndex].color,
                 fontSize: '12px',
               }}
             >
@@ -375,7 +375,7 @@ function GlobeScene() {
                 top: '50%',
                 width: '40px',
                 height: '1px',
-                background: 'linear-gradient(90deg, transparent, #2E9DB5)',
+                background: `linear-gradient(90deg, transparent, ${SERVICES[selectedIndex].color})`,
               }}
             />
           </div>
@@ -399,7 +399,7 @@ export default function ServicesGlobe() {
   }, []);
 
   return (
-    <section style={{ background: '#0D1B2A', position: 'relative' }}>
+    <section style={{ background: 'linear-gradient(180deg, #0D1B2A 0%, #0A1628 50%, #0D1B2A 100%)', position: 'relative' }}>
       <SectionHeader
         label="INTERACTIVE GLOBE"
         title="Services That Span the Globe"

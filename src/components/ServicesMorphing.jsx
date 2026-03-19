@@ -350,7 +350,7 @@ export default function ServicesMorphing() {
   const service = SERVICES[activeIndex];
 
   return (
-    <section style={{ background: '#0D1B2A', position: 'relative' }}>
+    <section style={{ background: 'linear-gradient(180deg, #0D1B2A 0%, #0A1628 50%, #0D1B2A 100%)', position: 'relative' }}>
       {/* Section Header */}
       <SectionHeader
         label="MORPHING BLOB"
@@ -548,7 +548,7 @@ const arrowBtnStyle = {
   width: '36px',
   height: '36px',
   borderRadius: '100px',
-  background: 'linear-gradient(135deg, #1A6B7C, #2E9DB5)',
+  background: 'linear-gradient(135deg, #1a1a2e, #2E9DB5)',
   border: 'none',
   color: '#ffffff',
   fontSize: '16px',

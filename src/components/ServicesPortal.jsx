@@ -490,7 +490,7 @@ export default function ServicesPortal() {
   const selected = selectedIndex !== null ? SERVICES[selectedIndex] : null;
 
   return (
-    <section style={{ background: '#0D1B2A', position: 'relative' }}>
+    <section style={{ background: 'linear-gradient(180deg, #0D1B2A 0%, #0A1628 50%, #0D1B2A 100%)', position: 'relative' }}>
       <SectionHeader
         label="PORTAL DOORS"
         title="Walk Through Our Portals"
@@ -540,8 +540,8 @@ export default function ServicesPortal() {
               <div
                 style={{
                   width: '360px',
-                  background: 'linear-gradient(135deg, #1C2E44, #2E9DB511)',
-                  border: '2px solid #2E9DB5',
+                  background: `linear-gradient(135deg, rgba(13,27,42,0.95), ${selected.color}08)`,
+                  border: `1.5px solid ${selected.color}44`,
                   borderRadius: '20px',
                   padding: '28px',
                   color: '#fff',
@@ -549,7 +549,7 @@ export default function ServicesPortal() {
                   backdropFilter: 'blur(16px)',
                   animation: 'portalSlideIn 0.5s cubic-bezier(0.22,1,0.36,1)',
                   pointerEvents: 'auto',
-                  boxShadow: '0 8px 40px rgba(0,0,0,0.5), 0 0 1px #2E9DB544',
+                  boxShadow: `0 24px 48px rgba(0,0,0,0.4), 0 0 0 1px ${selected.color}22, inset 0 1px 0 rgba(255,255,255,0.05)`,
                 }}
               >
                 <button
@@ -558,7 +558,7 @@ export default function ServicesPortal() {
                     position: 'absolute',
                     top: '12px',
                     right: '16px',
-                    background: '#2E9DB5',
+                    background: selected.color,
                     border: 'none',
                     borderRadius: '100px',
                     color: '#fff',
@@ -569,10 +569,10 @@ export default function ServicesPortal() {
                     transition: 'all 0.2s ease',
                   }}
                   onMouseEnter={(e) => {
-                    e.target.style.background = '#3BB0C8';
+                    e.target.style.opacity = '0.85';
                   }}
                   onMouseLeave={(e) => {
-                    e.target.style.background = '#2E9DB5';
+                    e.target.style.opacity = '1';
                   }}
                 >
                   ← Back
@@ -612,7 +612,7 @@ export default function ServicesPortal() {
                   style={{
                     fontFamily: "'Archivo', sans-serif",
                     fontStyle: 'italic',
-                    color: '#2E9DB5',
+                    color: selected.color,
                     fontSize: '13px',
                   }}
                 >

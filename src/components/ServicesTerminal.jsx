@@ -313,7 +313,7 @@ export default function ServicesTerminal() {
     <section
       ref={sectionRef}
       style={{
-        background: '#0D1B2A',
+        background: 'linear-gradient(180deg, #0D1B2A 0%, #0A1628 50%, #0D1B2A 100%)',
         minHeight: '100vh',
         position: 'relative',
         display: 'flex',
@@ -362,7 +362,7 @@ export default function ServicesTerminal() {
             borderRadius: '14px',
             overflow: 'hidden',
             boxShadow:
-              '0 0 60px rgba(46,157,181,0.12), 0 0 120px rgba(46,157,181,0.06), 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(46,157,181,0.1)',
+              '0 0 60px rgba(46,157,181,0.15), 0 0 120px rgba(46,157,181,0.08), 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(46,157,181,0.1)',
             border: '1px solid rgba(46,157,181,0.2)',
             position: 'relative',
           }}
@@ -580,7 +580,7 @@ export default function ServicesTerminal() {
           style={{
             marginBottom: '60px',
             padding: '10px 28px',
-            background: 'linear-gradient(135deg, #1A6B7C, #2E9DB5)',
+            background: 'linear-gradient(135deg, #1a1a2e, #2E9DB5)',
             border: 'none',
             borderRadius: '100px',
             color: '#ffffff',

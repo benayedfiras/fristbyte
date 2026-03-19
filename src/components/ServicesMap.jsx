@@ -97,7 +97,7 @@ export default function ServicesMap() {
     <section
       ref={sectionRef}
       style={{
-        background: '#0D1B2A',
+        background: 'linear-gradient(180deg, #0D1B2A 0%, #0A1628 50%, #0D1B2A 100%)',
         minHeight: '100vh',
         position: 'relative',
         overflow: 'hidden',
@@ -542,8 +542,8 @@ export default function ServicesMap() {
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
                     width: '360px',
-                    background: '#1C2E44',
-                    border: '2px solid #2E9DB5',
+                    background: 'rgba(13,27,42,0.92)',
+                    border: `1.5px solid ${svc.color}44`,
                     borderRadius: '20px',
                     padding: '28px',
                     color: '#fff',
@@ -551,7 +551,7 @@ export default function ServicesMap() {
                     backdropFilter: 'blur(16px)',
                     animation: 'panelSlideUp 0.45s cubic-bezier(0.22,1,0.36,1)',
                     zIndex: 20,
-                    boxShadow: `0 8px 40px rgba(0,0,0,0.5), 0 0 1px #2E9DB544`,
+                    boxShadow: `0 24px 48px rgba(0,0,0,0.4), 0 0 0 1px ${svc.color}22, inset 0 1px 0 rgba(255,255,255,0.05)`,
                   }}
                 >
                   <button
@@ -560,7 +560,7 @@ export default function ServicesMap() {
                       position: 'absolute',
                       top: '12px',
                       right: '16px',
-                      background: '#2E9DB5',
+                      background: svc.color,
                       border: 'none',
                       borderRadius: '50%',
                       color: '#fff',
@@ -612,7 +612,7 @@ export default function ServicesMap() {
                     style={{
                       fontFamily: "'Archivo', sans-serif",
                       fontStyle: 'italic',
-                      color: '#2E9DB5',
+                      color: svc.color,
                       fontSize: '13px',
                       opacity: 0,
                       animation: 'bulletFadeIn 0.3s ease-out 0.5s forwards',

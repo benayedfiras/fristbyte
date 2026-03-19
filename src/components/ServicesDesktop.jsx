@@ -669,7 +669,7 @@ function InteractiveObject({
         >
           <div style={{
             background: '#ffffff',
-            border: '3px solid #2E9DB5',
+            border: `3px solid ${service.color}`,
             borderRadius: '20px',
             padding: '24px 24px 20px',
             color: '#222',
@@ -689,7 +689,7 @@ function InteractiveObject({
                 position: 'absolute',
                 top: '8px',
                 right: '12px',
-                background: '#2E9DB5',
+                background: service.color,
                 border: 'none',
                 color: '#fff',
                 width: '28px',
@@ -712,7 +712,7 @@ function InteractiveObject({
               fontWeight: 700,
               marginBottom: '12px',
               fontFamily: "'Archivo', sans-serif",
-              color: '#2E9DB5',
+              color: service.color,
             }}>
               {service.title}
             </h3>
@@ -730,7 +730,7 @@ function InteractiveObject({
             </ul>
             <p style={{
               fontStyle: 'italic',
-              color: '#2E9DB5',
+              color: service.color,
               fontSize: '13px',
               fontWeight: 600,
             }}>

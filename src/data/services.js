@@ -1,7 +1,7 @@
 export const SERVICES = [
   {
     title: 'Branding and Design Systems',
-    color: '#2E9DB5',
+    color: '#3B82F6',
     icon: '\u2726',
     bullets: [
       'Brand strategy and positioning',
@@ -15,7 +15,7 @@ export const SERVICES = [
   },
   {
     title: 'Web and Product Development',
-    color: '#2E9DB5',
+    color: '#6366F1',
     icon: '</>',
     bullets: [
       'Corporate and multi-page websites',
@@ -29,7 +29,7 @@ export const SERVICES = [
   },
   {
     title: 'Automation and AI Engineering',
-    color: '#2E9DB5',
+    color: '#8B5CF6',
     icon: '\u26A1',
     bullets: [
       'CRM automation and lead routing',
@@ -43,7 +43,7 @@ export const SERVICES = [
   },
   {
     title: 'Data Dashboards and Performance Tracking',
-    color: '#2E9DB5',
+    color: '#F59E0B',
     icon: '\u25A6',
     bullets: [
       'KPI dashboards',
@@ -57,7 +57,7 @@ export const SERVICES = [
   },
   {
     title: 'Growth and Digital Marketing',
-    color: '#2E9DB5',
+    color: '#10B981',
     icon: '\u25CE',
     bullets: [
       'Go-to-market strategy',
@@ -70,7 +70,7 @@ export const SERVICES = [
   },
   {
     title: 'Infrastructure Security and Optimization',
-    color: '#2E9DB5',
+    color: '#EF4444',
     icon: '\u2699',
     bullets: [
       'Cloud hosting and VPS setup',
