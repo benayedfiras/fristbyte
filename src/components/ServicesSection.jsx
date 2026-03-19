@@ -357,7 +357,7 @@ function HexPrism({
               borderRadius: '20px',
               padding: '32px',
               color: '#fff',
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Archivo', sans-serif",
               position: 'relative',
               backdropFilter: 'blur(12px)',
               animation: 'fadeIn 0.4s ease-out',
@@ -397,7 +397,7 @@ function HexPrism({
                 fontSize: '20px',
                 fontWeight: 700,
                 marginBottom: '16px',
-                fontFamily: "'Nunito', sans-serif",
+                fontFamily: "'Archivo', sans-serif",
                 color: '#ffffff',
               }}
             >
@@ -416,7 +416,7 @@ function HexPrism({
                   style={{
                     padding: '4px 0',
                     fontSize: '14px',
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: "'Archivo', sans-serif",
                     fontWeight: 300,
                     color: 'rgba(255,255,255,0.75)',
                     borderBottom: '1px solid rgba(255,255,255,0.06)',
@@ -429,7 +429,7 @@ function HexPrism({
             <p
               style={{
                 fontStyle: 'italic',
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Archivo', sans-serif",
                 color: '#2E9DB5',
                 fontSize: '14px',
                 marginTop: '12px',

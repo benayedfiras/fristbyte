@@ -545,7 +545,7 @@ export default function ServicesPortal() {
                   borderRadius: '20px',
                   padding: '28px',
                   color: '#fff',
-                  fontFamily: "'DM Sans', sans-serif",
+                  fontFamily: "'Archivo', sans-serif",
                   backdropFilter: 'blur(16px)',
                   animation: 'portalSlideIn 0.5s cubic-bezier(0.22,1,0.36,1)',
                   pointerEvents: 'auto',
@@ -565,7 +565,7 @@ export default function ServicesPortal() {
                     fontSize: '14px',
                     cursor: 'pointer',
                     padding: '6px 14px',
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: "'Archivo', sans-serif",
                     transition: 'all 0.2s ease',
                   }}
                   onMouseEnter={(e) => {
@@ -585,7 +585,7 @@ export default function ServicesPortal() {
                     fontSize: '18px',
                     fontWeight: 700,
                     marginBottom: '14px',
-                    fontFamily: "'Nunito', sans-serif",
+                    fontFamily: "'Archivo', sans-serif",
                     color: '#ffffff',
                   }}
                 >
@@ -598,7 +598,7 @@ export default function ServicesPortal() {
                       style={{
                         padding: '4px 0',
                         fontSize: '13px',
-                        fontFamily: "'DM Sans', sans-serif",
+                        fontFamily: "'Archivo', sans-serif",
                         fontWeight: 300,
                         color: 'rgba(255,255,255,0.75)',
                         borderBottom: '1px solid rgba(255,255,255,0.06)',
@@ -610,7 +610,7 @@ export default function ServicesPortal() {
                 </ul>
                 <p
                   style={{
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: "'Archivo', sans-serif",
                     fontStyle: 'italic',
                     color: '#2E9DB5',
                     fontSize: '13px',

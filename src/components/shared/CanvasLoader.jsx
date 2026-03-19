@@ -28,7 +28,7 @@ export default function CanvasLoader({ color = '#1D9E75' }) {
         style={{
           color: 'rgba(255,255,255,0.4)',
           fontSize: '13px',
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "'Archivo', sans-serif",
           letterSpacing: '1px',
         }}
       >

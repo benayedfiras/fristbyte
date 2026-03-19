@@ -373,7 +373,7 @@ export default function ServicesMap() {
                         padding: '4px 10px',
                         color: service.color,
                         fontSize: '11px',
-                        fontFamily: "'Nunito', sans-serif",
+                        fontFamily: "'Archivo', sans-serif",
                         fontWeight: 600,
                         whiteSpace: 'nowrap',
                         pointerEvents: 'none',
@@ -502,7 +502,7 @@ export default function ServicesMap() {
                       style={{
                         color: '#fff',
                         fontSize: 'clamp(7px, 0.9vw, 12px)',
-                        fontFamily: "'DM Sans', sans-serif",
+                        fontFamily: "'Archivo', sans-serif",
                         textAlign: 'center',
                         marginTop: '4px',
                         padding: '0 4px',
@@ -547,7 +547,7 @@ export default function ServicesMap() {
                     borderRadius: '20px',
                     padding: '28px',
                     color: '#fff',
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: "'Archivo', sans-serif",
                     backdropFilter: 'blur(16px)',
                     animation: 'panelSlideUp 0.45s cubic-bezier(0.22,1,0.36,1)',
                     zIndex: 20,
@@ -583,7 +583,7 @@ export default function ServicesMap() {
                       fontSize: '18px',
                       fontWeight: 700,
                       marginBottom: '14px',
-                      fontFamily: "'Nunito', sans-serif",
+                      fontFamily: "'Archivo', sans-serif",
                       color: '#ffffff',
                     }}
                   >
@@ -596,7 +596,7 @@ export default function ServicesMap() {
                         style={{
                           padding: '4px 0',
                           fontSize: '13px',
-                          fontFamily: "'DM Sans', sans-serif",
+                          fontFamily: "'Archivo', sans-serif",
                           fontWeight: 300,
                           color: 'rgba(255,255,255,0.75)',
                           borderBottom: '1px solid rgba(255,255,255,0.06)',
@@ -610,7 +610,7 @@ export default function ServicesMap() {
                   </ul>
                   <p
                     style={{
-                      fontFamily: "'DM Sans', sans-serif",
+                      fontFamily: "'Archivo', sans-serif",
                       fontStyle: 'italic',
                       color: '#2E9DB5',
                       fontSize: '13px',

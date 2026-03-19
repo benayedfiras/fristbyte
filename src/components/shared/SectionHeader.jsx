@@ -23,7 +23,7 @@ export default function SectionHeader({ label, title, description, accentColor =
           fontWeight: 600,
           letterSpacing: '0.15em',
           textTransform: 'uppercase',
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "'Archivo', sans-serif",
           fontVariant: 'small-caps',
           marginBottom: '16px',
         }}
@@ -35,7 +35,7 @@ export default function SectionHeader({ label, title, description, accentColor =
           color: dark ? '#ffffff' : '#222222',
           fontSize: 'clamp(28px, 4vw, 48px)',
           fontWeight: 700,
-          fontFamily: "'Nunito', sans-serif",
+          fontFamily: "'Archivo', sans-serif",
           marginBottom: '16px',
           lineHeight: 1.2,
         }}
@@ -46,7 +46,7 @@ export default function SectionHeader({ label, title, description, accentColor =
         style={{
           color: dark ? 'rgba(255,255,255,0.7)' : '#666666',
           fontSize: 'clamp(15px, 2vw, 18px)',
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "'Archivo', sans-serif",
           lineHeight: 1.6,
           maxWidth: '640px',
           margin: '0 auto',

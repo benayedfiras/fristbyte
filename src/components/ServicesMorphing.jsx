@@ -396,7 +396,7 @@ export default function ServicesMorphing() {
             transform: 'translateY(-50%)',
             maxWidth: isMobile ? 'calc(100% - 32px)' : '340px',
             color: '#fff',
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "'Archivo', sans-serif",
             pointerEvents: 'none',
           }}
         >
@@ -417,7 +417,7 @@ export default function ServicesMorphing() {
               style={{
                 fontSize: isMobile ? '20px' : '24px',
                 fontWeight: 700,
-                fontFamily: "'Nunito', sans-serif",
+                fontFamily: "'Archivo', sans-serif",
                 color: service.color,
                 marginBottom: '16px',
               }}
@@ -552,7 +552,7 @@ const arrowBtnStyle = {
   border: 'none',
   color: '#ffffff',
   fontSize: '16px',
-  fontFamily: "'Nunito', sans-serif",
+  fontFamily: "'Archivo', sans-serif",
   fontWeight: 700,
   cursor: 'pointer',
   display: 'flex',

@@ -217,7 +217,7 @@ export default function ServicesCards3D() {
                       fontSize: isMobile ? '18px' : '22px',
                       fontWeight: 700,
                       color: '#ffffff',
-                      fontFamily: "'Nunito', sans-serif",
+                      fontFamily: "'Archivo', sans-serif",
                       textAlign: 'center',
                       marginBottom: '12px',
                     }}
@@ -237,7 +237,7 @@ export default function ServicesCards3D() {
                       marginTop: '16px',
                       fontSize: '13px',
                       color: 'rgba(255,255,255,0.5)',
-                      fontFamily: "'DM Sans', sans-serif",
+                      fontFamily: "'Archivo', sans-serif",
                     }}
                   >
                     Click to flip
@@ -269,7 +269,7 @@ export default function ServicesCards3D() {
                       fontSize: '17px',
                       fontWeight: 700,
                       color: '#ffffff',
-                      fontFamily: "'Nunito', sans-serif",
+                      fontFamily: "'Archivo', sans-serif",
                       marginBottom: '14px',
                     }}
                   >
@@ -289,7 +289,7 @@ export default function ServicesCards3D() {
                           padding: '3px 0',
                           fontSize: '13px',
                           color: 'rgba(255,255,255,0.75)',
-                          fontFamily: "'DM Sans', sans-serif",
+                          fontFamily: "'Archivo', sans-serif",
                           fontWeight: 300,
                           borderBottom: '1px solid rgba(255,255,255,0.06)',
                         }}
@@ -303,7 +303,7 @@ export default function ServicesCards3D() {
                       fontStyle: 'italic',
                       color: '#2E9DB5',
                       fontSize: '13px',
-                      fontFamily: "'DM Sans', sans-serif",
+                      fontFamily: "'Archivo', sans-serif",
                     }}
                   >
                     {service.tagline}
@@ -313,7 +313,7 @@ export default function ServicesCards3D() {
                       marginTop: '12px',
                       fontSize: '12px',
                       color: 'rgba(255,255,255,0.4)',
-                      fontFamily: "'DM Sans', sans-serif",
+                      fontFamily: "'Archivo', sans-serif",
                     }}
                   >
                     {isMobile ? 'Swipe left or tap' : 'Click'} to dismiss
@@ -331,7 +331,7 @@ export default function ServicesCards3D() {
               justifyContent: 'center',
               height: '100%',
               color: 'rgba(255,255,255,0.5)',
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Archivo', sans-serif",
               fontSize: '16px',
             }}
           >
@@ -386,7 +386,7 @@ export default function ServicesCards3D() {
           borderRadius: '100px',
           color: '#ffffff',
           fontSize: '14px',
-          fontFamily: "'Nunito', sans-serif",
+          fontFamily: "'Archivo', sans-serif",
           fontWeight: 700,
           cursor: 'pointer',
           transition: 'all 0.3s ease',

@@ -211,7 +211,7 @@ function OSWindow({
             color: '#fff',
             fontSize: '14px',
             fontWeight: 600,
-            fontFamily: "'Nunito', sans-serif",
+            fontFamily: "'Archivo', sans-serif",
             marginRight: '62px',
           }}
         >
@@ -227,7 +227,7 @@ function OSWindow({
           padding: '24px',
           overflowY: 'auto',
           color: '#fff',
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "'Archivo', sans-serif",
         }}
       >
         <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 16px 0' }}>
@@ -238,7 +238,7 @@ function OSWindow({
                 padding: '6px 0',
                 fontSize: '14px',
                 color: 'rgba(255,255,255,0.75)',
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Archivo', sans-serif",
                 fontWeight: 300,
                 borderBottom: '1px solid rgba(255,255,255,0.06)',
               }}
@@ -252,7 +252,7 @@ function OSWindow({
             fontStyle: 'italic',
             color: '#2E9DB5',
             fontSize: '14px',
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "'Archivo', sans-serif",
             marginTop: '16px',
           }}
         >
@@ -396,7 +396,7 @@ export default function ServicesOS() {
               alignItems: 'center',
               padding: '0 16px',
               zIndex: 200,
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Archivo', sans-serif",
               fontSize: '13px',
               color: 'rgba(255,255,255,0.7)',
               gap: '20px',
@@ -469,7 +469,7 @@ export default function ServicesOS() {
               right: '20px',
               color: 'rgba(255,255,255,0.7)',
               fontSize: '14px',
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Archivo', sans-serif",
               fontWeight: 500,
               zIndex: 2,
               background: 'rgba(255,255,255,0.05)',
@@ -502,7 +502,7 @@ export default function ServicesOS() {
                 style={{
                   color: 'rgba(255,255,255,0.5)',
                   fontSize: '11px',
-                  fontFamily: "'DM Sans', sans-serif",
+                  fontFamily: "'Archivo', sans-serif",
                   textAlign: 'center',
                   maxWidth: '80px',
                   textShadow: '0 1px 4px rgba(0,0,0,0.8)',
@@ -578,7 +578,7 @@ export default function ServicesOS() {
                         padding: '4px 10px',
                         borderRadius: '6px',
                         fontSize: '11px',
-                        fontFamily: "'DM Sans', sans-serif",
+                        fontFamily: "'Archivo', sans-serif",
                         whiteSpace: 'nowrap',
                         pointerEvents: 'none',
                         zIndex: 200,

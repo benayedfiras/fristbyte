@@ -49,7 +49,7 @@ function SectionLabel({ label }) {
           color: '#ffffff',
           fontSize: '12px',
           fontWeight: 600,
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "'Archivo', sans-serif",
           letterSpacing: '0.5px',
           pointerEvents: 'auto',
         }}

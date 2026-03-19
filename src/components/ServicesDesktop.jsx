@@ -673,7 +673,7 @@ function InteractiveObject({
             borderRadius: '20px',
             padding: '24px 24px 20px',
             color: '#222',
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "'Archivo', sans-serif",
             position: 'relative',
             boxShadow: '0 8px 30px rgba(0,0,0,0.12)',
             animation: 'deskSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
@@ -711,7 +711,7 @@ function InteractiveObject({
               fontSize: '18px',
               fontWeight: 700,
               marginBottom: '12px',
-              fontFamily: "'Nunito', sans-serif",
+              fontFamily: "'Archivo', sans-serif",
               color: '#2E9DB5',
             }}>
               {service.title}

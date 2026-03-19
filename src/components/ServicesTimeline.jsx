@@ -136,7 +136,7 @@ function CylinderCard({ service, index, frontIndex, onSelect, selectedIndex }) {
               borderRadius: '20px',
               padding: '24px',
               color: '#fff',
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Archivo', sans-serif",
               backdropFilter: 'blur(12px)',
               animation: 'tlFadeIn 0.4s ease-out',
             }}
@@ -173,7 +173,7 @@ function CylinderCard({ service, index, frontIndex, onSelect, selectedIndex }) {
                 fontSize: '17px',
                 fontWeight: 700,
                 marginBottom: '12px',
-                fontFamily: "'Nunito', sans-serif",
+                fontFamily: "'Archivo', sans-serif",
                 color: '#ffffff',
               }}
             >
@@ -186,7 +186,7 @@ function CylinderCard({ service, index, frontIndex, onSelect, selectedIndex }) {
                   style={{
                     padding: '3px 0',
                     fontSize: '13px',
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: "'Archivo', sans-serif",
                     fontWeight: 300,
                     color: 'rgba(255,255,255,0.75)',
                     borderBottom: '1px solid rgba(255,255,255,0.06)',
@@ -198,7 +198,7 @@ function CylinderCard({ service, index, frontIndex, onSelect, selectedIndex }) {
             </ul>
             <p
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Archivo', sans-serif",
                 fontStyle: 'italic',
                 color: '#2E9DB5',
                 fontSize: '13px',
@@ -515,7 +515,7 @@ export default function ServicesTimeline() {
                 style={{
                   color: 'rgba(255,255,255,0.5)',
                   fontSize: '14px',
-                  fontFamily: "'DM Sans', sans-serif",
+                  fontFamily: "'Archivo', sans-serif",
                   alignSelf: 'center',
                 }}
               >
@@ -557,7 +557,7 @@ const navBtnStyle = {
   borderRadius: '100px',
   color: '#ffffff',
   fontSize: '14px',
-  fontFamily: "'Nunito', sans-serif",
+  fontFamily: "'Archivo', sans-serif",
   fontWeight: 700,
   cursor: 'pointer',
   transition: 'all 0.3s ease',

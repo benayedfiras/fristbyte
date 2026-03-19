@@ -585,7 +585,7 @@ export default function ServicesTerminal() {
             borderRadius: '100px',
             color: '#ffffff',
             fontSize: '14px',
-            fontFamily: "'Nunito', sans-serif",
+            fontFamily: "'Archivo', sans-serif",
             fontWeight: 700,
             cursor: 'pointer',
             transition: 'all 0.2s',

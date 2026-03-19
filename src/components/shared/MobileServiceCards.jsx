@@ -39,7 +39,7 @@ function MobileCard({ service, index }) {
         padding: '28px',
         marginBottom: '16px',
         color: '#fff',
-        fontFamily: "'DM Sans', sans-serif",
+        fontFamily: "'Archivo', sans-serif",
         backdropFilter: 'blur(8px)',
       }}
     >
@@ -62,7 +62,7 @@ function MobileCard({ service, index }) {
           style={{
             fontSize: '18px',
             fontWeight: 700,
-            fontFamily: "'Nunito', sans-serif",
+            fontFamily: "'Archivo', sans-serif",
             color: service.color,
             margin: 0,
           }}
@@ -160,7 +160,7 @@ function LightMobileCard({ service, index }) {
         padding: '28px',
         marginBottom: '16px',
         color: '#222',
-        fontFamily: "'DM Sans', sans-serif",
+        fontFamily: "'Archivo', sans-serif",
         boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
       }}
     >
@@ -183,7 +183,7 @@ function LightMobileCard({ service, index }) {
           style={{
             fontSize: '18px',
             fontWeight: 700,
-            fontFamily: "'Nunito', sans-serif",
+            fontFamily: "'Archivo', sans-serif",
             color: service.color,
             margin: 0,
           }}
