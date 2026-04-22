@@ -11,6 +11,7 @@ import ServicesGlobe from './components/ServicesGlobe';
 import ServicesTerminal from './components/ServicesTerminal';
 import ServicesMorphing from './components/ServicesMorphing';
 import ServicesDesktop from './components/ServicesDesktop';
+import ServicesOrbital from './components/ServicesOrbital';
 
 const LABELS = [
   'Option 1: Hex Grid',
@@ -24,6 +25,7 @@ const LABELS = [
   'Option 9: Terminal',
   'Option 10: Morphing Blob',
   'Option 11: Cartoon Desktop',
+  'Option 12: Orbital',
 ];
 
 function SectionLabel({ label }) {
@@ -97,6 +99,9 @@ function App() {
 
       <SectionLabel label={LABELS[10]} />
       <ServicesDesktop />
+
+      <SectionLabel label={LABELS[11]} />
+      <ServicesOrbital />
     </>
   );
 }

@@ -105,9 +105,9 @@ export default function ServicesMap() {
     >
       <SectionHeader
         label="CITY BLUEPRINT"
-        title="Navigate the Service City"
-        description="Hover to raise buildings. Click to explore."
-        accentColor="#2E9DB5"
+        title="Navigate the Service District"
+        description="Every building is a capability. Hover to spotlight, click to explore what's inside."
+        accentColor="#10B981"
       />
 
       {isMobile ? (
@@ -535,92 +535,97 @@ export default function ServicesMap() {
                   onClick={handleClose}
                 />
                 {/* Panel */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    width: '360px',
-                    background: 'rgba(13,27,42,0.92)',
-                    border: `1.5px solid ${svc.color}44`,
-                    borderRadius: '20px',
-                    padding: '28px',
-                    color: '#fff',
-                    fontFamily: "'Archivo', sans-serif",
-                    backdropFilter: 'blur(16px)',
-                    animation: 'panelSlideUp 0.45s cubic-bezier(0.22,1,0.36,1)',
-                    zIndex: 20,
-                    boxShadow: `0 24px 48px rgba(0,0,0,0.4), 0 0 0 1px ${svc.color}22, inset 0 1px 0 rgba(255,255,255,0.05)`,
-                  }}
-                >
-                  <button
-                    onClick={handleClose}
-                    style={{
-                      position: 'absolute',
-                      top: '12px',
-                      right: '16px',
-                      background: svc.color,
-                      border: 'none',
-                      borderRadius: '50%',
-                      color: '#fff',
-                      width: '28px',
-                      height: '28px',
-                      fontSize: '16px',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    ✕
-                  </button>
-                  <div style={{ fontSize: '36px', marginBottom: '8px' }}>
-                    {svc.icon}
-                  </div>
-                  <h3
-                    style={{
-                      fontSize: '18px',
-                      fontWeight: 700,
-                      marginBottom: '14px',
-                      fontFamily: "'Archivo', sans-serif",
-                      color: '#ffffff',
-                    }}
-                  >
-                    {svc.title}
-                  </h3>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 14px 0' }}>
-                    {svc.bullets.map((bul, j) => (
-                      <li
-                        key={j}
-                        style={{
-                          padding: '4px 0',
-                          fontSize: '13px',
-                          fontFamily: "'Archivo', sans-serif",
-                          fontWeight: 300,
-                          color: 'rgba(255,255,255,0.75)',
-                          borderBottom: '1px solid rgba(255,255,255,0.06)',
-                          opacity: 0,
-                          animation: `bulletFadeIn 0.3s ease-out ${0.15 + j * 0.06}s forwards`,
-                        }}
-                      >
-                        — {bul}
-                      </li>
-                    ))}
-                  </ul>
-                  <p
-                    style={{
-                      fontFamily: "'Archivo', sans-serif",
-                      fontStyle: 'italic',
-                      color: svc.color,
-                      fontSize: '13px',
-                      opacity: 0,
-                      animation: 'bulletFadeIn 0.3s ease-out 0.5s forwards',
-                    }}
-                  >
-                    {svc.tagline}
-                  </p>
-                </div>
+                {(() => {
+                  const energy = Math.round(100 - (selectedIndex / 5) * 40);
+                  return (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: '280px',
+                        background: 'rgba(8, 14, 26, 0.95)',
+                        border: `1px solid ${svc.color}35`,
+                        borderRadius: '14px',
+                        padding: 0,
+                        overflow: 'hidden',
+                        color: '#fff',
+                        fontFamily: "'Archivo', sans-serif",
+                        backdropFilter: 'blur(16px)',
+                        animation: 'panelSlideUp 0.45s cubic-bezier(0.22,1,0.36,1)',
+                        zIndex: 20,
+                        boxShadow: `0 24px 48px rgba(0,0,0,0.5), 0 0 0 1px ${svc.color}15`,
+                      }}
+                    >
+                      {/* Accent bar */}
+                      <div style={{ height: '3px', background: `linear-gradient(90deg, ${svc.color}, ${svc.color}60)` }} />
+
+                      {/* Header */}
+                      <div style={{ padding: '16px 16px 12px', position: 'relative' }}>
+                        <button
+                          onClick={handleClose}
+                          style={{
+                            position: 'absolute',
+                            top: '12px',
+                            right: '12px',
+                            background: 'rgba(255,255,255,0.08)',
+                            border: `1px solid ${svc.color}30`,
+                            borderRadius: '50%',
+                            color: 'rgba(255,255,255,0.6)',
+                            width: '22px',
+                            height: '22px',
+                            fontSize: '12px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          ✕
+                        </button>
+                        <div style={{ fontSize: '24px', marginBottom: '6px' }}>{svc.icon}</div>
+                        <h3 style={{ fontSize: '15px', fontWeight: 700, margin: '0 0 4px 0', color: '#fff' }}>{svc.title}</h3>
+                        <p style={{ fontStyle: 'italic', color: svc.color, fontSize: '12px', margin: 0, opacity: 0, animation: 'bulletFadeIn 0.3s ease-out 0.1s forwards' }}>{svc.tagline}</p>
+                      </div>
+
+                      {/* Bullets */}
+                      <div style={{ padding: '0 16px 12px' }}>
+                        {svc.bullets.map((bul, j) => (
+                          <div
+                            key={j}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'flex-start',
+                              gap: '8px',
+                              padding: '6px 0',
+                              fontSize: '12px',
+                              color: 'rgba(255,255,255,0.7)',
+                              lineHeight: 1.4,
+                              borderBottom: j < svc.bullets.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
+                              opacity: 0,
+                              animation: `bulletFadeIn 0.3s ease-out ${0.15 + j * 0.06}s forwards`,
+                            }}
+                          >
+                            <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: svc.color, marginTop: '5px', flexShrink: 0 }} />
+                            {bul}
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Energy bar */}
+                      <div style={{ padding: '12px 16px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                          <span style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)' }}>Capability</span>
+                          <span style={{ fontSize: '10px', fontFamily: 'monospace', color: 'rgba(255,255,255,0.4)' }}>{energy}%</span>
+                        </div>
+                        <div style={{ width: '100%', height: '3px', background: 'rgba(255,255,255,0.08)', borderRadius: '2px', overflow: 'hidden' }}>
+                          <div style={{ height: '100%', width: `${energy}%`, background: `linear-gradient(90deg, ${svc.color}, ${svc.color}80)`, borderRadius: '2px' }} />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
               </>
             );
           })()}

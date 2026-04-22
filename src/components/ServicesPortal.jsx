@@ -493,9 +493,9 @@ export default function ServicesPortal() {
     <section style={{ background: 'linear-gradient(180deg, #0D1B2A 0%, #0A1628 50%, #0D1B2A 100%)', position: 'relative' }}>
       <SectionHeader
         label="PORTAL DOORS"
-        title="Walk Through Our Portals"
-        description="Hover to peek inside. Click to step through."
-        accentColor="#2E9DB5"
+        title="Step Through Each Portal"
+        description="Hover to crack open. Click to walk through. Each door leads to a different capability."
+        accentColor="#EC4899"
       />
 
       {isMobile ? (
@@ -521,106 +521,170 @@ export default function ServicesPortal() {
           </Canvas>
 
           {/* Fixed CSS overlay info panel */}
-          {selected && (
-            <div
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-end',
-                paddingRight: '5%',
-                pointerEvents: 'none',
-                zIndex: 10,
-              }}
-            >
+          {selected && (() => {
+            const energyValue = Math.round(100 - (selectedIndex / 5) * 40);
+            return (
               <div
                 style={{
-                  width: '360px',
-                  background: `linear-gradient(135deg, rgba(13,27,42,0.95), ${selected.color}08)`,
-                  border: `1.5px solid ${selected.color}44`,
-                  borderRadius: '20px',
-                  padding: '28px',
-                  color: '#fff',
-                  fontFamily: "'Archivo', sans-serif",
-                  backdropFilter: 'blur(16px)',
-                  animation: 'portalSlideIn 0.5s cubic-bezier(0.22,1,0.36,1)',
-                  pointerEvents: 'auto',
-                  boxShadow: `0 24px 48px rgba(0,0,0,0.4), 0 0 0 1px ${selected.color}22, inset 0 1px 0 rgba(255,255,255,0.05)`,
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'flex-end',
+                  paddingRight: '5%',
+                  pointerEvents: 'none',
+                  zIndex: 10,
                 }}
               >
-                <button
-                  onClick={() => setSelectedIndex(null)}
+                <div
                   style={{
-                    position: 'absolute',
-                    top: '12px',
-                    right: '16px',
-                    background: selected.color,
-                    border: 'none',
-                    borderRadius: '100px',
+                    width: '260px',
+                    background: 'rgba(8, 14, 26, 0.92)',
+                    backdropFilter: 'blur(16px)',
+                    border: `1px solid ${selected.color}35`,
+                    borderRadius: '14px',
+                    boxShadow: '0 16px 48px rgba(0,0,0,0.5)',
+                    padding: 0,
+                    overflow: 'hidden',
                     color: '#fff',
-                    fontSize: '14px',
-                    cursor: 'pointer',
-                    padding: '6px 14px',
                     fontFamily: "'Archivo', sans-serif",
-                    transition: 'all 0.2s ease',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.opacity = '0.85';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.opacity = '1';
+                    animation: 'portalSlideIn 0.5s cubic-bezier(0.22,1,0.36,1)',
+                    pointerEvents: 'auto',
                   }}
                 >
-                  ← Back
-                </button>
-                <div style={{ fontSize: '36px', marginBottom: '8px' }}>
-                  {selected.icon}
-                </div>
-                <h3
-                  style={{
-                    fontSize: '18px',
-                    fontWeight: 700,
-                    marginBottom: '14px',
-                    fontFamily: "'Archivo', sans-serif",
-                    color: '#ffffff',
-                  }}
-                >
-                  {selected.title}
-                </h3>
-                <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 14px 0' }}>
-                  {selected.bullets.map((b, bi) => (
-                    <li
-                      key={bi}
+                  {/* Top accent bar */}
+                  <div
+                    style={{
+                      height: '3px',
+                      background: `linear-gradient(90deg, ${selected.color}, ${selected.color}60)`,
+                    }}
+                  />
+
+                  {/* Header section */}
+                  <div style={{ padding: '16px' }}>
+                    <div
                       style={{
-                        padding: '4px 0',
-                        fontSize: '13px',
+                        fontSize: '15px',
+                        fontWeight: 700,
+                        color: '#ffffff',
                         fontFamily: "'Archivo', sans-serif",
-                        fontWeight: 300,
-                        color: 'rgba(255,255,255,0.75)',
-                        borderBottom: '1px solid rgba(255,255,255,0.06)',
+                        margin: 0,
+                        lineHeight: 1.3,
                       }}
                     >
-                      — {b}
-                    </li>
-                  ))}
-                </ul>
-                <p
-                  style={{
-                    fontFamily: "'Archivo', sans-serif",
-                    fontStyle: 'italic',
-                    color: selected.color,
-                    fontSize: '13px',
-                  }}
-                >
-                  {selected.tagline}
-                </p>
+                      {selected.title}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: '12px',
+                        fontStyle: 'italic',
+                        color: selected.color,
+                        fontFamily: "'Archivo', sans-serif",
+                        marginTop: '4px',
+                      }}
+                    >
+                      {selected.tagline}
+                    </div>
+                  </div>
+
+                  {/* Bullets section */}
+                  <div style={{ padding: '0 16px 12px' }}>
+                    {selected.bullets.map((b, bi) => (
+                      <div
+                        key={bi}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          padding: '7px 0',
+                          borderBottom: '1px solid rgba(255,255,255,0.05)',
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: '5px',
+                            height: '5px',
+                            borderRadius: '50%',
+                            backgroundColor: selected.color,
+                            flexShrink: 0,
+                          }}
+                        />
+                        <span
+                          style={{
+                            fontSize: '12px',
+                            fontFamily: "'Archivo', sans-serif",
+                            color: 'rgba(255,255,255,0.7)',
+                            lineHeight: 1.4,
+                          }}
+                        >
+                          {b}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Energy bar section */}
+                  <div
+                    style={{
+                      padding: '12px 16px',
+                      borderTop: '1px solid rgba(255,255,255,0.06)',
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: '6px',
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: '10px',
+                          fontFamily: "'Archivo', sans-serif",
+                          color: 'rgba(255,255,255,0.4)',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.5px',
+                        }}
+                      >
+                        Capability
+                      </span>
+                      <span
+                        style={{
+                          fontSize: '10px',
+                          fontFamily: 'monospace',
+                          color: 'rgba(255,255,255,0.4)',
+                        }}
+                      >
+                        {energyValue}%
+                      </span>
+                    </div>
+                    <div
+                      style={{
+                        width: '100%',
+                        height: '3px',
+                        borderRadius: '2px',
+                        background: 'rgba(255,255,255,0.06)',
+                        overflow: 'hidden',
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: `${energyValue}%`,
+                          height: '100%',
+                          borderRadius: '2px',
+                          background: `linear-gradient(90deg, ${selected.color}, ${selected.color}80)`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
         </div>
       )}
 

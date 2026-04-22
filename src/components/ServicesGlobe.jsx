@@ -286,101 +286,153 @@ function GlobeScene() {
       </group>
 
       {/* Info panel */}
-      {selectedIndex !== null && (
-        <Html
-          position={[5, 1, 0]}
-          style={{ pointerEvents: 'auto', width: '320px' }}
-        >
-          <div
-            style={{
-              background: `linear-gradient(135deg, rgba(13,27,42,0.92), ${SERVICES[selectedIndex].color}08)`,
-              border: `1.5px solid ${SERVICES[selectedIndex].color}44`,
-              borderRadius: '20px',
-              padding: '24px',
-              color: '#fff',
-              fontFamily: "'Archivo', sans-serif",
-              backdropFilter: 'blur(12px)',
-              animation: 'globeFadeIn 0.4s ease-out',
-            }}
+      {selectedIndex !== null && (() => {
+        const service = SERVICES[selectedIndex];
+        const energyValue = Math.round(100 - (selectedIndex / 5) * 40);
+        return (
+          <Html
+            position={[5, 1, 0]}
+            style={{ pointerEvents: 'auto', width: '260px' }}
           >
-            <button
-              onClick={() => setSelectedIndex(null)}
-              style={{
-                position: 'absolute',
-                top: '10px',
-                right: '14px',
-                background: SERVICES[selectedIndex].color,
-                border: 'none',
-                borderRadius: '50%',
-                color: '#fff',
-                fontSize: '18px',
-                cursor: 'pointer',
-                width: '32px',
-                height: '32px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: 0,
-              }}
-            >
-              ✕
-            </button>
-            <div style={{ fontSize: '32px', marginBottom: '6px' }}>
-              {SERVICES[selectedIndex].icon}
-            </div>
-            <h3
-              style={{
-                fontSize: '17px',
-                fontWeight: 700,
-                marginBottom: '12px',
-                fontFamily: "'Archivo', sans-serif",
-                color: '#ffffff',
-              }}
-            >
-              {SERVICES[selectedIndex].title}
-            </h3>
-            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 12px 0' }}>
-              {SERVICES[selectedIndex].bullets.map((b, i) => (
-                <li
-                  key={i}
-                  style={{
-                    padding: '3px 0',
-                    fontSize: '12px',
-                    fontFamily: "'Archivo', sans-serif",
-                    fontWeight: 300,
-                    color: 'rgba(255,255,255,0.75)',
-                    borderBottom: '1px solid rgba(255,255,255,0.06)',
-                  }}
-                >
-                  — {b}
-                </li>
-              ))}
-            </ul>
-            <p
-              style={{
-                fontFamily: "'Archivo', sans-serif",
-                fontStyle: 'italic',
-                color: SERVICES[selectedIndex].color,
-                fontSize: '12px',
-              }}
-            >
-              {SERVICES[selectedIndex].tagline}
-            </p>
-
-            {/* Connection line decoration */}
             <div
               style={{
-                position: 'absolute',
-                left: '-40px',
-                top: '50%',
-                width: '40px',
-                height: '1px',
-                background: `linear-gradient(90deg, transparent, ${SERVICES[selectedIndex].color})`,
+                background: 'rgba(8, 14, 26, 0.92)',
+                backdropFilter: 'blur(16px)',
+                border: `1px solid ${service.color}35`,
+                borderRadius: '14px',
+                boxShadow: '0 16px 48px rgba(0,0,0,0.5)',
+                width: '260px',
+                padding: 0,
+                overflow: 'hidden',
+                fontFamily: "'Archivo', sans-serif",
+                animation: 'globeFadeIn 0.4s ease-out',
               }}
-            />
-          </div>
-        </Html>
-      )}
+            >
+              {/* Top accent bar */}
+              <div
+                style={{
+                  height: '3px',
+                  background: `linear-gradient(90deg, ${service.color}, ${service.color}60)`,
+                }}
+              />
+
+              {/* Header section */}
+              <div style={{ padding: '16px' }}>
+                <div
+                  style={{
+                    fontSize: '15px',
+                    fontWeight: 700,
+                    color: '#ffffff',
+                    fontFamily: "'Archivo', sans-serif",
+                    margin: 0,
+                  }}
+                >
+                  {service.title}
+                </div>
+                <div
+                  style={{
+                    fontSize: '12px',
+                    fontStyle: 'italic',
+                    color: service.color,
+                    fontFamily: "'Archivo', sans-serif",
+                    marginTop: '4px',
+                  }}
+                >
+                  {service.tagline}
+                </div>
+              </div>
+
+              {/* Bullets section */}
+              <div style={{ padding: '0 16px 12px' }}>
+                {service.bullets.map((b, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '6px 0',
+                      borderBottom: '1px solid rgba(255,255,255,0.05)',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: '5px',
+                        height: '5px',
+                        borderRadius: '50%',
+                        background: service.color,
+                        flexShrink: 0,
+                      }}
+                    />
+                    <span
+                      style={{
+                        fontSize: '12px',
+                        color: 'rgba(255,255,255,0.7)',
+                        fontFamily: "'Archivo', sans-serif",
+                      }}
+                    >
+                      {b}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Energy bar section */}
+              <div
+                style={{
+                  padding: '12px 16px',
+                  borderTop: '1px solid rgba(255,255,255,0.06)',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '6px',
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: '10px',
+                      color: 'rgba(255,255,255,0.4)',
+                      fontFamily: "'Archivo', sans-serif",
+                    }}
+                  >
+                    Capability
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '10px',
+                      fontFamily: 'monospace',
+                      color: 'rgba(255,255,255,0.4)',
+                    }}
+                  >
+                    {energyValue}%
+                  </span>
+                </div>
+                <div
+                  style={{
+                    width: '100%',
+                    height: '3px',
+                    borderRadius: '2px',
+                    background: 'rgba(255,255,255,0.06)',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: `${energyValue}%`,
+                      height: '100%',
+                      borderRadius: '2px',
+                      background: `linear-gradient(90deg, ${service.color}, ${service.color}80)`,
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          </Html>
+        );
+      })()}
       <Environment preset="city" />
       <PostEffects />
     </>
@@ -402,9 +454,9 @@ export default function ServicesGlobe() {
     <section style={{ background: 'linear-gradient(180deg, #0D1B2A 0%, #0A1628 50%, #0D1B2A 100%)', position: 'relative' }}>
       <SectionHeader
         label="INTERACTIVE GLOBE"
-        title="Services That Span the Globe"
-        description="Spin the globe. Click any pin to explore the service connected to it."
-        accentColor="#2E9DB5"
+        title="Capabilities Without Borders"
+        description="Spin the globe. Click any pin. Every service is mapped and interconnected."
+        accentColor="#06B6D4"
       />
 
       {isMobile ? (

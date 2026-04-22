@@ -86,10 +86,10 @@ export default function ServicesCards3D() {
       }}
     >
       <SectionHeader
-        label="PHYSICAL CARD DECK"
+        label="CARD DECK"
         title="Deal Yourself the Full Stack"
-        description="Flip each card to explore our services. Swipe through the deck to see them all."
-        accentColor="#2E9DB5"
+        description="Flip to reveal. Swipe to discover. Every card holds a capability ready to deploy."
+        accentColor="#8B5CF6"
       />
 
       {/* Card deck area */}
@@ -253,71 +253,77 @@ export default function ServicesCards3D() {
                     backfaceVisibility: 'hidden',
                     transform: 'rotateY(180deg)',
                     borderRadius: '20px',
-                    background: '#1C2E44',
-                    border: `2px solid ${service.color}`,
-                    padding: isMobile ? '24px' : '28px',
+                    background: 'rgba(8, 14, 26, 0.95)',
+                    border: `1px solid ${service.color}35`,
+                    padding: 0,
                     boxSizing: 'border-box',
                     display: 'flex',
                     flexDirection: 'column',
-                    justifyContent: 'center',
-                    boxShadow: `0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)`,
-                    overflow: 'auto',
+                    boxShadow: `0 16px 48px rgba(0,0,0,0.5), 0 0 0 1px ${service.color}15`,
+                    overflow: 'hidden',
                   }}
                 >
-                  <h3
-                    style={{
-                      fontSize: '17px',
-                      fontWeight: 700,
-                      color: '#ffffff',
-                      fontFamily: "'Archivo', sans-serif",
-                      marginBottom: '14px',
-                    }}
-                  >
-                    {service.icon} {service.title}
-                  </h3>
-                  <ul
-                    style={{
-                      listStyle: 'none',
-                      padding: 0,
-                      margin: '0 0 14px 0',
-                    }}
-                  >
-                    {service.bullets.map((b, j) => (
-                      <li
-                        key={j}
-                        style={{
-                          padding: '3px 0',
-                          fontSize: '13px',
-                          color: 'rgba(255,255,255,0.75)',
-                          fontFamily: "'Archivo', sans-serif",
-                          fontWeight: 300,
-                          borderBottom: '1px solid rgba(255,255,255,0.06)',
-                        }}
-                      >
-                        — {b}
-                      </li>
-                    ))}
-                  </ul>
-                  <p
-                    style={{
-                      fontStyle: 'italic',
-                      color: service.color,
-                      fontSize: '13px',
-                      fontFamily: "'Archivo', sans-serif",
-                    }}
-                  >
-                    {service.tagline}
-                  </p>
-                  <p
-                    style={{
-                      marginTop: '12px',
-                      fontSize: '12px',
-                      color: 'rgba(255,255,255,0.4)',
-                      fontFamily: "'Archivo', sans-serif",
-                    }}
-                  >
-                    {isMobile ? 'Swipe left or tap' : 'Click'} to dismiss
-                  </p>
+                  {/* Accent bar */}
+                  <div style={{ height: '3px', background: `linear-gradient(90deg, ${service.color}, ${service.color}60)`, flexShrink: 0 }} />
+
+                  <div style={{ padding: isMobile ? '16px' : '20px', flex: 1, display: 'flex', flexDirection: 'column', overflow: 'auto' }}>
+                    <h3
+                      style={{
+                        fontSize: '15px',
+                        fontWeight: 700,
+                        color: '#ffffff',
+                        fontFamily: "'Archivo', sans-serif",
+                        margin: '0 0 4px 0',
+                      }}
+                    >
+                      {service.icon} {service.title}
+                    </h3>
+                    <p style={{ fontStyle: 'italic', color: service.color, fontSize: '12px', fontFamily: "'Archivo', sans-serif", margin: '0 0 14px 0' }}>
+                      {service.tagline}
+                    </p>
+
+                    <div style={{ flex: 1 }}>
+                      {service.bullets.map((b, j) => (
+                        <div
+                          key={j}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'flex-start',
+                            gap: '8px',
+                            padding: '5px 0',
+                            fontSize: '12px',
+                            color: 'rgba(255,255,255,0.7)',
+                            fontFamily: "'Archivo', sans-serif",
+                            lineHeight: 1.4,
+                            borderBottom: j < service.bullets.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
+                          }}
+                        >
+                          <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: service.color, marginTop: '5px', flexShrink: 0 }} />
+                          {b}
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Energy bar */}
+                    {(() => {
+                      const energy = Math.round(100 - (i / 5) * 40);
+                      return (
+                        <div style={{ marginTop: '12px', paddingTop: '10px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
+                            <span style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', fontFamily: "'Archivo', sans-serif" }}>Capability</span>
+                            <span style={{ fontSize: '10px', fontFamily: 'monospace', color: 'rgba(255,255,255,0.4)' }}>{energy}%</span>
+                          </div>
+                          <div style={{ width: '100%', height: '3px', background: 'rgba(255,255,255,0.08)', borderRadius: '2px', overflow: 'hidden' }}>
+                            <div style={{ height: '100%', width: `${energy}%`, background: `linear-gradient(90deg, ${service.color}, ${service.color}80)`, borderRadius: '2px' }} />
+                          </div>
+                        </div>
+                      );
+                    })()}
+
+                    <p style={{ marginTop: '10px', fontSize: '11px', color: 'rgba(255,255,255,0.3)', fontFamily: "'Archivo', sans-serif", textAlign: 'center' }}>
+                      {isMobile ? 'Swipe left or tap' : 'Click'} to dismiss
+                    </p>
+                  </div>
                 </div>
               </div>
             );

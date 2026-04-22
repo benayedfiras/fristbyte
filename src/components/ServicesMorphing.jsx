@@ -353,10 +353,10 @@ export default function ServicesMorphing() {
     <section style={{ background: 'linear-gradient(180deg, #0D1B2A 0%, #0A1628 50%, #0D1B2A 100%)', position: 'relative' }}>
       {/* Section Header */}
       <SectionHeader
-        label="MORPHING BLOB"
-        title="One Shape, Many Services"
-        description="Watch the blob morph as it cycles through each service. Click a dot to jump to any service."
-        accentColor="#2E9DB5"
+        label="MORPHING SHAPE"
+        title="One Form, Many Functions"
+        description="Watch it morph through each capability. Click any dot to jump. Move your cursor to distort."
+        accentColor="#F43F5E"
       />
 
       <div
@@ -402,55 +402,69 @@ export default function ServicesMorphing() {
         >
           <div
             key={activeIndex}
-            style={{ animation: 'morphFadeIn 0.6s ease-out' }}
+            style={{
+              animation: 'morphFadeIn 0.6s ease-out',
+              background: 'rgba(8, 14, 26, 0.75)',
+              backdropFilter: 'blur(16px)',
+              border: `1px solid ${service.color}25`,
+              borderRadius: '14px',
+              overflow: 'hidden',
+              padding: 0,
+            }}
           >
-            <div
-              style={{
-                fontSize: '40px',
-                marginBottom: '8px',
-                filter: `drop-shadow(0 0 15px ${service.color}66)`,
-              }}
-            >
-              {service.icon}
-            </div>
-            <h3
-              style={{
-                fontSize: isMobile ? '20px' : '24px',
-                fontWeight: 700,
-                fontFamily: "'Archivo', sans-serif",
-                color: service.color,
-                marginBottom: '16px',
-              }}
-            >
-              {service.title}
-            </h3>
-            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 16px 0' }}>
+            {/* Accent bar */}
+            <div style={{ height: '3px', background: `linear-gradient(90deg, ${service.color}, ${service.color}60)` }} />
+
+            <div style={{ padding: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                <div style={{ fontSize: '28px', filter: `drop-shadow(0 0 12px ${service.color}66)` }}>{service.icon}</div>
+                <div>
+                  <h3 style={{ fontSize: isMobile ? '16px' : '18px', fontWeight: 700, fontFamily: "'Archivo', sans-serif", color: '#fff', margin: 0, lineHeight: 1.2 }}>
+                    {service.title}
+                  </h3>
+                  <p style={{ fontStyle: 'italic', color: service.color, fontSize: '12px', margin: '4px 0 0', opacity: 0, animation: `bulletFadeIn 0.4s 0.15s ease-out forwards` }}>
+                    {service.tagline}
+                  </p>
+                </div>
+              </div>
+
               {service.bullets.map((b, i) => (
-                <li
+                <div
                   key={i}
                   style={{
-                    padding: '4px 0',
-                    fontSize: '14px',
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '8px',
+                    padding: '6px 0',
+                    fontSize: '13px',
+                    color: 'rgba(255,255,255,0.7)',
+                    lineHeight: 1.4,
+                    borderBottom: i < service.bullets.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
                     opacity: 0,
-                    borderBottom: '1px solid rgba(255,255,255,0.06)',
-                    animation: `bulletFadeIn 0.4s ${0.2 + i * 0.1}s ease-out forwards`,
+                    animation: `bulletFadeIn 0.4s ${0.2 + i * 0.08}s ease-out forwards`,
                   }}
                 >
-                  — {b}
-                </li>
+                  <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: service.color, marginTop: '6px', flexShrink: 0 }} />
+                  {b}
+                </div>
               ))}
-            </ul>
-            <p
-              style={{
-                fontStyle: 'italic',
-                color: service.color,
-                fontSize: '14px',
-                opacity: 0,
-                animation: `bulletFadeIn 0.4s ${0.2 + service.bullets.length * 0.1}s ease-out forwards`,
-              }}
-            >
-              {service.tagline}
-            </p>
+
+              {/* Energy bar */}
+              {(() => {
+                const energy = Math.round(100 - (activeIndex / 5) * 40);
+                return (
+                  <div style={{ marginTop: '14px', paddingTop: '12px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                      <span style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', fontFamily: "'Archivo', sans-serif" }}>Capability</span>
+                      <span style={{ fontSize: '10px', fontFamily: 'monospace', color: 'rgba(255,255,255,0.4)' }}>{energy}%</span>
+                    </div>
+                    <div style={{ width: '100%', height: '3px', background: 'rgba(255,255,255,0.08)', borderRadius: '2px', overflow: 'hidden' }}>
+                      <div style={{ height: '100%', width: `${energy}%`, background: `linear-gradient(90deg, ${service.color}, ${service.color}80)`, borderRadius: '2px', transition: 'width 0.8s ease' }} />
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
           </div>
         </div>
 

@@ -9,76 +9,86 @@ export default function SectionHeader({ label, title, description, accentColor =
       ref={ref}
       style={{
         textAlign: 'center',
-        padding: '80px 20px 40px',
+        padding: '80px 20px 48px',
         maxWidth: '800px',
         margin: '0 auto',
         position: 'relative',
         zIndex: 5,
       }}
     >
-      <p
+      {/* Label pill */}
+      <div
         style={{
-          color: accentColor,
-          fontSize: '12px',
-          fontWeight: 600,
-          letterSpacing: '0.2em',
-          textTransform: 'uppercase',
-          fontFamily: "'Archivo', sans-serif",
-          marginBottom: '20px',
           display: 'inline-flex',
           alignItems: 'center',
-          gap: '12px',
+          gap: '10px',
+          marginBottom: '24px',
+          padding: '6px 16px',
+          borderRadius: '999px',
+          background: `${accentColor}10`,
+          border: `1px solid ${accentColor}25`,
         }}
       >
         <span
           style={{
             display: 'inline-block',
-            width: '24px',
-            height: '1px',
-            background: `linear-gradient(90deg, transparent, ${accentColor})`,
+            width: '6px',
+            height: '6px',
+            borderRadius: '50%',
+            background: accentColor,
+            boxShadow: `0 0 8px ${accentColor}60`,
           }}
         />
-        {label}
         <span
           style={{
-            display: 'inline-block',
-            width: '24px',
-            height: '1px',
-            background: `linear-gradient(90deg, ${accentColor}, transparent)`,
+            color: accentColor,
+            fontSize: '11px',
+            fontWeight: 700,
+            letterSpacing: '0.15em',
+            textTransform: 'uppercase',
+            fontFamily: "'Archivo', sans-serif",
           }}
-        />
-      </p>
+        >
+          {label}
+        </span>
+      </div>
+
+      {/* Title */}
       <h2
         style={{
           color: dark ? '#ffffff' : '#1a1a2e',
           fontSize: 'clamp(28px, 4vw, 48px)',
           fontWeight: 700,
           fontFamily: "'Archivo', sans-serif",
-          marginBottom: '16px',
-          lineHeight: 1.15,
-          letterSpacing: '-0.02em',
+          marginBottom: '20px',
+          lineHeight: 1.1,
+          letterSpacing: '-0.03em',
         }}
       >
         {title}
       </h2>
+
       {/* Accent line */}
       <div
         style={{
-          width: '48px',
-          height: '3px',
-          background: `linear-gradient(90deg, ${accentColor}, ${accentColor}88)`,
+          width: '40px',
+          height: '2px',
+          background: `linear-gradient(90deg, ${accentColor}, ${accentColor}40)`,
           borderRadius: '2px',
           margin: '0 auto 20px',
         }}
       />
+
+      {/* Description */}
       <p
         style={{
-          color: dark ? 'rgba(255,255,255,0.6)' : '#666666',
-          fontSize: 'clamp(15px, 2vw, 18px)',
+          color: dark ? 'rgba(255,255,255,0.55)' : '#777',
+          fontSize: 'clamp(14px, 1.8vw, 17px)',
           fontFamily: "'Archivo', sans-serif",
-          lineHeight: 1.6,
-          maxWidth: '600px',
+          lineHeight: 1.7,
+          maxWidth: '540px',
           margin: '0 auto',
+          fontWeight: 400,
         }}
       >
         {description}

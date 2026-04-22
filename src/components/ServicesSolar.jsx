@@ -408,22 +408,25 @@ function Planet({
           center
           position={[3, 0, 0]}
           distanceFactor={7}
-          style={{ pointerEvents: 'auto', width: '360px' }}
+          style={{ pointerEvents: 'auto', width: '260px' }}
         >
           <div
             style={{
-              background: 'rgba(13,27,42,0.92)',
-              border: `1.5px solid ${service.color}44`,
-              borderRadius: '20px',
-              padding: '28px',
-              color: '#fff',
+              background: 'rgba(8, 14, 26, 0.92)',
+              backdropFilter: 'blur(16px)',
+              border: `1px solid ${service.color}35`,
+              borderRadius: '14px',
+              boxShadow: '0 16px 48px rgba(0,0,0,0.5)',
+              width: '260px',
+              padding: 0,
+              overflow: 'hidden',
               fontFamily: "'Archivo', sans-serif",
+              color: '#fff',
               position: 'relative',
-              backdropFilter: 'blur(12px)',
-              boxShadow: `0 24px 48px rgba(0,0,0,0.4), 0 0 0 1px ${service.color}22, inset 0 1px 0 rgba(255,255,255,0.05)`,
               animation: 'solarFadeIn 0.4s ease-out',
             }}
           >
+            {/* Close button */}
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -432,72 +435,151 @@ function Planet({
               }}
               style={{
                 position: 'absolute',
-                top: '12px',
-                right: '16px',
-                background: service.color,
-                border: 'none',
-                color: '#fff',
-                fontSize: '16px',
+                top: '10px',
+                right: '10px',
+                background: 'rgba(255,255,255,0.08)',
+                border: `1px solid ${service.color}40`,
+                color: 'rgba(255,255,255,0.6)',
+                fontSize: '12px',
                 cursor: 'pointer',
                 lineHeight: 1,
-                width: '28px',
-                height: '28px',
+                width: '22px',
+                height: '22px',
                 borderRadius: '50%',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                fontFamily: "'Archivo', sans-serif",
+                zIndex: 2,
               }}
             >
               ✕
             </button>
-            <div style={{ fontSize: '36px', marginBottom: '8px' }}>
-              {service.icon}
+
+            {/* Top accent bar */}
+            <div
+              style={{
+                height: '3px',
+                background: `linear-gradient(90deg, ${service.color}, ${service.color}60)`,
+              }}
+            />
+
+            {/* Header section */}
+            <div style={{ padding: '16px' }}>
+              <div
+                style={{
+                  fontSize: '15px',
+                  fontWeight: 700,
+                  color: '#ffffff',
+                  fontFamily: "'Archivo', sans-serif",
+                  marginBottom: '4px',
+                  paddingRight: '24px',
+                }}
+              >
+                {service.title}
+              </div>
+              <div
+                style={{
+                  fontSize: '12px',
+                  fontStyle: 'italic',
+                  color: service.color,
+                  fontFamily: "'Archivo', sans-serif",
+                }}
+              >
+                {service.tagline}
+              </div>
             </div>
-            <h3
-              style={{
-                fontSize: '18px',
-                fontWeight: 700,
-                marginBottom: '14px',
-                fontFamily: "'Archivo', sans-serif",
-                color: '#ffffff',
-              }}
-            >
-              {service.title}
-            </h3>
-            <ul
-              style={{
-                listStyle: 'none',
-                padding: 0,
-                margin: '0 0 14px 0',
-              }}
-            >
+
+            {/* Bullets section */}
+            <div style={{ padding: '0 16px 12px' }}>
               {service.bullets.map((b, i) => (
-                <li
+                <div
                   key={i}
                   style={{
-                    padding: '4px 0',
-                    fontSize: '13px',
-                    fontFamily: "'Archivo', sans-serif",
-                    fontWeight: 300,
-                    color: 'rgba(255,255,255,0.75)',
-                    borderBottom: '1px solid rgba(255,255,255,0.06)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '7px 0',
+                    borderBottom: i < service.bullets.length - 1
+                      ? '1px solid rgba(255,255,255,0.05)'
+                      : 'none',
                   }}
                 >
-                  — {b}
-                </li>
+                  <div
+                    style={{
+                      width: '5px',
+                      height: '5px',
+                      borderRadius: '50%',
+                      background: service.color,
+                      flexShrink: 0,
+                    }}
+                  />
+                  <span
+                    style={{
+                      fontSize: '12px',
+                      color: 'rgba(255,255,255,0.7)',
+                      fontFamily: "'Archivo', sans-serif",
+                    }}
+                  >
+                    {b}
+                  </span>
+                </div>
               ))}
-            </ul>
-            <p
+            </div>
+
+            {/* Energy bar section */}
+            <div
               style={{
-                fontStyle: 'italic',
-                fontFamily: "'Archivo', sans-serif",
-                color: service.color,
-                fontSize: '13px',
-                marginTop: '12px',
+                padding: '12px 16px',
+                borderTop: '1px solid rgba(255,255,255,0.06)',
               }}
             >
-              {service.tagline}
-            </p>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '6px',
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: '10px',
+                    color: 'rgba(255,255,255,0.4)',
+                    fontFamily: "'Archivo', sans-serif",
+                  }}
+                >
+                  Capability
+                </span>
+                <span
+                  style={{
+                    fontSize: '10px',
+                    color: 'rgba(255,255,255,0.4)',
+                    fontFamily: "'Archivo', sans-serif",
+                  }}
+                >
+                  {Math.round(100 - (index / 5) * 40)}%
+                </span>
+              </div>
+              <div
+                style={{
+                  width: '100%',
+                  height: '3px',
+                  background: 'rgba(255,255,255,0.06)',
+                  borderRadius: '2px',
+                  overflow: 'hidden',
+                }}
+              >
+                <div
+                  style={{
+                    width: `${Math.round(100 - (index / 5) * 40)}%`,
+                    height: '100%',
+                    background: `linear-gradient(90deg, ${service.color}, ${service.color}60)`,
+                    borderRadius: '2px',
+                  }}
+                />
+              </div>
+            </div>
           </div>
         </Html>
       )}
@@ -556,11 +638,10 @@ export default function ServicesSolar() {
   return (
     <section style={{ background: 'linear-gradient(180deg, #0D1B2A 0%, #0A1628 50%, #0D1B2A 100%)', position: 'relative' }}>
       <SectionHeader
-        label="THE SOLAR SYSTEM"
-        title="Our Services Orbit Your Success"
-        description="Each service revolves around your core business — connected, balanced, and always in motion."
-        accentColor="#2E9DB5"
-        dark
+        label="SOLAR SYSTEM"
+        title="Services in Perfect Orbit"
+        description="Each capability revolves around your core business — gravitationally bound, always in motion."
+        accentColor="#F59E0B"
       />
 
       {isMobile ? (

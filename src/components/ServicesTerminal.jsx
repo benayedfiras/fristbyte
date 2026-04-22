@@ -215,18 +215,24 @@ export default function ServicesTerminal() {
     setPhase('typing');
 
     const service = SERVICES[idx];
+    const energy = Math.round(100 - (idx / 5) * 40);
+    const barLen = 20;
+    const filled = Math.round((energy / 100) * barLen);
+    const bar = '█'.repeat(filled) + '░'.repeat(barLen - filled);
     const detailLines = [
       `> ${idx + 1}`,
       '',
-      `╔══════════════════════════════════════╗`,
-      `║  ${service.icon}  ${service.title}`,
-      `╚══════════════════════════════════════╝`,
+      `┌─────────────────────────────────────┐`,
+      `│  ${service.icon}  ${service.title}`,
+      `├─────────────────────────────────────┤`,
+      `│  "${service.tagline}"`,
+      `└─────────────────────────────────────┘`,
       '',
-      ...service.bullets.map((b) => `  • ${b}`),
+      ...service.bullets.map((b) => `  ● ${b}`),
       '',
-      `  "${service.tagline}"`,
+      `  Capability  [${bar}] ${energy}%`,
       '',
-      "  Type 'back' or press ESC to return",
+      '  Press ESC to return',
     ];
 
     setLines([]);
@@ -327,10 +333,10 @@ export default function ServicesTerminal() {
 
       {/* Section Header */}
       <SectionHeader
-        label="HACKER TERMINAL"
+        label="COMMAND LINE"
         title="Access the Service Terminal"
-        description="Type 1-6 on your keyboard or click a service to explore."
-        accentColor="#2E9DB5"
+        description="Type a number or click to query. The terminal knows everything we build."
+        accentColor="#22C55E"
       />
 
       {/* Terminal window with ambient glow */}

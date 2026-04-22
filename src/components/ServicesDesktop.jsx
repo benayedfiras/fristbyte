@@ -660,85 +660,96 @@ function InteractiveObject({
       </mesh>
 
       {/* Service detail panel - slides in from side */}
-      {isSelected && (
+      {isSelected && (() => {
+        const energy = Math.round(100 - (serviceIndex / 5) * 40);
+        return (
         <Html
           center
           position={[2.2, 0.5, 0]}
           distanceFactor={5}
-          style={{ pointerEvents: 'auto', width: '340px' }}
+          style={{ pointerEvents: 'auto', width: '280px' }}
         >
           <div style={{
             background: '#ffffff',
-            border: `3px solid ${service.color}`,
-            borderRadius: '20px',
-            padding: '24px 24px 20px',
-            color: '#222',
+            border: `1px solid ${service.color}30`,
+            borderRadius: '14px',
+            padding: 0,
+            overflow: 'hidden',
+            color: '#1a1a2e',
             fontFamily: "'Archivo', sans-serif",
             position: 'relative',
-            boxShadow: '0 8px 30px rgba(0,0,0,0.12)',
+            boxShadow: `0 16px 48px rgba(0,0,0,0.1), 0 0 0 1px ${service.color}10`,
             animation: 'deskSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
           }}>
-            {/* Close button */}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setSelectedIndex(null);
-                document.body.style.cursor = 'auto';
-              }}
-              style={{
-                position: 'absolute',
-                top: '8px',
-                right: '12px',
-                background: service.color,
-                border: 'none',
-                color: '#fff',
-                width: '28px',
-                height: '28px',
-                borderRadius: '50%',
-                fontSize: '16px',
-                fontWeight: 700,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                lineHeight: 1,
-              }}
-            >
-              ✕
-            </button>
-            <div style={{ fontSize: '36px', marginBottom: '6px' }}>{service.icon}</div>
-            <h3 style={{
-              fontSize: '18px',
-              fontWeight: 700,
-              marginBottom: '12px',
-              fontFamily: "'Archivo', sans-serif",
-              color: service.color,
-            }}>
-              {service.title}
-            </h3>
-            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 12px 0' }}>
+            {/* Accent bar */}
+            <div style={{ height: '3px', background: `linear-gradient(90deg, ${service.color}, ${service.color}60)` }} />
+
+            {/* Header */}
+            <div style={{ padding: '16px 16px 12px', position: 'relative' }}>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedIndex(null);
+                  document.body.style.cursor = 'auto';
+                }}
+                style={{
+                  position: 'absolute',
+                  top: '10px',
+                  right: '10px',
+                  background: `${service.color}10`,
+                  border: `1px solid ${service.color}25`,
+                  color: service.color,
+                  width: '22px',
+                  height: '22px',
+                  borderRadius: '50%',
+                  fontSize: '12px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  lineHeight: 1,
+                }}
+              >
+                ✕
+              </button>
+              <div style={{ fontSize: '24px', marginBottom: '6px' }}>{service.icon}</div>
+              <h3 style={{ fontSize: '15px', fontWeight: 700, margin: '0 0 4px 0', color: '#1a1a2e' }}>{service.title}</h3>
+              <p style={{ fontStyle: 'italic', color: service.color, fontSize: '12px', margin: 0 }}>{service.tagline}</p>
+            </div>
+
+            {/* Bullets */}
+            <div style={{ padding: '0 16px 12px' }}>
               {service.bullets.map((b, i) => (
-                <li key={i} style={{
-                  padding: '4px 0',
-                  fontSize: '13px',
-                  color: '#444',
-                  borderBottom: '1px solid #f0f0f0',
+                <div key={i} style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '8px',
+                  padding: '6px 0',
+                  fontSize: '12px',
+                  color: '#555',
+                  lineHeight: 1.4,
+                  borderBottom: i < service.bullets.length - 1 ? '1px solid #f0f0f0' : 'none',
                 }}>
-                  — {b}
-                </li>
+                  <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: service.color, marginTop: '5px', flexShrink: 0 }} />
+                  {b}
+                </div>
               ))}
-            </ul>
-            <p style={{
-              fontStyle: 'italic',
-              color: service.color,
-              fontSize: '13px',
-              fontWeight: 600,
-            }}>
-              {service.tagline}
-            </p>
+            </div>
+
+            {/* Energy bar */}
+            <div style={{ padding: '12px 16px', borderTop: '1px solid #f0f0f0' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                <span style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#999' }}>Capability</span>
+                <span style={{ fontSize: '10px', fontFamily: 'monospace', color: '#999' }}>{energy}%</span>
+              </div>
+              <div style={{ width: '100%', height: '3px', background: '#f0f0f0', borderRadius: '2px', overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${energy}%`, background: `linear-gradient(90deg, ${service.color}, ${service.color}80)`, borderRadius: '2px' }} />
+              </div>
+            </div>
           </div>
         </Html>
-      )}
+        );
+      })()}
     </group>
   );
 }
@@ -1079,10 +1090,10 @@ export default function ServicesDesktop() {
   return (
     <section style={{ background: '#FFF5E6', position: 'relative' }}>
       <SectionHeader
-        label="OUR CONNECTED ECOSYSTEM"
-        title="Everything Your Business Needs Connected."
-        description="From brand to backend, from traffic to automation, our services work together as one scalable system."
-        accentColor="#2E9DB5"
+        label="THE WORKSHOP"
+        title="A Desk Full of Possibilities"
+        description="Click any object on the desk to discover the service behind it. The penguin is watching."
+        accentColor="#F97316"
         dark={false}
       />
 

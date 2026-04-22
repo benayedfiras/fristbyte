@@ -339,110 +339,195 @@ function HexPrism({
       </Text>
 
       {/* Detail panel on selected */}
-      {isSelected && (
-        <Html
-          ref={htmlRef}
-          center
-          position={[0, 0, 0.3]}
-          distanceFactor={4}
-          style={{
-            pointerEvents: 'auto',
-            width: '360px',
-          }}
-        >
-          <div
+      {isSelected && (() => {
+        const capability = Math.round(100 - (index / 5) * 40);
+        return (
+          <Html
+            ref={htmlRef}
+            center
+            position={[0, 0, 0.3]}
+            distanceFactor={4}
             style={{
-              background: 'rgba(13,27,42,0.92)',
-              border: `1.5px solid ${service.color}44`,
-              borderRadius: '20px',
-              padding: '32px',
-              color: '#fff',
-              fontFamily: "'Archivo', sans-serif",
-              position: 'relative',
-              backdropFilter: 'blur(12px)',
-              boxShadow: `0 24px 48px rgba(0,0,0,0.4), 0 0 0 1px ${service.color}22, inset 0 1px 0 rgba(255,255,255,0.05)`,
-              animation: 'fadeIn 0.4s ease-out',
+              pointerEvents: 'auto',
+              width: '260px',
             }}
           >
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setSelectedIndex(null);
-                document.body.style.cursor = 'auto';
-              }}
+            <div
               style={{
-                position: 'absolute',
-                top: '12px',
-                right: '16px',
-                background: service.color,
-                border: 'none',
+                background: 'rgba(8, 14, 26, 0.92)',
+                border: `1px solid ${service.color}35`,
+                borderRadius: '14px',
                 color: '#fff',
-                fontSize: '16px',
-                cursor: 'pointer',
-                lineHeight: 1,
-                width: '28px',
-                height: '28px',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              ✕
-            </button>
-            <div style={{ fontSize: '40px', marginBottom: '8px' }}>
-              {service.icon}
-            </div>
-            <h3
-              style={{
-                fontSize: '20px',
-                fontWeight: 700,
-                marginBottom: '16px',
                 fontFamily: "'Archivo', sans-serif",
-                color: '#ffffff',
+                position: 'relative',
+                backdropFilter: 'blur(16px)',
+                boxShadow: `0 16px 48px rgba(0,0,0,0.5), 0 0 0 1px ${service.color}15`,
+                animation: 'fadeIn 0.4s ease-out',
+                overflow: 'hidden',
+                maxWidth: '260px',
               }}
             >
-              {service.title}
-            </h3>
-            <ul
-              style={{
-                listStyle: 'none',
-                padding: 0,
-                margin: '0 0 16px 0',
-              }}
-            >
-              {service.bullets.map((b, i) => (
-                <li
-                  key={i}
+              {/* Colored top accent bar */}
+              <div
+                style={{
+                  height: '3px',
+                  background: `linear-gradient(90deg, ${service.color}, ${service.color}66)`,
+                  width: '100%',
+                }}
+              />
+
+              {/* Header section */}
+              <div style={{ padding: '16px 16px 12px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedIndex(null);
+                    document.body.style.cursor = 'auto';
+                  }}
                   style={{
-                    padding: '4px 0',
-                    fontSize: '14px',
-                    fontFamily: "'Archivo', sans-serif",
-                    fontWeight: 300,
-                    color: 'rgba(255,255,255,0.75)',
-                    borderBottom: '1px solid rgba(255,255,255,0.06)',
-                    borderLeft: `2px solid ${service.color}44`,
-                    paddingLeft: '8px',
+                    position: 'absolute',
+                    top: '10px',
+                    right: '12px',
+                    background: 'rgba(255,255,255,0.08)',
+                    border: `1px solid ${service.color}30`,
+                    color: 'rgba(255,255,255,0.6)',
+                    fontSize: '12px',
+                    cursor: 'pointer',
+                    lineHeight: 1,
+                    width: '22px',
+                    height: '22px',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                   }}
                 >
-                  {b}
-                </li>
-              ))}
-            </ul>
-            <p
-              style={{
-                fontStyle: 'italic',
-                fontFamily: "'Archivo', sans-serif",
-                color: service.color,
-                fontSize: '14px',
-                marginTop: '12px',
-              }}
-            >
-              {service.tagline}
-            </p>
-          </div>
-        </Html>
-      )}
+                  ✕
+                </button>
+                <div style={{ fontSize: '28px', marginBottom: '6px' }}>
+                  {service.icon}
+                </div>
+                <h3
+                  style={{
+                    fontSize: '15px',
+                    fontWeight: 700,
+                    margin: '0 0 4px 0',
+                    fontFamily: "'Archivo', sans-serif",
+                    color: '#ffffff',
+                  }}
+                >
+                  {service.title}
+                </h3>
+                <p
+                  style={{
+                    fontStyle: 'italic',
+                    fontFamily: "'Archivo', sans-serif",
+                    color: service.color,
+                    fontSize: '12px',
+                    margin: 0,
+                  }}
+                >
+                  {service.tagline}
+                </p>
+              </div>
+
+              {/* Bullets section */}
+              <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                <ul
+                  style={{
+                    listStyle: 'none',
+                    padding: 0,
+                    margin: 0,
+                  }}
+                >
+                  {service.bullets.map((b, i) => (
+                    <li
+                      key={i}
+                      style={{
+                        padding: '6px 0',
+                        fontSize: '12px',
+                        fontFamily: "'Archivo', sans-serif",
+                        fontWeight: 400,
+                        color: 'rgba(255,255,255,0.7)',
+                        borderBottom: i < service.bullets.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: '8px',
+                        lineHeight: 1.4,
+                      }}
+                    >
+                      <span
+                        style={{
+                          width: '5px',
+                          height: '5px',
+                          minWidth: '5px',
+                          borderRadius: '50%',
+                          background: service.color,
+                          marginTop: '4px',
+                        }}
+                      />
+                      <span>{b}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Energy bar section */}
+              <div style={{ padding: '12px 16px 14px 16px' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '6px',
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: '10px',
+                      fontFamily: "'Archivo', sans-serif",
+                      fontWeight: 600,
+                      color: 'rgba(255,255,255,0.45)',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                    }}
+                  >
+                    Capability
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '11px',
+                      fontFamily: "'Archivo', sans-serif",
+                      fontWeight: 700,
+                      color: service.color,
+                    }}
+                  >
+                    {capability}%
+                  </span>
+                </div>
+                <div
+                  style={{
+                    width: '100%',
+                    height: '3px',
+                    background: 'rgba(255,255,255,0.06)',
+                    borderRadius: '2px',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: `${capability}%`,
+                      height: '100%',
+                      background: `linear-gradient(90deg, ${service.color}, ${service.color}99)`,
+                      borderRadius: '2px',
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          </Html>
+        );
+      })()}
     </group>
   );
 }
@@ -548,11 +633,10 @@ export default function ServicesSection() {
   return (
     <section ref={sectionRef} style={{ background: 'linear-gradient(180deg, #0D1B2A 0%, #0A1628 50%, #0D1B2A 100%)', position: 'relative' }}>
       <SectionHeader
-        label="OUR CONNECTED ECOSYSTEM"
-        title="Everything Your Business Needs Connected."
-        description="From brand to backend, from traffic to automation, our services work together as one scalable system."
-        accentColor="#2E9DB5"
-        dark
+        label="HEXAGONAL GRID"
+        title="A Connected Ecosystem of Services"
+        description="Six interlocking capabilities, one unified system — hover to explore, click to dive deep."
+        accentColor="#3B82F6"
       />
 
       {/* 3D Canvas or Mobile Cards */}

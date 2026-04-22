@@ -21,6 +21,7 @@ function Clock() {
 function OSWindow({
   win,
   service,
+  index,
   onClose,
   onMinimize,
   onMaximize,
@@ -223,41 +224,49 @@ function OSWindow({
       <div
         style={{
           flex: 1,
-          background: '#1C2E44',
-          padding: '24px',
+          background: 'rgba(8, 14, 26, 0.95)',
+          padding: '20px',
           overflowY: 'auto',
           color: '#fff',
           fontFamily: "'Archivo', sans-serif",
         }}
       >
-        <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 16px 0' }}>
-          {service.bullets.map((b, j) => (
-            <li
-              key={j}
-              style={{
-                padding: '6px 0',
-                fontSize: '14px',
-                color: 'rgba(255,255,255,0.75)',
-                fontFamily: "'Archivo', sans-serif",
-                fontWeight: 300,
-                borderBottom: '1px solid rgba(255,255,255,0.06)',
-              }}
-            >
-              — {b}
-            </li>
-          ))}
-        </ul>
-        <p
-          style={{
-            fontStyle: 'italic',
-            color: service.color,
-            fontSize: '14px',
-            fontFamily: "'Archivo', sans-serif",
-            marginTop: '16px',
-          }}
-        >
+        <p style={{ fontStyle: 'italic', color: service.color, fontSize: '12px', margin: '0 0 16px 0', lineHeight: 1.4 }}>
           {service.tagline}
         </p>
+        {service.bullets.map((b, j) => (
+          <div
+            key={j}
+            style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '10px',
+              padding: '7px 0',
+              fontSize: '13px',
+              color: 'rgba(255,255,255,0.7)',
+              lineHeight: 1.4,
+              borderBottom: j < service.bullets.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
+            }}
+          >
+            <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: service.color, marginTop: '6px', flexShrink: 0 }} />
+            {b}
+          </div>
+        ))}
+        {/* Energy bar */}
+        {(() => {
+          const energy = Math.round(100 - (index / 5) * 40);
+          return (
+            <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                <span style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)' }}>Capability</span>
+                <span style={{ fontSize: '10px', fontFamily: 'monospace', color: 'rgba(255,255,255,0.4)' }}>{energy}%</span>
+              </div>
+              <div style={{ width: '100%', height: '3px', background: 'rgba(255,255,255,0.08)', borderRadius: '2px', overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${energy}%`, background: `linear-gradient(90deg, ${service.color}, ${service.color}80)`, borderRadius: '2px' }} />
+              </div>
+            </div>
+          );
+        })()}
       </div>
     </div>
   );
@@ -362,10 +371,10 @@ export default function ServicesOS() {
       }}
     >
       <SectionHeader
-        label="THE DESKTOP EXPERIENCE"
+        label="DESKTOP OS"
         title="Your Business Operating System"
-        description="Click the dock icons to explore each service. Drag, stack, and manage windows like a real desktop."
-        accentColor="#2E9DB5"
+        description="Launch apps from the dock. Drag and stack windows. Every service runs like native software."
+        accentColor="#6366F1"
       />
 
       {isMobile ? (
@@ -521,6 +530,7 @@ export default function ServicesOS() {
                 key={win.id}
                 win={win}
                 service={SERVICES[win.serviceIndex]}
+                index={win.serviceIndex}
                 onClose={closeWindow}
                 onMinimize={minimizeWindow}
                 onMaximize={() => {}}

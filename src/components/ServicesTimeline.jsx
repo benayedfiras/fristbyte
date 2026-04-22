@@ -122,94 +122,155 @@ function CylinderCard({ service, index, frontIndex, onSelect, selectedIndex }) {
       </Text>
 
       {/* Detail panel for selected front card */}
-      {isSelected && isFront && (
-        <Html
-          center
-          position={[0, -0.2, 0.5]}
-          distanceFactor={6}
-          style={{ pointerEvents: 'auto', width: '340px' }}
-        >
-          <div
-            style={{
-              background: 'rgba(13,27,42,0.92)',
-              border: `1.5px solid ${service.color}44`,
-              borderRadius: '20px',
-              padding: '24px',
-              color: '#fff',
-              fontFamily: "'Archivo', sans-serif",
-              backdropFilter: 'blur(12px)',
-              animation: 'tlFadeIn 0.4s ease-out',
-              boxShadow: `0 24px 48px rgba(0,0,0,0.4), 0 0 0 1px ${service.color}22`,
-            }}
+      {isSelected && isFront && (() => {
+        const energyValue = Math.round(100 - (index / 5) * 40);
+        return (
+          <Html
+            center
+            position={[0, -0.2, 0.5]}
+            distanceFactor={6}
+            style={{ pointerEvents: 'auto', width: '260px' }}
           >
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onSelect(null);
-              }}
+            <div
+              onClick={(e) => e.stopPropagation()}
               style={{
-                position: 'absolute',
-                top: '10px',
-                right: '14px',
-                background: service.color,
-                border: 'none',
-                borderRadius: '50%',
-                color: '#fff',
-                width: '28px',
-                height: '28px',
-                fontSize: '16px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              ✕
-            </button>
-            <div style={{ fontSize: '32px', marginBottom: '6px' }}>
-              {service.icon}
-            </div>
-            <h3
-              style={{
-                fontSize: '17px',
-                fontWeight: 700,
-                marginBottom: '12px',
+                background: 'rgba(8, 14, 26, 0.92)',
+                backdropFilter: 'blur(16px)',
+                border: `1px solid ${service.color}35`,
+                borderRadius: '14px',
+                boxShadow: '0 16px 48px rgba(0,0,0,0.5)',
+                width: '260px',
+                padding: 0,
+                overflow: 'hidden',
                 fontFamily: "'Archivo', sans-serif",
-                color: '#ffffff',
+                animation: 'tlFadeIn 0.4s ease-out',
               }}
             >
-              {service.title}
-            </h3>
-            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 12px 0' }}>
-              {service.bullets.map((b, i) => (
-                <li
-                  key={i}
+              {/* Top accent bar */}
+              <div
+                style={{
+                  height: '3px',
+                  background: `linear-gradient(90deg, ${service.color}, ${service.color}60)`,
+                }}
+              />
+
+              {/* Header section */}
+              <div style={{ padding: '16px' }}>
+                <div
                   style={{
-                    padding: '3px 0',
-                    fontSize: '13px',
+                    fontSize: '15px',
+                    fontWeight: 700,
+                    color: '#ffffff',
                     fontFamily: "'Archivo', sans-serif",
-                    fontWeight: 300,
-                    color: 'rgba(255,255,255,0.75)',
-                    borderBottom: '1px solid rgba(255,255,255,0.06)',
+                    margin: 0,
                   }}
                 >
-                  — {b}
-                </li>
-              ))}
-            </ul>
-            <p
-              style={{
-                fontFamily: "'Archivo', sans-serif",
-                fontStyle: 'italic',
-                color: service.color,
-                fontSize: '13px',
-              }}
-            >
-              {service.tagline}
-            </p>
-          </div>
-        </Html>
-      )}
+                  {service.title}
+                </div>
+                <div
+                  style={{
+                    fontSize: '12px',
+                    fontStyle: 'italic',
+                    color: service.color,
+                    fontFamily: "'Archivo', sans-serif",
+                    marginTop: '4px',
+                  }}
+                >
+                  {service.tagline}
+                </div>
+              </div>
+
+              {/* Bullets section */}
+              <div style={{ padding: '0 16px 12px' }}>
+                {service.bullets.map((b, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '6px 0',
+                      borderBottom: '1px solid rgba(255,255,255,0.05)',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: '5px',
+                        height: '5px',
+                        borderRadius: '50%',
+                        background: service.color,
+                        flexShrink: 0,
+                      }}
+                    />
+                    <span
+                      style={{
+                        fontSize: '12px',
+                        color: 'rgba(255,255,255,0.7)',
+                        fontFamily: "'Archivo', sans-serif",
+                      }}
+                    >
+                      {b}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Energy bar section */}
+              <div
+                style={{
+                  padding: '12px 16px',
+                  borderTop: '1px solid rgba(255,255,255,0.06)',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '6px',
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: '10px',
+                      color: 'rgba(255,255,255,0.4)',
+                      fontFamily: "'Archivo', sans-serif",
+                    }}
+                  >
+                    Capability
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '10px',
+                      color: 'rgba(255,255,255,0.4)',
+                      fontFamily: "'Archivo', monospace",
+                    }}
+                  >
+                    {energyValue}%
+                  </span>
+                </div>
+                <div
+                  style={{
+                    height: '3px',
+                    borderRadius: '2px',
+                    background: 'rgba(255,255,255,0.06)',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <div
+                    style={{
+                      height: '100%',
+                      width: `${energyValue}%`,
+                      borderRadius: '2px',
+                      background: `linear-gradient(90deg, ${service.color}, ${service.color}80)`,
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          </Html>
+        );
+      })()}
     </group>
   );
 }
@@ -461,10 +522,10 @@ export default function ServicesTimeline() {
   return (
     <section style={{ background: 'linear-gradient(180deg, #0D1B2A 0%, #0A1628 50%, #0D1B2A 100%)', position: 'relative' }}>
       <SectionHeader
-        label="CYLINDER TIMELINE"
+        label="ROTATING CYLINDER"
         title="Spin Through Our Services"
-        description="Drag to rotate the cylinder. Click the front card to explore."
-        accentColor="#2E9DB5"
+        description="Drag to rotate. Click the front card to expand. Momentum carries you through."
+        accentColor="#2DD4BF"
       />
 
       {isMobile ? (
